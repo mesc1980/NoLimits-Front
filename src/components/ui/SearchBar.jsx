@@ -1,0 +1,68 @@
+/**
+ * components/ui/SearchBar.jsx — Español neutro.
+ */
+
+import { useState }      from 'react';
+import { useNavigate }   from 'react-router-dom';
+import { Search }        from 'lucide-react';
+import PropTypes         from 'prop-types';
+import { SEARCH_TABS }   from '@/utils/constants';
+
+function SearchBar({ initialQuery = '', initialType = 'all', onSearch, compact = false }) {
+  const [query, setQuery]     = useState(initialQuery);
+  const [activeType, setType] = useState(initialType);
+  const navigate              = useNavigate();
+
+  function handleSubmit(e) {
+    e.preventDefault();
+    if (!query.trim()) return;
+    if (onSearch) onSearch(query, activeType);
+    navigate(`/search?q=${encodeURIComponent(query.trim())}&type=${activeType}`);
+  }
+
+  return (
+    <form className="nl-searchbar" onSubmit={handleSubmit} role="search">
+      <div className="nl-searchbar__input-wrap">
+        <Search size={20} className="nl-searchbar__icon" aria-hidden="true" />
+        <input
+          type="search"
+          className="nl-searchbar__input"
+          placeholder="Busca cualquier película, libro, juego, anime…"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          aria-label="Buscar obras"
+          autoComplete="off"
+        />
+        {query && (
+          <span className="nl-searchbar__hint" aria-hidden="true">↵ buscar</span>
+        )}
+      </div>
+
+      {!compact && (
+        <div className="nl-searchbar__tabs" role="tablist" aria-label="Filtrar por tipo">
+          {SEARCH_TABS.map((tab) => (
+            <button
+              key={tab.id}
+              type="button"
+              role="tab"
+              aria-selected={activeType === tab.id}
+              className={`nl-searchbar__tab ${activeType === tab.id ? 'nl-searchbar__tab--active' : ''}`}
+              onClick={() => setType(tab.id)}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+      )}
+    </form>
+  );
+}
+
+SearchBar.propTypes = {
+  initialQuery: PropTypes.string,
+  initialType:  PropTypes.string,
+  onSearch:     PropTypes.func,
+  compact:      PropTypes.bool,
+};
+
+export default SearchBar;

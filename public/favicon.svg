@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <!-- Isotipo no/limits: "n/l" compacto sobre fondo oscuro -->
+  <rect width="64" height="64" rx="12" fill="#0A0A0B"/>
+  <!-- "n" -->
+  <text x="6" y="46" font-family="Arial, sans-serif" font-weight="700"
+        font-size="36" fill="#FAFAFA">n</text>
+  <!-- "/" en acento rojo -->
+  <text x="30" y="46" font-family="Arial, sans-serif" font-weight="700"
+        font-size="36" fill="#FF4D4D">/</text>
+  <!-- "l" -->
+  <text x="44" y="46" font-family="Arial, sans-serif" font-weight="700"
+        font-size="36" fill="#FAFAFA">l</text>
+</svg>

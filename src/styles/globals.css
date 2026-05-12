@@ -1,0 +1,165 @@
+/**
+ * globals.css — Reset de CSS y estilos tipográficos base de no/limits.
+ * Importado una sola vez en main.jsx, después de tokens.css.
+ *
+ * Fuentes cargadas vía @fontsource (self-hosted, sin CDN externo):
+ *   - Geist (display)
+ *   - Inter (UI)
+ *   - JetBrains Mono (técnica)
+ */
+
+/* Reset box-model */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  font-family: var(--font-ui);
+  font-size: var(--text-body-size);
+  line-height: var(--text-body-lh);
+  font-weight: var(--text-body-weight);
+  background-color: var(--nl-bg-base);
+  color: var(--nl-text-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  min-height: 100vh;
+  transition: background-color var(--duration-state) var(--ease-standard),
+              color var(--duration-state) var(--ease-standard);
+}
+
+/* Elementos multimedia no desbordan su contenedor */
+img,
+picture,
+video,
+canvas,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+/* Herencia de fuente en formularios */
+input,
+button,
+textarea,
+select {
+  font: inherit;
+}
+
+/* Evita desbordamientos por texto largo */
+p,
+h1, h2, h3, h4, h5, h6 {
+  overflow-wrap: break-word;
+}
+
+/* Links sin decoración base */
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* Botón sin estilos de agente */
+button {
+  cursor: pointer;
+  background: none;
+  border: none;
+}
+
+/* Listas sin bullets */
+ul, ol {
+  list-style: none;
+}
+
+/* ============================================================
+   CLASES UTILITARIAS DE TIPOGRAFÍA
+============================================================ */
+
+.text-display-xl {
+  font-family: var(--font-display);
+  font-size: var(--text-display-xl-size);
+  line-height: var(--text-display-xl-lh);
+  font-weight: var(--text-display-xl-weight);
+  letter-spacing: var(--text-display-xl-tracking);
+}
+
+.text-display-lg {
+  font-family: var(--font-display);
+  font-size: var(--text-display-lg-size);
+  line-height: var(--text-display-lg-lh);
+  font-weight: var(--text-display-lg-weight);
+  letter-spacing: var(--text-display-lg-tracking);
+}
+
+.text-heading-md {
+  font-family: var(--font-display);
+  font-size: var(--text-heading-md-size);
+  line-height: var(--text-heading-md-lh);
+  font-weight: var(--text-heading-md-weight);
+  letter-spacing: var(--text-heading-md-tracking);
+}
+
+.text-body {
+  font-size: var(--text-body-size);
+  line-height: var(--text-body-lh);
+}
+
+.text-caption {
+  font-size: var(--text-caption-size);
+  line-height: var(--text-caption-lh);
+  color: var(--nl-text-muted);
+}
+
+.text-mono {
+  font-family: var(--font-mono);
+  font-size: var(--text-caption-size);
+  line-height: var(--text-caption-lh);
+}
+
+/* ============================================================
+   LAYOUT HELPERS
+============================================================ */
+
+/* Contenedor centrado con padding lateral */
+.container {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 0 var(--space-6);
+  width: 100%;
+}
+
+/* Divider horizontal */
+.divider {
+  height: 1px;
+  background-color: var(--nl-border);
+  border: none;
+}
+
+/* ============================================================
+   SCROLLBAR personalizada
+============================================================ */
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--nl-bg-base);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--nl-border);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--nl-text-muted);
+}

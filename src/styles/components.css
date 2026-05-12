@@ -1,0 +1,695 @@
+/**
+ * components.css — Estilos base de componentes UI de no/limits.
+ * Usa exclusivamente CSS custom properties definidas en tokens.css.
+ * Clases con prefijo nl- para evitar colisiones globales.
+ *
+ * Secciones:
+ *  1. Button
+ *  2. Badge
+ *  3. SkeletonCard
+ *  4. SearchBar
+ *  5. Modal
+ *  6. Cards (Media, Anime, Book)
+ *  7. Header
+ *  8. Footer
+ *  9. Hero
+ * 10. ContentSection
+ * 11. Grid de cards
+ */
+
+/* ============================================================
+   1. BUTTON — brandbook §07.2
+   Sin gradientes. Sin sombras. Sin bordes extremos.
+============================================================ */
+
+.nl-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  border-radius: var(--radius-btn);
+  font-family: var(--font-ui);
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  outline: none;
+  white-space: nowrap;
+  transition:
+    background-color var(--duration-hover) var(--ease-standard),
+    color            var(--duration-hover) var(--ease-standard),
+    opacity          var(--duration-hover) var(--ease-standard),
+    transform        var(--duration-hover) var(--ease-standard);
+}
+
+.nl-btn:focus-visible {
+  outline: 2px solid var(--nl-accent);
+  outline-offset: 2px;
+}
+
+.nl-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.nl-btn:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+/* Tamaños */
+.nl-btn--sm { height: 32px; padding: 0 var(--space-3); font-size: 13px; }
+.nl-btn--md { height: 40px; padding: 0 var(--space-4); font-size: 14px; }
+.nl-btn--lg { height: 48px; padding: 0 var(--space-6); font-size: 15px; }
+
+/* Variantes */
+.nl-btn--primary {
+  background-color: var(--nl-accent);
+  color: #fff;
+}
+.nl-btn--primary:hover:not(:disabled) {
+  background-color: var(--nl-accent-hover);
+}
+
+.nl-btn--secondary {
+  background-color: var(--nl-bg-subtle);
+  color: var(--nl-text-primary);
+}
+.nl-btn--secondary:hover:not(:disabled) {
+  background-color: var(--nl-border);
+}
+
+.nl-btn--ghost {
+  background-color: transparent;
+  color: var(--nl-text-secondary);
+}
+.nl-btn--ghost:hover:not(:disabled) {
+  color: var(--nl-text-primary);
+}
+
+.nl-btn--destructive {
+  background-color: transparent;
+  color: var(--nl-format-movie);
+}
+.nl-btn--destructive:hover:not(:disabled) {
+  background-color: var(--nl-format-movie-bg);
+}
+
+/* ============================================================
+   2. BADGE — chips de tipo de obra · brandbook §04.3
+   Solo en elementos pequeños. Fondo al 15% de opacidad.
+============================================================ */
+
+.nl-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-badge);
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  line-height: 1.4;
+}
+
+.nl-badge--movie   { color: var(--nl-format-movie);  background: var(--nl-format-movie-bg); }
+.nl-badge--series  { color: var(--nl-format-series); background: var(--nl-format-series-bg); }
+.nl-badge--book    { color: var(--nl-format-book);   background: var(--nl-format-book-bg); }
+.nl-badge--music   { color: var(--nl-format-music);  background: var(--nl-format-music-bg); }
+.nl-badge--game    { color: var(--nl-format-game);   background: var(--nl-format-game-bg); }
+.nl-badge--anime   { color: var(--nl-format-anime);  background: var(--nl-format-anime-bg); }
+
+/* Badge de rating — siempre en acento de marca */
+.nl-badge--rating {
+  color: var(--nl-accent);
+  background: transparent;
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0;
+  padding: 0;
+}
+
+/* ============================================================
+   3. SKELETON CARD — brandbook §09: shimmer 1.5s ∞
+============================================================ */
+
+.nl-skeleton-card {
+  background-color: var(--nl-bg-elevated);
+  border-radius: var(--radius-card);
+  overflow: hidden;
+}
+
+.nl-skeleton-card__poster {
+  aspect-ratio: var(--aspect-poster);
+  width: 100%;
+}
+
+.nl-skeleton-card__body {
+  padding: var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.nl-skeleton-card__line {
+  height: 14px;
+  border-radius: 4px;
+}
+
+.nl-skeleton-card__line--short { width: 60%; }
+
+/* ============================================================
+   4. SEARCH BAR
+============================================================ */
+
+.nl-searchbar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  width: 100%;
+}
+
+.nl-searchbar__input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.nl-searchbar__icon {
+  position: absolute;
+  left: var(--space-4);
+  color: var(--nl-text-muted);
+  pointer-events: none;
+}
+
+.nl-searchbar__input {
+  width: 100%;
+  height: 52px;
+  background-color: var(--nl-bg-elevated);
+  border: 1px solid var(--nl-border);
+  border-radius: var(--radius-input);
+  color: var(--nl-text-primary);
+  font-size: var(--text-body-size);
+  padding: 0 var(--space-4) 0 52px;
+  outline: none;
+  transition: border-color var(--duration-hover) var(--ease-standard);
+}
+
+.nl-searchbar__input::placeholder {
+  color: var(--nl-text-muted);
+}
+
+.nl-searchbar__input:focus {
+  border-color: var(--nl-accent);
+}
+
+.nl-searchbar__hint {
+  position: absolute;
+  right: var(--space-4);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--nl-text-muted);
+}
+
+/* Tabs de tipo */
+.nl-searchbar__tabs {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.nl-searchbar__tab {
+  height: 32px;
+  padding: 0 var(--space-3);
+  border-radius: 20px;
+  border: 1px solid var(--nl-border);
+  background: transparent;
+  color: var(--nl-text-secondary);
+  font-size: 13px;
+  font-family: var(--font-ui);
+  cursor: pointer;
+  transition:
+    border-color var(--duration-hover) var(--ease-standard),
+    color        var(--duration-hover) var(--ease-standard),
+    background   var(--duration-hover) var(--ease-standard);
+}
+
+.nl-searchbar__tab:hover {
+  color: var(--nl-text-primary);
+  border-color: var(--nl-text-secondary);
+}
+
+.nl-searchbar__tab--active {
+  background-color: var(--nl-accent);
+  border-color: var(--nl-accent);
+  color: #fff;
+}
+
+/* ============================================================
+   5. MODAL — entrada 300ms, overlay fade
+============================================================ */
+
+.nl-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: var(--nl-bg-overlay);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-6);
+}
+
+.nl-modal {
+  background-color: var(--nl-bg-elevated);
+  border: 1px solid var(--nl-border);
+  border-radius: var(--radius-modal);
+  width: 100%;
+  max-width: 680px;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+}
+
+.nl-modal__close {
+  position: absolute;
+  top: var(--space-4);
+  right: var(--space-4);
+  color: var(--nl-text-secondary);
+  z-index: 1;
+  transition: color var(--duration-hover) var(--ease-standard);
+}
+
+.nl-modal__close:hover {
+  color: var(--nl-text-primary);
+}
+
+/* ============================================================
+   6. CARDS — brandbook §07.1 "componente estrella"
+   Sin sombra. Hover scale 1.02. Border-radius 12px.
+============================================================ */
+
+/* --- MediaCard (película · serie) --- */
+.nl-media-card {
+  background-color: var(--nl-bg-elevated);
+  border-radius: var(--radius-card);
+  overflow: hidden;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid transparent;
+  transition:
+    border-color var(--duration-hover) var(--ease-standard);
+}
+
+.nl-media-card:hover {
+  border-color: var(--nl-border);
+}
+
+.nl-media-card__poster {
+  aspect-ratio: var(--aspect-poster);
+  width: 100%;
+  object-fit: cover;
+  background-color: var(--nl-bg-subtle);
+}
+
+.nl-media-card__body {
+  padding: var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  flex: 1;
+}
+
+.nl-media-card__title {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--nl-text-primary);
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.nl-media-card__meta {
+  font-size: 12px;
+  color: var(--nl-text-secondary);
+  font-family: var(--font-ui);
+}
+
+.nl-media-card__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: var(--space-2);
+}
+
+.nl-media-card__save {
+  font-size: 12px;
+  color: var(--nl-text-muted);
+  transition: color var(--duration-hover) var(--ease-standard);
+}
+
+.nl-media-card__save:hover {
+  color: var(--nl-accent);
+}
+
+/* --- AnimeCard (ratio 3:4) --- */
+.nl-anime-card {
+  background-color: var(--nl-bg-elevated);
+  border-radius: var(--radius-card);
+  overflow: hidden;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: border-color var(--duration-hover) var(--ease-standard);
+}
+
+.nl-anime-card:hover {
+  border-color: var(--nl-border);
+}
+
+.nl-anime-card__poster {
+  aspect-ratio: var(--aspect-series);
+  width: 100%;
+  object-fit: cover;
+  background-color: var(--nl-bg-subtle);
+}
+
+.nl-anime-card__body {
+  padding: var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.nl-anime-card__title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--nl-text-primary);
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* --- BookCard (layout horizontal) --- */
+.nl-book-card {
+  display: flex;
+  gap: var(--space-3);
+  background-color: var(--nl-bg-elevated);
+  border-radius: var(--radius-card);
+  overflow: hidden;
+  cursor: pointer;
+  padding: var(--space-3);
+  border: 1px solid transparent;
+  transition: border-color var(--duration-hover) var(--ease-standard);
+}
+
+.nl-book-card:hover {
+  border-color: var(--nl-border);
+}
+
+.nl-book-card__cover {
+  width: 64px;
+  flex-shrink: 0;
+  aspect-ratio: var(--aspect-poster);
+  object-fit: cover;
+  border-radius: 4px;
+  background-color: var(--nl-bg-subtle);
+}
+
+.nl-book-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  flex: 1;
+  min-width: 0;
+}
+
+.nl-book-card__title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--nl-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ============================================================
+   7. HEADER
+============================================================ */
+
+.nl-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  height: var(--header-h);
+  background-color: var(--nl-bg-header);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--nl-border);
+  transition: background-color var(--duration-state) var(--ease-standard);
+}
+
+.nl-header__inner {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-6);
+}
+
+.nl-header__nav {
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+}
+
+.nl-header__nav-link {
+  font-size: 14px;
+  color: var(--nl-text-muted);
+  transition: color var(--duration-hover) var(--ease-standard);
+}
+
+.nl-header__nav-link:hover,
+.nl-header__nav-link--active {
+  color: var(--nl-text-primary);
+}
+
+.nl-header__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+/* Botón de búsqueda colapsable en header */
+.nl-header__search-btn {
+  color: var(--nl-text-secondary);
+  transition: color var(--duration-hover) var(--ease-standard);
+}
+.nl-header__search-btn:hover {
+  color: var(--nl-text-primary);
+}
+
+/* ============================================================
+   8. FOOTER
+============================================================ */
+
+.nl-footer {
+  border-top: 1px solid var(--nl-border);
+  padding: var(--space-8) 0;
+  margin-top: var(--space-16);
+}
+
+.nl-footer__inner {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.nl-footer__sources {
+  display: flex;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+
+.nl-footer__source-link {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--nl-text-muted);
+  transition: color var(--duration-hover) var(--ease-standard);
+}
+
+.nl-footer__source-link:hover {
+  color: var(--nl-text-secondary);
+}
+
+.nl-footer__copy {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--nl-text-muted);
+}
+
+/* ============================================================
+   9. HERO SECTION
+============================================================ */
+
+.nl-hero {
+  position: relative;
+  min-height: 480px;
+  display: flex;
+  align-items: flex-end;
+  overflow: hidden;
+  border-radius: 0;
+}
+
+.nl-hero__backdrop {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+}
+
+/* Gradiente sobre el backdrop — única excepción de gradiente del brandbook */
+.nl-hero__gradient {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    var(--nl-bg-base) 0%,
+    rgba(10, 10, 11, 0.6) 50%,
+    rgba(10, 10, 11, 0.2) 100%
+  );
+}
+
+.nl-hero__content {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  padding: var(--space-12) 0;
+}
+
+.nl-hero__eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--nl-text-muted);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: var(--space-3);
+}
+
+.nl-hero__title {
+  font-family: var(--font-display);
+  font-size: clamp(36px, 5vw, var(--text-display-lg-size));
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--nl-text-primary);
+  max-width: 640px;
+  margin-bottom: var(--space-6);
+}
+
+.nl-hero__search-wrap {
+  max-width: 560px;
+}
+
+/* ============================================================
+   10. CONTENT SECTION — sección con título + grid
+============================================================ */
+
+.nl-section {
+  margin-top: var(--space-12);
+}
+
+.nl-section__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-6);
+}
+
+.nl-section__title {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--nl-text-muted);
+}
+
+/* ============================================================
+   11. GRIDS DE CARDS
+============================================================ */
+
+.nl-grid {
+  display: grid;
+  gap: var(--grid-gutter);
+}
+
+/* ── Home / secciones: cards medianas ────────────────────── */
+.nl-grid--cards {
+  grid-template-columns: repeat(2, 1fr);
+}
+@media (min-width: 640px) {
+  .nl-grid--cards { grid-template-columns: repeat(3, 1fr); }
+}
+@media (min-width: 1024px) {
+  .nl-grid--cards { grid-template-columns: repeat(5, 1fr); }
+}
+
+/* ── Búsqueda: cards compactas (más columnas = menos zoom) ── */
+/* 3 cols → 4 cols → 6 cols: cada card ~130–180px de ancho   */
+.nl-grid--search {
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-3);   /* Gutter reducido para cards compactas */
+}
+@media (min-width: 640px) {
+  .nl-grid--search { grid-template-columns: repeat(4, 1fr); }
+}
+@media (min-width: 1024px) {
+  .nl-grid--search {
+    grid-template-columns: repeat(6, 1fr);
+    gap: var(--space-4);
+  }
+}
+
+/* ── Libros: layout horizontal ───────────────────────────── */
+.nl-grid--books {
+  grid-template-columns: 1fr;
+}
+@media (min-width: 640px) {
+  .nl-grid--books { grid-template-columns: repeat(2, 1fr); }
+}
+@media (min-width: 1024px) {
+  .nl-grid--books { grid-template-columns: repeat(3, 1fr); }
+}
+
+/* ============================================================
+   RESPONSIVE — ocultar nav en móvil
+============================================================ */
+
+@media (max-width: 767px) {
+  .nl-header__nav {
+    display: none;
+  }
+}
+
+/* ============================================================
+   GRID DE SAGAS DESTACADAS — responsive
+============================================================ */
+@media (min-width: 640px) {
+  .nl-sagas-grid,
+  section [style*="repeat(2, 1fr)"] {
+    grid-template-columns: repeat(3, 1fr) !important;
+  }
+}
+@media (min-width: 1024px) {
+  .nl-sagas-grid,
+  section [style*="repeat(2, 1fr)"] {
+    grid-template-columns: repeat(4, 1fr) !important;
+  }
+}

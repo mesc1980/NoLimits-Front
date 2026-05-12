@@ -1,0 +1,96 @@
+/**
+ * animations.css — Keyframes cinematográficos de no/limits.
+ */
+
+/* ── Shimmer skeleton ──────────────────────────────────────── */
+@keyframes nl-shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position:  200% 0; }
+}
+
+/* ── Entrada suave ─────────────────────────────────────────── */
+@keyframes nl-fade-up {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+
+/* ── Fade ──────────────────────────────────────────────────── */
+@keyframes nl-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* ── Modal scale ───────────────────────────────────────────── */
+@keyframes nl-scale-in {
+  from { opacity: 0; transform: scale(0.94); }
+  to   { opacity: 1; transform: scale(1);    }
+}
+
+/* ── Entrada cinematográfica: escala + desenfoque ─────────── */
+@keyframes nl-cinematic-in {
+  from { opacity: 0; transform: scale(0.88); filter: blur(8px); }
+  to   { opacity: 1; transform: scale(1);    filter: blur(0);   }
+}
+
+/* ── Stamp: aparición brusca con rebote ───────────────────── */
+@keyframes nl-stamp {
+  0%   { opacity: 0; transform: scale(1.18); }
+  60%  { opacity: 1; transform: scale(0.97); }
+  100% { opacity: 1; transform: scale(1);    }
+}
+
+/* ── Slide desde la izquierda ─────────────────────────────── */
+@keyframes nl-slide-left {
+  from { opacity: 0; transform: translateX(-24px); }
+  to   { opacity: 1; transform: translateX(0);      }
+}
+
+/* ── Slide desde la derecha ───────────────────────────────── */
+@keyframes nl-slide-right {
+  from { opacity: 0; transform: translateX(24px); }
+  to   { opacity: 1; transform: translateX(0);     }
+}
+
+/* ── Ken Burns: zoom lento del backdrop ───────────────────── */
+@keyframes nl-ken-burns {
+  from { transform: scale(1.08); }
+  to   { transform: scale(1.0);  }
+}
+
+/* ── Barra de acento que crece de izquierda a derecha ─────── */
+@keyframes nl-bar-grow {
+  from { transform: scaleX(0); transform-origin: left; }
+  to   { transform: scaleX(1); transform-origin: left; }
+}
+
+/* ── Pulse suave del botón CTA ────────────────────────────── */
+@keyframes nl-pulse-soft {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(255, 77, 77, 0.4); }
+  50%       { box-shadow: 0 0 0 8px rgba(255, 77, 77, 0);  }
+}
+
+/* ============================================================
+   CLASES UTILITARIAS
+============================================================ */
+
+.nl-animate-fade-up      { animation: nl-fade-up      var(--duration-state) var(--ease-standard) both; }
+.nl-animate-fade-in      { animation: nl-fade-in      var(--duration-state) var(--ease-standard) both; }
+.nl-animate-scale-in     { animation: nl-scale-in     var(--duration-modal) var(--ease-standard) both; }
+.nl-animate-cinematic-in { animation: nl-cinematic-in 0.6s var(--ease-standard) both; }
+.nl-animate-stamp        { animation: nl-stamp        0.45s cubic-bezier(0.22,1,0.36,1) both; }
+.nl-animate-slide-left   { animation: nl-slide-left   var(--duration-page) var(--ease-standard) both; }
+
+/* Skeleton */
+.nl-skeleton {
+  background: linear-gradient(90deg, var(--nl-bg-elevated) 25%, var(--nl-bg-subtle) 50%, var(--nl-bg-elevated) 75%);
+  background-size: 200% 100%;
+  animation: nl-shimmer var(--duration-skeleton) ease-in-out infinite;
+  border-radius: var(--radius-card);
+}
+
+/* Delays de escalonado */
+.nl-delay-1 { animation-delay:  60ms; }
+.nl-delay-2 { animation-delay: 120ms; }
+.nl-delay-3 { animation-delay: 180ms; }
+.nl-delay-4 { animation-delay: 240ms; }
+.nl-delay-5 { animation-delay: 300ms; }

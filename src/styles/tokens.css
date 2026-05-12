@@ -1,0 +1,153 @@
+/**
+ * tokens.css — Design tokens del brandbook NoLimits v2.0
+ * Fuente de verdad para todos los valores visuales del sistema.
+ * Los componentes deben consumir SOLO estas variables, nunca valores literales.
+ */
+
+:root {
+  /* ============================================================
+     COLORES — DARK MODE (modo por defecto, "dark-first")
+  ============================================================ */
+
+  /* Fondos — capas de elevación */
+  --nl-bg-base:     #0A0A0B;  /* Fondo principal · negro cálido */
+  --nl-bg-elevated: #141416;  /* Cards · modales */
+  --nl-bg-subtle:   #1C1C1F;  /* Hover · inputs */
+  --nl-border:      #27272A;  /* Divisores 1px */
+
+  /* Texto */
+  --nl-text-primary:   #FAFAFA;  /* Títulos y cuerpo */
+  --nl-text-secondary: #A1A1AA;  /* Metadata, subtítulos */
+  --nl-text-muted:     #52525B;  /* Labels, captions técnicas */
+
+  /* Acento de marca — único, eléctrico */
+  --nl-accent:       #FF4D4D;  /* CTAs · branding */
+  --nl-accent-hover: #F03A3A;  /* Estado hover del acento */
+
+  /* ============================================================
+     COLORES SEMÁNTICOS POR FORMATO
+     Solo en chips/badges pequeños. Texto al 100%, fondo al 15%.
+     Nunca como background dominante.
+  ============================================================ */
+  --nl-format-movie:   #F87171;  /* Película */
+  --nl-format-series:  #FB923C;  /* Serie */
+  --nl-format-book:    #FBBF24;  /* Libro */
+  --nl-format-music:   #34D399;  /* Música */
+  --nl-format-game:    #60A5FA;  /* Videojuego */
+  --nl-format-anime:   #A78BFA;  /* Anime */
+
+  /* Fondos de badge al 15% de opacidad (rgba de cada formato) */
+  --nl-format-movie-bg:   rgba(248, 113, 113, 0.15);
+  --nl-format-series-bg:  rgba(251, 146,  60, 0.15);
+  --nl-format-book-bg:    rgba(251, 191,  36, 0.15);
+  --nl-format-music-bg:   rgba( 52, 211, 153, 0.15);
+  --nl-format-game-bg:    rgba( 96, 165, 250, 0.15);
+  --nl-format-anime-bg:   rgba(167, 139, 250, 0.15);
+
+  /* ============================================================
+     TIPOGRAFÍA
+  ============================================================ */
+  --font-display: 'Geist', Arial, sans-serif;
+  --font-ui:      'Inter', Arial, sans-serif;
+  --font-mono:    'JetBrains Mono', 'Courier New', monospace;
+
+  /* Escala tipográfica — brandbook §05 */
+  --text-display-xl-size:    72px;
+  --text-display-xl-lh:      1.0;
+  --text-display-xl-weight:  700;
+  --text-display-xl-tracking: -0.04em;
+
+  --text-display-lg-size:    48px;
+  --text-display-lg-lh:      1.05;
+  --text-display-lg-weight:  700;
+  --text-display-lg-tracking: -0.03em;
+
+  --text-heading-md-size:    24px;
+  --text-heading-md-lh:      1.3;
+  --text-heading-md-weight:  600;
+  --text-heading-md-tracking: -0.01em;
+
+  --text-body-size:   15px;
+  --text-body-lh:     1.6;
+  --text-body-weight: 400;
+
+  --text-caption-size: 12px;
+  --text-caption-lh:   1.4;
+
+  /* ============================================================
+     SPACING — escala 4px (brandbook §08)
+  ============================================================ */
+  --space-1:  4px;
+  --space-2:  8px;
+  --space-3:  12px;
+  --space-4:  16px;
+  --space-6:  24px;
+  --space-8:  32px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-24: 96px;
+
+  /* ============================================================
+     BORDER RADIUS (brandbook §14 — mini-guía esenciales)
+  ============================================================ */
+  --radius-btn:   8px;
+  --radius-card:  12px;
+  --radius-modal: 16px;
+  --radius-badge: 6px;
+  --radius-input: 8px;
+
+  /* ============================================================
+     MOTION (brandbook §09)
+  ============================================================ */
+  --ease-standard:      cubic-bezier(0.4, 0, 0.2, 1);
+  --duration-hover:     150ms;  /* Hover · focus */
+  --duration-state:     200ms;  /* Cambios de estado */
+  --duration-modal:     300ms;  /* Entrada de modales */
+  --duration-page:      400ms;  /* Transición de página */
+  --duration-skeleton:  1500ms; /* Skeleton loaders ∞ */
+
+  /* ============================================================
+     LAYOUT
+  ============================================================ */
+  --max-width:    1280px;
+  --grid-cols:    12;
+  --grid-gutter:  24px;
+  --header-h:     64px;
+
+  /* ============================================================
+     ASPECT RATIOS DE PORTADAS (brandbook §10)
+  ============================================================ */
+  --aspect-poster:  2 / 3;   /* Película · Libro · Juego */
+  --aspect-series:  3 / 4;   /* Serie · Anime */
+  --aspect-album:   1 / 1;   /* Música */
+  --aspect-hero:    16 / 9;  /* Hero · banner */
+
+  /* ============================================================
+     COLORES SEMITRANSPARENTES (evitan hardcodear rgba en componentes)
+  ============================================================ */
+  --nl-bg-header:  rgba(10, 10, 11, 0.88);   /* Header sticky con blur */
+  --nl-bg-overlay: rgba(10, 10, 11, 0.85);   /* Overlay de modal */
+  --nl-hero-fade:  rgba(10, 10, 11, 0.55);   /* Capa media del gradiente hero */
+}
+
+/* ============================================================
+   LIGHT MODE — activado con clase .light en <html>
+============================================================ */
+.light {
+  --nl-bg-base:     #FAFAFA;
+  --nl-bg-elevated: #FFFFFF;
+  --nl-bg-subtle:   #F4F4F5;
+  --nl-border:      #E4E4E7;
+
+  --nl-text-primary:   #09090B;
+  --nl-text-secondary: #52525B;
+  --nl-text-muted:     #71717A;
+
+  --nl-accent:       #E63946;
+  --nl-accent-hover: #C82333;
+
+  /* Semitransparentes en light */
+  --nl-bg-header:  rgba(250, 250, 250, 0.88);
+  --nl-bg-overlay: rgba(9, 9, 11, 0.70);
+  --nl-hero-fade:  rgba(250, 250, 250, 0.55);
+}
