@@ -9,6 +9,8 @@ import { Eye, EyeOff, Mail, Lock, User } from 'lucide-react';
 import Button      from '@/components/ui/Button';
 import Logo        from '@/components/layout/Logo';
 import useAppStore from '@/store/useAppStore';
+import { login } from '@/services/usuarios';
+import { supabase } from '@/lib/supabase';
 
 const TAB_LOGIN    = 'login';
 const TAB_REGISTER = 'register';
@@ -26,28 +28,85 @@ function Login() {
   const navigate = useNavigate();
 
   async function handleSubmit(e) {
-    e.preventDefault();
-    setError('');
-    setLoading(true);
+  e.preventDefault();
+  setError('');
+  setLoading(true);
 
-    /* Cuando exista el backend, reemplazar este bloque:
-    const endpoint = tab === TAB_LOGIN ? '/api/auth/login' : '/api/auth/register';
-    const res = await apiFetch(`${import.meta.env.VITE_API_BASE_URL}${endpoint}`, {
-      method: 'POST', body: JSON.stringify({ email, password, name }),
-    });
-    setUser(res.user); navigate('/');
-    */
-
-    await new Promise((r) => setTimeout(r, 800));
-
+  try {
     if (!email.includes('@')) {
       setError('Ingresa un email válido.');
-      setLoading(false);
       return;
     }
 
-    setUser({ id: '1', name: name || email.split('@')[0], email, token: 'mock-jwt-token', avatar: null });
-    navigate('/');
+    if (password.trim().length < 8) {
+      setError('La contraseña debe tener mínimo 8 caracteres.');
+      return;
+    }
+
+    const data = await login(email, password);
+
+    if (!data) {
+      setError('Error al procesar respuesta del servidor.');
+      return;
+    }
+
+    localStorage.setItem('nl_auth', '1');
+    localStorage.setItem('nl_user', JSON.stringify(data));
+    localStorage.setItem('nl_role', data.rolNombre || data.rol || '');
+
+    if (data?.token) {
+      localStorage.setItem('nl_token', data.token);
+    }
+
+    setUser({
+      id: data.id || data.usuarioId || '1',
+      name: data.nombre || data.name || email.split('@')[0],
+      email: data.correo || data.email || email,
+      token: data.token || null,
+      avatar: null,
+      role: data.rolNombre || data.rol || '',
+    });
+
+    const rolNombre = (data.rolNombre || data.rol || '').toUpperCase().trim();
+
+    const esAdmin = rolNombre === 'ROLE_ADMIN' || rolNombre === 'ADMIN';
+
+    navigate(esAdmin ? '/admin' : '/', { replace: true });
+  } catch (error) {
+    console.error('Error real en login:', error);
+    setError(error.message || 'Error al iniciar sesión.');
+  } finally {
+    setLoading(false);
+  }
+}
+
+  async function handleGoogleLogin() {
+    try {
+      setLoading(true);
+      setError('');
+
+      const redirectUrl =
+        window.location.hostname === 'localhost'
+          ? 'http://localhost:5173/auth/callback'
+          : 'https://www.nolimitshub.cl/auth/callback';
+
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: redirectUrl,
+        },
+      });
+
+      if (error) {
+        console.error(error);
+        setError('No se pudo iniciar sesión con Google.');
+      }
+    } catch (error) {
+      console.error(error);
+      setError('Ocurrió un error con Google.');
+    } finally {
+      setLoading(false);
+    }
   }
 
   const inputStyle = {
@@ -156,7 +215,7 @@ function Login() {
         </div>
 
         <button
-          onClick={() => setError('OAuth disponible cuando exista el backend.')}
+          onClick={handleGoogleLogin}
           style={{ width: '100%', height: '48px', background: 'var(--nl-bg-subtle)', border: '1px solid var(--nl-border)', borderRadius: 'var(--radius-btn)', color: 'var(--nl-text-primary)', fontSize: '14px', cursor: 'pointer', fontFamily: 'var(--font-ui)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}
         >
           <svg width="18" height="18" viewBox="0 0 18 18">

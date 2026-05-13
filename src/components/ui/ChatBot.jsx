@@ -32,6 +32,11 @@ import {
 import { searchGames } from '@/services/igdb';
 import { mediaIdToSlug, truncateText } from '@/utils/formatters';
 
+const API_BASE = (
+  import.meta.env.VITE_API_URL ||
+  'https://nolimits-backend-final.onrender.com'
+).replace(/\/+$/, '');
+
 /* ── Motor de procesamiento de mensajes ─────────────────── */
 
 /**
@@ -171,7 +176,7 @@ function ChatBot() {
     {
       id:   0,
       role: 'bot',
-      text: '¡Hola! Soy el asistente cultural de no/limits.\nPuedes preguntarme sobre películas, series, anime, juegos o sagas.',
+      text: '¡Hola!👋 Soy el asistente de NoLimits.\nPuedo orientarle dentro de la plataforma.',
     },
   ]);
   const [input,    setInput]    = useState('');
@@ -191,27 +196,46 @@ function ChatBot() {
     const userText = input.trim();
     setInput('');
 
-    /* Agrega mensaje del usuario */
-    setMessages((prev) => [...prev, { id: Date.now(), role: 'user', text: userText }]);
+    setMessages((prev) => [
+      ...prev,
+      { id: Date.now(), role: 'user', text: userText },
+    ]);
+
     setThinking(true);
 
     try {
-      /* ── Cuando exista el backend, reemplazar con:
-      const res = await apiFetch(`${import.meta.env.VITE_API_BASE_URL}/api/chat`, {
+      const res = await fetch(`${API_BASE}/api/chatbot/chat`, {
         method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
         body: JSON.stringify({ message: userText }),
       });
-      const botResponse = { id: Date.now(), role: 'bot', text: res.text, results: res.results };
-      ─── */
-      const response = await processMessage(userText, navigate);
+
+      if (!res.ok) {
+        throw new Error('No se pudo obtener respuesta del chatbot');
+      }
+
+      const data = await res.json();
+
       setMessages((prev) => [
         ...prev,
-        { id: Date.now(), role: 'bot', text: response.text, results: response.results },
+        {
+          id: Date.now(),
+          role: 'bot',
+          text: data.reply || 'No pude generar una respuesta.',
+        },
       ]);
-    } catch {
+    } catch (error) {
+      console.error('Error chatbot:', error);
+
       setMessages((prev) => [
         ...prev,
-        { id: Date.now(), role: 'bot', text: 'Hubo un error. Intentá de nuevo.' },
+        {
+          id: Date.now(),
+          role: 'bot',
+          text: 'No pude responder en este momento. Intenta nuevamente más tarde.',
+        },
       ]);
     } finally {
       setThinking(false);
