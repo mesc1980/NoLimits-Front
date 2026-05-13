@@ -30,6 +30,7 @@ import { useSagaSearch }   from '@/hooks/useSearch';
 import useAppStore         from '@/store/useAppStore';
 import { parseMediaSlug }  from '@/utils/formatters';
 import { DATA_SOURCES, MEDIA_TYPES } from '@/utils/constants';
+import { obtenerProducto } from '@/services/productos';
 
 /* ── Etiqueta de sección estilo brandbook ─────────────────── */
 function SectionLabel({ number, children }) {
@@ -224,11 +225,57 @@ function Detail() {
   const animeRes  = useAnimeDetail (isAnime  ? nativeId : null);
   const gameRes   = useGameDetail  (isGame   ? nativeId : null);
 
+  const isNoLimits = source === 'nolimits';
+
+  const [noLimitsRes, setNoLimitsRes] = useState({
+    data: null,
+    isLoading: false,
+    error: null,
+  });
+
+  useEffect(() => {
+    if (!isNoLimits || !nativeId) return;
+
+    setNoLimitsRes({ data: null, isLoading: true, error: null });
+
+    obtenerProducto(nativeId)
+      .then((producto) => {
+        setNoLimitsRes({
+          data: {
+            id: producto.id,
+            source: 'nolimits',
+            title: producto.nombre,
+            type: producto.tipoProductoNombre || 'Producto',
+            poster: producto.imagenes?.[0] || producto.imagen || null,
+            backdrop: producto.imagenes?.[0] || producto.imagen || null,
+            rating: '—',
+            year: '—',
+            genres: (producto.generos || [])
+              .map((g) => typeof g === 'string' ? g : g?.nombre)
+              .filter(Boolean),
+
+            platforms: (producto.plataformas || [])
+              .map((p) => typeof p === 'string' ? p : p?.nombre)
+              .filter(Boolean),
+            synopsis: producto.sinopsis || 'Sin sinopsis disponible.',
+            saga: producto.saga || null,
+            linksCompra: producto.linksCompra || [],
+          },
+          isLoading: false,
+          error: null,
+        });
+      })
+      .catch((err) => {
+        setNoLimitsRes({ data: null, isLoading: false, error: err });
+      });
+  }, [isNoLimits, nativeId]);
+
   const { data: obra, isLoading, error } =
-    isMovie  ? movieRes  :
-    isSeries ? seriesRes :
-    isAnime  ? animeRes  :
-    isGame   ? gameRes   :
+    isNoLimits ? noLimitsRes :
+    isMovie    ? movieRes    :
+    isSeries   ? seriesRes   :
+    isAnime    ? animeRes    :
+    isGame     ? gameRes     :
     { data: null, isLoading: false, error: new Error(`Tipo no soportado: ${source}/${type}`) };
 
   const [providers, setProviders] = useState(null);
