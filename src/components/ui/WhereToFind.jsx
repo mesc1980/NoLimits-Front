@@ -101,6 +101,36 @@ function WhereToFind({ obra, compact = false, providers = null }) {
   if (!obra) return null;
   const { type, platforms = [], source } = obra;
 
+  if (obra?.linksCompra?.length > 0) {
+    return (
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
+        {obra.linksCompra.map((link, index) => (
+          <a
+            key={index}
+            href={link.url || link.urlCompra}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              padding: '6px 14px',
+              borderRadius: 'var(--radius-btn)',
+              background: 'var(--nl-bg-subtle)',
+              border: '1px solid var(--nl-border)',
+              fontSize: '12px',
+              color: 'var(--nl-text-secondary)',
+              textDecoration: 'none',
+            }}
+          >
+            {link.label || link.plataformaNombre || link.plataforma?.nombre || 'Mercado Libre'}
+            <ExternalLink size={10} />
+          </a>
+        ))}
+      </div>
+    );
+  }
+
   /* ── Videojuegos ────────────────────────────────────── */
   if (type === MEDIA_TYPES.GAME) {
     const knownPlatforms = platforms.slice(0, 5);
@@ -137,6 +167,36 @@ function WhereToFind({ obra, compact = false, providers = null }) {
 
   /* ── Películas y series (TMDB watch providers) ──────── */
   if (type === MEDIA_TYPES.MOVIE || type === MEDIA_TYPES.SERIES) {
+
+    if (obra?.linksCompra?.length > 0) {
+      return (
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
+          {obra.linksCompra.map((link, index) => (
+            <a
+              key={index}
+              href={link.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                padding: '5px 10px',
+                background: 'var(--nl-bg-subtle)',
+                borderRadius: 'var(--radius-badge)',
+                border: '1px solid var(--nl-border)',
+                fontSize: '12px',
+                color: 'var(--nl-text-secondary)',
+                textDecoration: 'none',
+              }}
+            >
+              {link.label || link.plataformaNombre || 'Mercado Libre'}
+            </a>
+          ))}
+        </div>
+      );
+    }
+
     if (compact) {
       /* En la saga page solo mostramos el link a JustWatch */
       const title     = encodeURIComponent(obra.title);
