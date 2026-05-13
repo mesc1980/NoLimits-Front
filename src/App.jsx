@@ -19,6 +19,7 @@ import MyList        from '@/pages/MyList';
 import Saga          from '@/pages/Saga';
 import Login         from '@/pages/Login';
 import Terms         from '@/pages/Terms';
+import AuthCallback  from '@/pages/AuthCallback';
 
 const router = createBrowserRouter([
   {
@@ -33,6 +34,8 @@ const router = createBrowserRouter([
       { path: 'saga',            element: <Saga />          },
       { path: 'login',           element: <Login />         },
       { path: 'terms',           element: <Terms />         },
+      // Callback de Google/Supabase
+      { path: 'auth/callback',   element: <AuthCallback />  },
     ],
   },
 ]);
