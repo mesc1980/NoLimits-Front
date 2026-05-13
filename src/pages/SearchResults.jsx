@@ -130,7 +130,7 @@ function ResultGroup({ group, obras, groupIndex, activeType }) {
         initial="hidden"
         animate="visible"
       >
-        {obras.slice(0, 12).map((obra) => (
+        {obras.slice(0, 24).map((obra) => (
           <CardForType key={obra.id} obra={obra} cardType={group.cardType} />
         ))}
       </motion.div>

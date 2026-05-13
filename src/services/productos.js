@@ -411,3 +411,74 @@ export async function obtenerProductosDeSagaCompleto(saga) {
     return [];
   }
 }
+
+export function adaptarProductoNoLimits(producto) {
+  const imagenPrincipal =
+    producto.imagenPortada ||
+    producto.imagenes?.[0] ||
+    producto.portadaSaga ||
+    producto.imagen ||
+    producto.urlImagen ||
+    null;
+
+  return {
+    id: `nolimits-${producto.id}`,
+    realId: producto.id,
+    source: "nolimits",
+
+    type:
+      producto.tipoProductoNombre === "Película"
+        ? "movie"
+        : producto.tipoProductoNombre === "Videojuego"
+        ? "game"
+        : "game",
+
+    title: producto.nombre,
+    name: producto.nombre,
+
+    year: "—",
+    rating: "—",
+
+    overview: producto.sinopsis,
+    description: producto.sinopsis,
+    summary: producto.sinopsis,
+
+    image: imagenPrincipal,
+    poster: imagenPrincipal,
+    poster_path: imagenPrincipal,
+    backdrop: imagenPrincipal,
+    backdrop_path: imagenPrincipal,
+
+    price: producto.precio,
+    precio: producto.precio,
+
+    tipoProductoNombre: producto.tipoProductoNombre,
+    category: producto.tipoProductoNombre,
+
+    saga: producto.saga,
+    urlTrailer: producto.urlTrailer,
+
+    plataformas: producto.plataformas || [],
+    linksCompra: producto.linksCompra || [],
+
+    original: producto,
+  };
+}
+
+export async function buscarProductosNoLimits(query) {
+  const productos = await listarProductos();
+
+  const q = query.trim().toLowerCase();
+
+  const resultados = productos
+    .filter((p) => {
+      const nombre = p.nombre?.toLowerCase() || "";
+      const saga = p.saga?.toLowerCase() || "";
+      const tipo = p.tipoProductoNombre?.toLowerCase() || "";
+
+      return nombre.includes(q) || saga.includes(q) || tipo.includes(q);
+    })
+    .map(adaptarProductoNoLimits);
+
+  return resultados;
+}
