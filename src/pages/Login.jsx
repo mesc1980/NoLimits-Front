@@ -94,6 +94,10 @@ function Login() {
     console.log('SET USER:', userData);
 
     setUser(userData);
+
+    setEmail('');
+    setPassword('');
+    setName('');
     //console.log('STORE DESPUÉS:', useAppStore.getState());
 
     const rolNombre = (data.rolNombre || data.rol || '').toUpperCase().trim();
@@ -195,8 +199,10 @@ function Login() {
           ))}
         </div>
 
-        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
-          {tab === TAB_REGISTER && (
+        <form onSubmit={handleSubmit} 
+          autoComplete="off"
+          style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+            {tab === TAB_REGISTER && (
             <div style={{ position: 'relative' }}>
               <User size={16} style={iconStyle} />
               <input type="text" placeholder="Tu nombre" value={name} onChange={(e) => setName(e.target.value)} style={inputStyle} required />
@@ -205,13 +211,14 @@ function Login() {
 
           <div style={{ position: 'relative' }}>
             <Mail size={16} style={iconStyle} />
-            <input type="email" placeholder="tu@email.com" value={email} onChange={(e) => setEmail(e.target.value)} style={inputStyle} required />
+            <input type="email" placeholder="tu@email.com" value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="new-email" style={inputStyle} required />
           </div>
 
           <div style={{ position: 'relative' }}>
             <Lock size={16} style={iconStyle} />
             <input
               type={showPwd ? 'text' : 'password'}
+              autoComplete="new-password"
               placeholder="Contraseña"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -263,7 +270,7 @@ function Login() {
 
         <p style={{ textAlign: 'center', fontSize: '12px', color: 'var(--nl-text-muted)', marginTop: 'var(--space-4)' }}>
           Al continuar aceptas los{' '}
-          <Link to="/" style={{ color: 'var(--nl-accent)', textDecoration: 'underline' }}>términos de uso</Link>.
+          <Link to="/terms" style={{ color: 'var(--nl-accent)', textDecoration: 'underline' }}>términos de uso</Link>.
         </p>
       </motion.div>
     </div>
