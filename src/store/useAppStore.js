@@ -57,7 +57,15 @@ const useAppStore = create(
        * Limpia la sesión al hacer logout.
        * También limpiar localStorage.removeItem('auth_token') en el componente.
        */
-      clearUser: () => set({ user: null }),
+      /*clearUser: () => set({ user: null }),*/
+      clearUser: () => {
+        localStorage.removeItem('nl_auth');
+        localStorage.removeItem('nl_user');
+        localStorage.removeItem('nl_role');
+        localStorage.removeItem('nl_token');
+
+        set({ user: null });
+      },
 
       // ── MI LISTA ─────────────────────────────────────────────
       // Tabla relacionada: user_lists (user_id, obra_id, created_at)
@@ -140,6 +148,7 @@ const useAppStore = create(
       // Solo persiste estos campos — user NO se persiste (el token
       // debe revalidarse con el backend en cada sesión).
       partialize: (state) => ({
+        user: state.user,
         myList:  state.myList,
         reviews: state.reviews,
         theme:   state.theme,
