@@ -38,7 +38,7 @@ const router = createBrowserRouter([
       { path: 'login',           element: <Login />         },
       { path: 'forgot-password', element: <ForgotPassword /> },
     
-      { path: 'terms',           element: <Terms />         },
+      { path: '/terms',           element: <Terms />         },
       // Callback de Google/Supabase
       { path: 'auth/callback',   element: <AuthCallback />  },
     ],

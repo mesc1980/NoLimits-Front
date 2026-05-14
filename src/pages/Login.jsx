@@ -270,7 +270,7 @@ function Login() {
 
         <p style={{ textAlign: 'center', fontSize: '12px', color: 'var(--nl-text-muted)', marginTop: 'var(--space-4)' }}>
           Al continuar aceptas los{' '}
-          <Link to="/" style={{ color: 'var(--nl-accent)', textDecoration: 'underline' }}>términos de uso</Link>.
+          <Link to="/terms" style={{ color: 'var(--nl-accent)', textDecoration: 'underline' }}>términos de uso</Link>.
         </p>
       </motion.div>
     </div>
