@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from "../lib/supabase";
+
 import { Eye, EyeOff } from "lucide-react";
+
 
 export default function ResetPassword() {
   const [password, setPassword] = useState('');
@@ -9,8 +11,10 @@ export default function ResetPassword() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [confirmPassword, setConfirmPassword] = useState('');
+
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
 
   const navigate = useNavigate();
 
@@ -79,6 +83,7 @@ export default function ResetPassword() {
           padding: '32px',
           border: '1px solid var(--nl-border)',
           borderRadius: '16px',
+
           background:  '#111827',
         }}
       >
@@ -190,11 +195,48 @@ export default function ResetPassword() {
           </button>
         </div>
 
+          background: 'var(--nl-bg-elevated)',
+        }}
+      >
+        <h2 style={{ marginBottom: '20px' }}>
+          Nueva contraseña
+        </h2>
+
+        <input
+          type="password"
+          placeholder="Nueva contraseña"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+          minLength={8}
+          style={{
+            width: '100%',
+            height: '48px',
+            marginBottom: '16px',
+            padding: '0 12px',
+          }}
+        />
+        <input
+            type="password"
+            placeholder="Confirmar contraseña"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            required
+            style={{
+                width: '100%',
+                height: '48px',
+                marginBottom: '16px',
+                padding: '0 12px',
+        }}
+        />
+
+
         <button
           type="submit"
           disabled={loading}
           style={{
             width: '100%',
+
             height: '52px',
             cursor: 'pointer',
             border: 'none',
@@ -204,6 +246,10 @@ export default function ResetPassword() {
             color: 'white',
             fontWeight: '700',
             fontSize: '16px',
+
+            height: '48px',
+            cursor: 'pointer',
+
           }}
         >
           {loading ? 'Actualizando...' : 'Guardar contraseña'}
