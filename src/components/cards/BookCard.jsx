@@ -13,7 +13,7 @@
 
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'motion/react';
-import { BookmarkPlus, BookmarkCheck } from 'lucide-react';
+import { Star } from 'lucide-react';
 import PropTypes from 'prop-types';
 import Badge from '@/components/ui/Badge';
 import useAppStore from '@/store/useAppStore';
@@ -22,10 +22,25 @@ import { mediaIdToSlug, truncateText } from '@/utils/formatters';
 
 const COVER_FALLBACK = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="64" height="96" viewBox="0 0 64 96"%3E%3Crect width="64" height="96" fill="%231C1C1F"/%3E%3C/svg%3E';
 
-function BookCard({ obra, onClick, style }) {
+function BookCard({ obra, onClick, style, hideFavoriteButton = false }) {
   const navigate   = useNavigate();
   const isInList   = useAppStore((s) => s.isInList(obra.id));
   const toggleList = useAppStore((s) => s.toggleList);
+  const isLoggedIn = () => {
+  const token = localStorage.getItem("nl_token");
+  const user = localStorage.getItem("nl_user");
+  const auth = localStorage.getItem("nl_auth");
+
+  if (!token || !user) return false;
+  if (auth !== "1" && auth !== "true") return false;
+
+  try {
+    const parsedUser = JSON.parse(user);
+    return !!parsedUser?.id || !!parsedUser?.correo || !!parsedUser?.email;
+  } catch {
+    return false;
+  }
+};
 
   function handleCardClick() {
     if (onClick) {
@@ -36,7 +51,15 @@ function BookCard({ obra, onClick, style }) {
   }
 
   function handleSave(e) {
+    e.preventDefault();
     e.stopPropagation();
+
+    if (!isLoggedIn()) {
+      alert("Debes iniciar sesión para guardar en favoritos");
+      navigate("/login");
+      return;
+    }
+
     toggleList(obra);
   }
 
@@ -56,13 +79,46 @@ function BookCard({ obra, onClick, style }) {
       onKeyDown={(e) => e.key === 'Enter' && handleCardClick()}
     >
       {/* Portada en miniatura — sin filtros ni marcos */}
-      <img
-        className="nl-book-card__cover"
-        src={obra.poster ?? COVER_FALLBACK}
-        alt={`Portada de ${obra.title}`}
-        loading="lazy"
-        onError={(e) => { e.currentTarget.src = COVER_FALLBACK; }}
-      />
+      <div style={{ position: 'relative', flexShrink: 0 }}>
+        <img
+          className="nl-book-card__cover"
+          src={obra.poster ?? COVER_FALLBACK}
+          alt={`Portada de ${obra.title}`}
+          loading="lazy"
+          onError={(e) => { e.currentTarget.src = COVER_FALLBACK; }}
+        />
+
+        {!hideFavoriteButton && (
+          <button
+            onClick={handleSave}
+            aria-label={isInList ? 'Quitar de favoritos' : 'Agregar a favoritos'}
+            title={isInList ? 'Quitar de favoritos' : 'Agregar a favoritos'}
+            style={{
+              position: 'absolute',
+              top: '6px',
+              left: '6px',
+              zIndex: 10,
+              width: '30px',
+              height: '30px',
+              borderRadius: '999px',
+              border: isInList ? '1px solid #facc15' : '1px solid rgba(255,255,255,0.25)',
+              background: isInList ? '#facc15' : 'rgba(10,10,11,0.78)',
+              color: isInList ? '#111' : '#fff',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              backdropFilter: 'blur(4px)',
+            }}
+          >
+            <Star
+              size={16}
+              color={isInList ? '#111' : '#fff'}
+              fill={isInList ? '#111' : 'none'}
+            />
+          </button>
+        )}
+      </div>
 
       <div className="nl-book-card__body">
         {/* Título */}
@@ -92,17 +148,6 @@ function BookCard({ obra, onClick, style }) {
 
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '6px' }}>
           {obra.rating !== '—' && <Badge variant="rating" label={obra.rating} />}
-
-          <button
-            className="nl-media-card__save"
-            onClick={handleSave}
-            aria-label={isInList ? 'Quitar de mi lista' : 'Guardar'}
-          >
-            {isInList
-              ? <BookmarkCheck size={14} color="var(--nl-accent)" />
-              : <BookmarkPlus  size={14} />
-            }
-          </button>
         </div>
       </div>
     </motion.article>
@@ -121,6 +166,7 @@ BookCard.propTypes = {
   }).isRequired,
   onClick: PropTypes.func,
   style:   PropTypes.object,
+  hideFavoriteButton: PropTypes.bool,
 };
 
 export default BookCard;
