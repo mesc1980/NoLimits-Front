@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from "../lib/supabase";
+import { Eye, EyeOff } from "lucide-react";
 
 export default function ResetPassword() {
   const [password, setPassword] = useState('');
@@ -8,6 +9,8 @@ export default function ResetPassword() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const navigate = useNavigate();
 
@@ -76,48 +79,131 @@ export default function ResetPassword() {
           padding: '32px',
           border: '1px solid var(--nl-border)',
           borderRadius: '16px',
-          background: 'var(--nl-bg-elevated)',
+          background:  '#111827',
         }}
       >
-        <h2 style={{ marginBottom: '20px' }}>
+        <h2 style={{ marginBottom: '20px',  color: 'white', }}>
           Nueva contraseña
         </h2>
 
-        <input
-          type="password"
-          placeholder="Nueva contraseña"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-          minLength={8}
+        <div
           style={{
-            width: '100%',
-            height: '48px',
-            marginBottom: '16px',
-            padding: '0 12px',
+            position: "relative",
+            marginBottom: "20px",
           }}
-        />
-        <input
-            type="password"
+        >
+          <input
+            type={showPassword ? "text" : "password"}
+            placeholder="Nueva contraseña"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            minLength={8}
+            style={{
+              width: "100%",
+              height: "52px",
+              padding: "0 50px 0 16px",
+              borderRadius: "12px",
+              border: "1px solid #444",
+              background: "#1e1e1e",
+              color: "white",
+              fontSize: "15px",
+              caretColor: "white",
+              outline: "none",
+            }}
+          />
+          <button
+            type="button"
+            onClick={() => setShowPassword(!showPassword)}
+            style={{
+              position: "absolute",
+              right: "14px",
+              top: "50%",
+              transform: "translateY(-50%)",
+              background: "none",
+              border: "none",
+              cursor: "pointer",
+              color: "#aaa",
+            }}
+          >
+            {showPassword ? (
+              <EyeOff size={20} />
+          ) : (
+            <Eye size={20} />
+          )}
+          </button>
+        </div>
+
+        <div
+          style={{
+            position: "relative",
+            marginBottom: "24px",
+          }}
+        >
+          <input
+            type={
+              showConfirmPassword ? "text" : "password"
+            }
             placeholder="Confirmar contraseña"
             value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
+            onChange={(e) =>
+              setConfirmPassword(e.target.value)
+            }
             required
             style={{
-                width: '100%',
-                height: '48px',
-                marginBottom: '16px',
-                padding: '0 12px',
-        }}
-        />
+              width: "100%",
+              height: "52px",
+              padding: "0 50px 0 16px",
+              borderRadius: "12px",
+              border: "1px solid #444",
+              background: "#1e1e1e",
+              color: "white",
+              fontSize: "15px",
+              caretColor: "white",
+              outline: "none",
+            }}
+          />
+
+          <button
+            type="button"
+            onClick={() =>
+              setShowConfirmPassword(
+                !showConfirmPassword
+              )
+            }
+            style={{
+              position: "absolute",
+              right: "14px",
+              top: "50%",
+              transform: "translateY(-50%)",
+              background: "none",
+              border: "none",
+              cursor: "pointer",
+              color: "#aaa",
+            }}
+          >
+           {showConfirmPassword ? (
+              <EyeOff size={20} />
+            ) : (
+              <Eye size={20} />
+            )} 
+          </button>
+        </div>
 
         <button
           type="submit"
           disabled={loading}
           style={{
             width: '100%',
-            height: '48px',
+            height: '52px',
             cursor: 'pointer',
+            border: 'none',
+            borderRadius: '12px',
+            background:
+              'linear-gradient(135deg, #ff4d4f, #ff2d55)',
+            color: 'white',
+            fontWeight: '700',
+            fontSize: '16px',
           }}
         >
           {loading ? 'Actualizando...' : 'Guardar contraseña'}
