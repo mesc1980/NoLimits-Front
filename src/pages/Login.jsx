@@ -9,7 +9,7 @@ import { Eye, EyeOff, Mail, Lock, User } from 'lucide-react';
 import Button      from '@/components/ui/Button';
 import Logo        from '@/components/layout/Logo';
 import useAppStore from '@/store/useAppStore';
-import { login } from '@/services/usuarios';
+import { login, registrarUsuario } from '@/services/usuarios';
 import { supabase } from '@/lib/supabase';
 
 const TAB_LOGIN    = 'login';
@@ -42,13 +42,35 @@ function Login() {
       setError('La contraseña debe tener mínimo 8 caracteres.');
       return;
     }
-
+    /*
     const data = await login(email, password);
 
     if (!data) {
       setError('Error al procesar respuesta del servidor.');
       return;
     }
+    */
+    // Si el usuario está en login → autenticar normal
+    // Si está en registro → crear cuenta y luego iniciar sesión automáticamente
+    let data;
+
+    if (tab === TAB_LOGIN) {
+      data = await login(email, password);
+    } else {
+      await registrarUsuario({ 
+        nombre: name,
+        apellidos: "Temporal",
+        correo: email,
+        telefono: "99999999",
+        contrasena: password
+      });
+      data = await login(email, password);
+    }
+    if (!data) {
+      setError("Error al procesar respuesta del servidor.");
+      return;
+    }
+    console.log('LOGIN DATA:', data);
 
     localStorage.setItem('nl_auth', '1');
     localStorage.setItem('nl_user', JSON.stringify(data));
@@ -58,21 +80,31 @@ function Login() {
       localStorage.setItem('nl_token', data.token);
     }
 
-    setUser({
-      id: data.id || data.usuarioId || '1',
-      name: data.nombre || data.name || email.split('@')[0],
+    const userData = {
+      id: data.id || data.usuarioId || "1",
+      name: data.nombre || data.name || email.split("@")[0],
       email: data.correo || data.email || email,
       token: data.token || null,
       avatar: null,
       role: data.rolNombre || data.rol || '',
-    });
+    };
+
+    localStorage.setItem('nl_user', JSON.stringify(userData));
+
+    console.log('SET USER:', userData);
+
+    setUser(userData);
+    //console.log('STORE DESPUÉS:', useAppStore.getState());
 
     const rolNombre = (data.rolNombre || data.rol || '').toUpperCase().trim();
 
     const esAdmin = rolNombre === 'ROLE_ADMIN' || rolNombre === 'ADMIN';
-
+    navigate(esAdmin ? '/admin' : '/', { replace: true });
+    //console.log('USUARIO GUARDADO:', useAppStore.getState());
     navigate(esAdmin ? '/admin' : '/', { replace: true });
   } catch (error) {
+    console.log('LOGIN ERROR:', error);
+
     console.error('Error real en login:', error);
     setError(error.message || 'Error al iniciar sesión.');
   } finally {
@@ -195,9 +227,11 @@ function Login() {
           {error && <p style={{ color: 'var(--nl-format-movie)', fontSize: '13px' }}>{error}</p>}
 
           {tab === TAB_LOGIN && (
-            <p style={{ fontSize: '13px', color: 'var(--nl-text-muted)', textAlign: 'right' }}>
-              <span style={{ cursor: 'pointer', textDecoration: 'underline' }}
-                onClick={() => setError('Función disponible cuando exista el backend.')}>
+            <p>
+              <span
+                style={{ cursor: 'pointer', textDecoration: 'underline' }}
+                onClick={() => navigate('/forgot-password')}
+              >
                 ¿Olvidaste tu contraseña?
               </span>
             </p>
