@@ -293,6 +293,33 @@ function Detail() {
     if (isSeries) fetchSeriesProviders(nativeId).then(setProviders).catch(() => {});
   }, [obra?.id]);
 
+  const isLoggedIn = () => {
+    const token = localStorage.getItem("nl_token");
+    const user = localStorage.getItem("nl_user");
+    const auth = localStorage.getItem("nl_auth");
+
+    if (!token || !user) return false;
+
+    if (auth !== "1" && auth !== "true") return false;
+
+    try {
+      const parsedUser = JSON.parse(user);
+      return !!parsedUser?.id || !!parsedUser?.correo || !!parsedUser?.email;
+    } catch {
+      return false;
+    }
+  };
+
+  const handleToggleList = () => {
+    if (!isLoggedIn()) {
+      alert("Debes iniciar sesión para guardar en favoritos");
+      navigate("/login");
+      return;
+    }
+
+    toggleList(obra);
+  };
+
   const isInList   = useAppStore((s) => obra ? s.isInList(obra.id) : false);
   const toggleList = useAppStore((s) => s.toggleList);
   const getReview  = useAppStore((s) => s.getReview);
@@ -551,7 +578,7 @@ function Detail() {
             {/* Botón guardar */}
             <Button
               variant={isInList ? 'secondary' : 'primary'}
-              onClick={() => toggleList(obra)}
+              onClick={handleToggleList}
               style={{ width: '100%' }}
             >
               {isInList ? <BookmarkCheck size={16} /> : <BookmarkPlus size={16} />}
