@@ -115,24 +115,31 @@ export function normalizeJikanAnime(item) {
 // Referencia: https://openlibrary.org/developers/api
 // ─────────────────────────────────────────────────────────────────
 export function normalizeOpenLibraryBook(item) {
-  // El ID de Open Library viene como "/works/OL45804W" — extraemos el código
   const nativeId = item.key?.replace('/works/', '')
     ?? item.edition_key?.[0]
-    ?? String(item.cover_i ?? Math.random());
+    ?? String(item.cover_i ?? item.covers?.[0] ?? Math.random());
+
+  const coverId = item.cover_i ?? item.covers?.[0] ?? item.cover_id;
 
   return {
     id:        buildMediaId(DATA_SOURCES.OPENLIBRARY, nativeId, MEDIA_TYPES.BOOK),
     type:      MEDIA_TYPES.BOOK,
     title:     item.title || 'Sin título',
-    year:      String(item.first_publish_year || '—'),
-    // ratings_average viene en escala /5 en algunos endpoints — Open Library es inconsistente
+    year:      String(item.first_publish_year || item.first_publish_date || '—'),
     rating:    formatRating(item.ratings_average),
-    poster:    buildOpenLibraryCoverUrl(item.cover_i, 'M'),
-    backdrop:  buildOpenLibraryCoverUrl(item.cover_i, 'L'),
-    synopsis:  typeof item.first_sentence === 'object'
-                 ? item.first_sentence.value
-                 : item.first_sentence || '',
-    genres:    Array.isArray(item.subject) ? item.subject.slice(0, 5) : [],
+    poster:    buildOpenLibraryCoverUrl(coverId, 'L'),
+    backdrop:  buildOpenLibraryCoverUrl(coverId, 'L'),
+    synopsis:  typeof item.description === 'object'
+                 ? item.description.value
+                 : item.description
+                   || (typeof item.first_sentence === 'object'
+                     ? item.first_sentence.value
+                     : item.first_sentence || ''),
+    genres:    Array.isArray(item.subjects)
+                 ? item.subjects.slice(0, 5)
+                 : Array.isArray(item.subject)
+                   ? item.subject.slice(0, 5)
+                   : [],
     saga:      null,
     platforms: [],
     source:    DATA_SOURCES.OPENLIBRARY,
