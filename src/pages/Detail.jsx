@@ -240,6 +240,9 @@ function Detail() {
 
     obtenerProducto(nativeId)
       .then((producto) => {
+
+        console.log(producto);
+        
         setNoLimitsRes({
           data: {
             id: producto.id,
@@ -249,7 +252,7 @@ function Detail() {
             poster: producto.imagenes?.[0] || producto.imagen || null,
             backdrop: producto.imagenes?.[0] || producto.imagen || null,
             rating: '—',
-            year: '—',
+            year: producto.anio || '—',
             genres: (producto.generos || [])
               .map((g) => typeof g === 'string' ? g : g?.nombre)
               .filter(Boolean),
