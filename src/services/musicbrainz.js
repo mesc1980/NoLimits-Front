@@ -28,7 +28,7 @@ function mbUrl(path, params = {}) {
  */
 export async function searchMusicReleaseGroups(query, limit = 20) {
   return apiFetch(
-    mbUrl('/release-group', { query: `releasegroup:"${query}"`, limit }),
+    mbUrl('/release-group', { query: `artist:${query} OR releasegroup:${query} OR recording:${query}`, limit }),
     { headers: MB_HEADERS }
   );
 }
@@ -42,6 +42,19 @@ export async function searchSoundtrack(franchise) {
     mbUrl('/release-group', {
       query: `releasegroup:"${franchise}" AND primarytype:Soundtrack`,
       limit: 10,
+    }),
+    { headers: MB_HEADERS }
+  );
+}
+
+/**
+ * Obtiene el detalle de un release-group por MBID.
+ * @param {string} id
+ */
+export async function getMusicReleaseGroupDetail(id) {
+  return apiFetch(
+    mbUrl(`/release-group/${id}`, {
+      inc: 'artist-credits+genres+tags+releases',
     }),
     { headers: MB_HEADERS }
   );
