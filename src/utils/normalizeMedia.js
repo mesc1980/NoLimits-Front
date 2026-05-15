@@ -207,12 +207,13 @@ export function normalizeMusicBrainzRelease(item) {
     type:      MEDIA_TYPES.MUSIC,
     title:     item.title || 'Sin título',
     year:      formatYear(item['first-release-date'] || item.date),
-    // rating.value en MusicBrainz = promedio de votos (0-5) → *2 para normalizar
     rating:    item.rating?.value ? formatRating(item.rating.value * 2) : '—',
-    // MusicBrainz no provee imágenes directamente — el backend puede complementar
-    // con la Cover Art Archive: https://coverartarchive.org/release-group/{mbid}
-    poster:    null,
-    backdrop:  null,
+
+    // MusicBrainz no entrega imágenes directamente.
+    // Por eso usamos una imagen local por defecto para música.
+    poster:    '/img/fallbacks/music-fallback.webp',
+    backdrop:  '/img/fallbacks/music-fallback.webp',
+
     synopsis:  item.disambiguation || '',
     genres:    item.tags?.slice(0, 5).map((t) => t.name) ?? [],
     saga:      null,
