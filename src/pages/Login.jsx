@@ -23,6 +23,7 @@ function Login() {
   const [showPwd,  setShowPwd]  = useState(false);
   const [loading,  setLoading]  = useState(false);
   const [error,    setError]    = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
 
   const setUser  = useAppStore((s) => s.setUser);
   const navigate = useNavigate();
@@ -95,17 +96,24 @@ function Login() {
 
     setUser(userData);
 
+    setSuccessMessage(
+      tab === TAB_LOGIN
+        ? 'Inicio de sesión exitoso'
+        : 'Cuenta creada correctamente'
+    );
     setEmail('');
     setPassword('');
     setName('');
-    //console.log('STORE DESPUÉS:', useAppStore.getState());
 
     const rolNombre = (data.rolNombre || data.rol || '').toUpperCase().trim();
 
     const esAdmin = rolNombre === 'ROLE_ADMIN' || rolNombre === 'ADMIN';
-    navigate(esAdmin ? '/admin' : '/', { replace: true });
-    //console.log('USUARIO GUARDADO:', useAppStore.getState());
-    navigate(esAdmin ? '/admin' : '/', { replace: true });
+
+    setTimeout(() => {
+      setSuccessMessage('');
+      navigate(esAdmin ? '/admin' : '/', { replace: true });
+    }, 2000);
+
   } catch (error) {
     console.log('LOGIN ERROR:', error);
 
@@ -115,7 +123,6 @@ function Login() {
     setLoading(false);
   }
 }
-
   async function handleGoogleLogin() {
     try {
       setLoading(true);
@@ -232,6 +239,21 @@ function Login() {
           </div>
 
           {error && <p style={{ color: 'var(--nl-format-movie)', fontSize: '13px' }}>{error}</p>}
+          {successMessage && (
+            <div
+              style={{
+                background: '#22c55e',
+                color: 'white',
+                padding: '12px',
+                borderRadius: '10px',
+                fontSize: '14px',
+                fontWeight: '600',
+              textAlign: 'center',
+              }}
+            >
+              {successMessage}
+            </div>
+          )}
 
           {tab === TAB_LOGIN && (
             <p>
