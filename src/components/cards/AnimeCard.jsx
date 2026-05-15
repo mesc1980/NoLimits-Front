@@ -90,9 +90,11 @@ function handleSave(e) {
               width: '34px',
               height: '34px',
               borderRadius: '999px',
-              border: isInList ? '1px solid #facc15' : '1px solid rgba(255,255,255,0.25)',
-              background: isInList ? '#facc15' : 'rgba(10,10,11,0.78)',
-              color: isInList ? '#111' : '#fff',
+              border: isInList
+                ? '1px solid #facc15'
+                : '1px solid rgba(255,255,255,0.25)',
+              background: 'rgba(10,10,11,0.78)',
+              color: isInList ? '#facc15' : '#fff',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -102,8 +104,8 @@ function handleSave(e) {
           >
             <Star
               size={18}
-              color={isInList ? '#111' : '#fff'}
-              fill={isInList ? '#111' : 'none'}
+              color={isInList ? '#facc15' : '#fff'}
+              fill="none"
             />
           </button>
         )}
