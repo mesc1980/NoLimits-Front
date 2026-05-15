@@ -102,6 +102,10 @@ function GroupHeader({ icon: Icon, label, count, index }) {
 function ResultGroup({ group, obras, groupIndex, activeType }) {
   if (!obras || obras.length === 0) return null;
 
+  const uniqueObras = Array.from(
+    new Map(obras.map((obra) => [obra.id, obra])).values()
+  );
+
   /* Libros: grid horizontal */
   const gridClass = group.cardType === 'book'
     ? 'nl-grid nl-grid--books'
@@ -119,7 +123,7 @@ function ResultGroup({ group, obras, groupIndex, activeType }) {
         <GroupHeader
           icon={group.icon}
           label={group.label}
-          count={obras.length}
+          count={uniqueObras.length}
           index={groupIndex}
         />
       )}
@@ -130,7 +134,7 @@ function ResultGroup({ group, obras, groupIndex, activeType }) {
         initial="hidden"
         animate="visible"
       >
-        {obras.slice(0, 24).map((obra) => (
+        {uniqueObras.slice(0, 24).map((obra) => (
           <CardForType key={obra.id} obra={obra} cardType={group.cardType} />
         ))}
       </motion.div>
