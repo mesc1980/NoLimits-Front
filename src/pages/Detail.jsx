@@ -26,6 +26,7 @@ import { useMovieDetail, useSeriesDetail } from '@/hooks/useTMDB';
 import { useAnimeDetail }                  from '@/hooks/useJikan';
 import { useGameDetail }                   from '@/hooks/useIGDB';
 import { useBookDetail }  from '@/hooks/useOpenLibrary';
+import { useMusicDetail } from '@/hooks/useMusicBrainz';
 import { fetchMovieProviders, fetchSeriesProviders } from '@/services/whereToWatch';
 import { useSagaSearch }   from '@/hooks/useSearch';
 import useAppStore         from '@/store/useAppStore';
@@ -221,6 +222,7 @@ function Detail() {
   const isAnime  = source === DATA_SOURCES.JIKAN;
   const isGame   = source === DATA_SOURCES.IGDB;
   const isBook   = source === DATA_SOURCES.OPENLIBRARY && type === MEDIA_TYPES.BOOK;
+  const isMusic = source === DATA_SOURCES.MUSICBRAINZ && type === MEDIA_TYPES.MUSIC;
 
   const movieRes  = useMovieDetail (isMovie  ? nativeId : null);
   const seriesRes = useSeriesDetail(isSeries ? nativeId : null);
@@ -228,6 +230,7 @@ function Detail() {
   const gameRes   = useGameDetail  (isGame   ? nativeId : null);
   const bookWorkKey = isBook ? `/works/${nativeId}` : null;
   const bookRes     = useBookDetail(bookWorkKey);
+  const musicRes = useMusicDetail(isMusic ? nativeId : null);
 
   const isNoLimits = source === 'nolimits';
 
@@ -284,6 +287,7 @@ function Detail() {
     isAnime    ? animeRes    :
     isGame     ? gameRes     :
     isBook     ? bookRes     :
+    isMusic    ? musicRes    :
     { data: null, isLoading: false, error: new Error(`Tipo no soportado: ${source}/${type}`) };
 
   const [providers, setProviders] = useState(null);
