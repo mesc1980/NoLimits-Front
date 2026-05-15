@@ -5,7 +5,11 @@
  */
 
 import { useQuery } from '@tanstack/react-query';
-import { searchMusicReleaseGroups, searchSoundtrack } from '@/services/musicbrainz';
+import { 
+  searchMusicReleaseGroups, 
+  searchSoundtrack, 
+  getMusicReleaseGroupDetail, 
+} from '@/services/musicbrainz';
 import { normalizeMusicBrainzRelease } from '@/utils/normalizeMedia';
 
 const STALE_TIME = 15 * 60 * 1000;
@@ -38,6 +42,18 @@ export function useFranchiseSoundtracks(franchise) {
       return (res['release-groups'] ?? []).map(normalizeMusicBrainzRelease);
     },
     enabled:   Boolean(franchise?.trim()),
+    staleTime: STALE_TIME,
+  });
+}
+
+export function useMusicDetail(id) {
+  return useQuery({
+    queryKey: ['musicbrainz', 'detail', id],
+    queryFn: async () => {
+      const res = await getMusicReleaseGroupDetail(id);
+      return normalizeMusicBrainzRelease(res);
+    },
+    enabled: Boolean(id),
     staleTime: STALE_TIME,
   });
 }

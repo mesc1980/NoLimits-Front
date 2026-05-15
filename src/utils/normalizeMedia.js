@@ -205,16 +205,14 @@ export function normalizeMusicBrainzRelease(item) {
   return {
     id:        buildMediaId(DATA_SOURCES.MUSICBRAINZ, item.id, MEDIA_TYPES.MUSIC),
     type:      MEDIA_TYPES.MUSIC,
-    title:     item.title || 'Sin título',
+    title:     item.title || item.name || item['artist-credit']?.[0]?.artist?.name || 'Sin título',
     year:      formatYear(item['first-release-date'] || item.date),
     rating:    item.rating?.value ? formatRating(item.rating.value * 2) : '—',
 
-    // MusicBrainz no entrega imágenes directamente.
-    // Por eso usamos una imagen local por defecto para música.
     poster:    '/img/fallbacks/music-fallback.webp',
     backdrop:  '/img/fallbacks/music-fallback.webp',
 
-    synopsis:  item.disambiguation || '',
+    synopsis:  item.disambiguation || item['primary-type'] || '',
     genres:    item.tags?.slice(0, 5).map((t) => t.name) ?? [],
     saga:      null,
     platforms: [],
