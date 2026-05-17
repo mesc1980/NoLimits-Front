@@ -16,7 +16,8 @@ function Header() {
   const navigate    = useNavigate();
 
   const myListCount = useAppStore((s) => s.myList.length);
-  const user        = useAppStore((s) => s.user);
+  const user        = useAppStore((state) => state.user);
+  console.log('USER HEADER:', user);
   const clearUser   = useAppStore((s) => s.clearUser);
 
   return (
@@ -73,20 +74,40 @@ function Header() {
           {user ? (
             <button
               className="nl-header__search-btn"
-              onClick={clearUser}
-              title={`Cerrar sesión (${user.name})`}
-              style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '13px' }}
+              onClick={() => {
+                clearUser();
+                localStorage.removeItem('nl_auth');
+                localStorage.removeItem('nl_user');
+                localStorage.removeItem('nl_role');
+                localStorage.removeItem('nl_token');
+                navigate('/');
+              }}
+              aria-label="Cerrar sesión"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                fontSize: '13px',
+              }}
+              
             >
-              <User size={16} />
-              <LogOut size={14} />
+              <LogOut size={16} />
+                Salir
             </button>
           ) : (
             <button
               className="nl-header__search-btn"
               onClick={() => navigate('/login')}
-              aria-label="Iniciar sesión"
+              aria-label='Iniciar sesión'
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "6px",
+                fontSize: "13px",
+              }}
             >
-              <LogIn size={18} />
+              <User size={16} />
+                Perfil
             </button>
           )}
         </div>

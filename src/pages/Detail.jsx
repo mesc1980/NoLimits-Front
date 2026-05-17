@@ -24,12 +24,15 @@ import WhereToFind    from '@/components/ui/WhereToFind';
 import ContentSection from '@/components/sections/ContentSection';
 import { useMovieDetail, useSeriesDetail } from '@/hooks/useTMDB';
 import { useAnimeDetail }                  from '@/hooks/useJikan';
-import { useGameDetail } from '@/hooks/useRAWG';
+import { useGameDetail }                   from '@/hooks/useRAWG';
+import { useBookDetail }                   from '@/hooks/useOpenLibrary';
+import { useMusicDetail }                  from '@/hooks/useMusicBrainz';
 import { fetchMovieProviders, fetchSeriesProviders } from '@/services/whereToWatch';
 import { useSagaSearch }   from '@/hooks/useSearch';
 import useAppStore         from '@/store/useAppStore';
 import { parseMediaSlug }  from '@/utils/formatters';
 import { DATA_SOURCES, MEDIA_TYPES } from '@/utils/constants';
+import { obtenerProducto } from '@/services/productos';
 
 /* ── Etiqueta de sección estilo brandbook ─────────────────── */
 function SectionLabel({ number, children }) {
@@ -217,18 +220,74 @@ function Detail() {
   const isMovie  = source === DATA_SOURCES.TMDB && type === MEDIA_TYPES.MOVIE;
   const isSeries = source === DATA_SOURCES.TMDB && type === MEDIA_TYPES.SERIES;
   const isAnime  = source === DATA_SOURCES.JIKAN;
-  const isGame = source === DATA_SOURCES.IGDB || source === 'rawg';
+  const isGame   = source === DATA_SOURCES.IGDB || source === 'rawg';
+  const isBook   = source === DATA_SOURCES.OPENLIBRARY && type === MEDIA_TYPES.BOOK;
+  const isMusic  = source === DATA_SOURCES.MUSICBRAINZ && type === MEDIA_TYPES.MUSIC;
 
   const movieRes  = useMovieDetail (isMovie  ? nativeId : null);
   const seriesRes = useSeriesDetail(isSeries ? nativeId : null);
   const animeRes  = useAnimeDetail (isAnime  ? nativeId : null);
   const gameRes   = useGameDetail  (isGame   ? nativeId : null);
+  const bookWorkKey = isBook ? `/works/${nativeId}` : null;
+  const bookRes     = useBookDetail(bookWorkKey);
+  const musicRes = useMusicDetail(isMusic ? nativeId : null);
+
+  const isNoLimits = source === 'nolimits';
+
+  const [noLimitsRes, setNoLimitsRes] = useState({
+    data: null,
+    isLoading: false,
+    error: null,
+  });
+
+  useEffect(() => {
+    if (!isNoLimits || !nativeId) return;
+
+    setNoLimitsRes({ data: null, isLoading: true, error: null });
+
+    obtenerProducto(nativeId)
+      .then((producto) => {
+
+        console.log(producto);
+        
+        setNoLimitsRes({
+          data: {
+            id: producto.id,
+            source: 'nolimits',
+            title: producto.nombre,
+            type: producto.tipoProductoNombre || 'Producto',
+            poster: producto.imagenes?.[0] || producto.imagen || null,
+            backdrop: producto.imagenes?.[0] || producto.imagen || null,
+            rating: '—',
+            year: producto.anio || '—',
+            genres: (producto.generos || [])
+              .map((g) => typeof g === 'string' ? g : g?.nombre)
+              .filter(Boolean),
+
+            platforms: (producto.plataformas || [])
+              .map((p) => typeof p === 'string' ? p : p?.nombre)
+              .filter(Boolean),
+            synopsis: producto.sinopsis || 'Sin sinopsis disponible.',
+            saga: producto.saga || null,
+            linksCompra: producto.linksCompra || [],
+          },
+          isLoading: false,
+          error: null,
+        });
+      })
+      .catch((err) => {
+        setNoLimitsRes({ data: null, isLoading: false, error: err });
+      });
+  }, [isNoLimits, nativeId]);
 
   const { data: obra, isLoading, error } =
-    isMovie  ? movieRes  :
-    isSeries ? seriesRes :
-    isAnime  ? animeRes  :
-    isGame   ? gameRes   :
+    isNoLimits ? noLimitsRes :
+    isMovie    ? movieRes    :
+    isSeries   ? seriesRes   :
+    isAnime    ? animeRes    :
+    isGame     ? gameRes     :
+    isBook     ? bookRes     :
+    isMusic    ? musicRes    :
     { data: null, isLoading: false, error: new Error(`Tipo no soportado: ${source}/${type}`) };
 
   const [providers, setProviders] = useState(null);
@@ -237,6 +296,33 @@ function Detail() {
     if (isMovie)  fetchMovieProviders(nativeId).then(setProviders).catch(() => {});
     if (isSeries) fetchSeriesProviders(nativeId).then(setProviders).catch(() => {});
   }, [obra?.id]);
+
+  const isLoggedIn = () => {
+    const token = localStorage.getItem("nl_token");
+    const user = localStorage.getItem("nl_user");
+    const auth = localStorage.getItem("nl_auth");
+
+    if (!token || !user) return false;
+
+    if (auth !== "1" && auth !== "true") return false;
+
+    try {
+      const parsedUser = JSON.parse(user);
+      return !!parsedUser?.id || !!parsedUser?.correo || !!parsedUser?.email;
+    } catch {
+      return false;
+    }
+  };
+
+  const handleToggleList = () => {
+    if (!isLoggedIn()) {
+      alert("Debes iniciar sesión para guardar en favoritos");
+      navigate("/login");
+      return;
+    }
+
+    toggleList(obra);
+  };
 
   const isInList   = useAppStore((s) => obra ? s.isInList(obra.id) : false);
   const toggleList = useAppStore((s) => s.toggleList);
@@ -496,7 +582,7 @@ function Detail() {
             {/* Botón guardar */}
             <Button
               variant={isInList ? 'secondary' : 'primary'}
-              onClick={() => toggleList(obra)}
+              onClick={handleToggleList}
               style={{ width: '100%' }}
             >
               {isInList ? <BookmarkCheck size={16} /> : <BookmarkPlus size={16} />}

@@ -54,11 +54,15 @@ function SagaSection({ section, obras, accentColor }) {
 
   return (
     <motion.section
+      id={`saga-section-${section.key}`}
       initial={{ opacity: 0, y: 24 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-60px' }}
       transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
-      style={{ marginTop: 'var(--space-12)' }}
+      style={{
+        marginTop: 'var(--space-12)',
+        scrollMarginTop: '90px',
+      }}
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', marginBottom: 'var(--space-5)', paddingBottom: 'var(--space-3)', borderBottom: '1px solid var(--nl-border)' }}>
         <Icon size={14} color={accentColor || 'var(--nl-accent)'} />
@@ -152,6 +156,17 @@ function CuratedSagaView({ sagaName, curated }) {
 
   const totalResults = Object.values(grouped).reduce((acc, arr) => acc + (arr?.length ?? 0), 0);
 
+  const scrollToSection = (id) => {
+    document.getElementById(`saga-section-${id}`)?.scrollIntoView({
+      behavior: 'smooth',
+      block: 'start',
+    });
+  };
+
+  const availableSections = SECTIONS.filter((section) => {
+    return grouped[section.key]?.length > 0;
+  });
+
   return (
     <>
       {/* ── Hero de la saga ─────────────────────────────────── */}
@@ -235,26 +250,26 @@ function CuratedSagaView({ sagaName, curated }) {
             transition={{ duration: 0.5, delay: 0.8 }}
             style={{ display: 'flex', gap: 'var(--space-3)', flexWrap: 'wrap' }}
           >
-            {curated.types.map((t) => {
-              const labels = { movies: 'Películas', series: 'Series', anime: 'Anime', games: 'Juegos', books: 'Libros', music: 'Música' };
-              return (
-                <span
-                  key={t}
-                  style={{
-                    padding:      '4px 12px',
-                    borderRadius: '20px',
-                    background:   `${curated.accent}22`,
-                    border:       `1px solid ${curated.accent}55`,
-                    color:        curated.accent,
-                    fontSize:     '12px',
-                    fontFamily:   'var(--font-mono)',
-                    letterSpacing:'0.04em',
-                  }}
-                >
-                  {labels[t] || t}
-                </span>
-              );
-            })}
+            {availableSections.map((section) => (
+              <button
+                key={section.key}
+                type="button"
+                onClick={() => scrollToSection(section.key)}
+                style={{
+                  padding:      '4px 12px',
+                  borderRadius: '20px',
+                  background:   `${curated.accent}22`,
+                  border:       `1px solid ${curated.accent}55`,
+                  color:        curated.accent,
+                  fontSize:     '12px',
+                  fontFamily:   'var(--font-mono)',
+                  letterSpacing:'0.04em',
+                  cursor:       'pointer',
+                }}
+              >
+                {section.label}
+              </button>
+            ))}
           </motion.div>
         </div>
       </div>

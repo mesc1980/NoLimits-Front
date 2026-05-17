@@ -9,7 +9,7 @@ import { Eye, EyeOff, Mail, Lock, User } from 'lucide-react';
 import Button      from '@/components/ui/Button';
 import Logo        from '@/components/layout/Logo';
 import useAppStore from '@/store/useAppStore';
-import { login } from '@/services/usuarios';
+import { login, registrarUsuario } from '@/services/usuarios';
 import { supabase } from '@/lib/supabase';
 
 const TAB_LOGIN    = 'login';
@@ -23,6 +23,7 @@ function Login() {
   const [showPwd,  setShowPwd]  = useState(false);
   const [loading,  setLoading]  = useState(false);
   const [error,    setError]    = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
 
   const setUser  = useAppStore((s) => s.setUser);
   const navigate = useNavigate();
@@ -42,13 +43,35 @@ function Login() {
       setError('La contraseña debe tener mínimo 8 caracteres.');
       return;
     }
-
+    /*
     const data = await login(email, password);
 
     if (!data) {
       setError('Error al procesar respuesta del servidor.');
       return;
     }
+    */
+    // Si el usuario está en login → autenticar normal
+    // Si está en registro → crear cuenta y luego iniciar sesión automáticamente
+    let data;
+
+    if (tab === TAB_LOGIN) {
+      data = await login(email, password);
+    } else {
+      await registrarUsuario({ 
+        nombre: name,
+        apellidos: "Temporal",
+        correo: email,
+        telefono: "99999999",
+        contrasena: password
+      });
+      data = await login(email, password);
+    }
+    if (!data) {
+      setError("Error al procesar respuesta del servidor.");
+      return;
+    }
+    console.log('LOGIN DATA:', data);
 
     localStorage.setItem('nl_auth', '1');
     localStorage.setItem('nl_user', JSON.stringify(data));
@@ -58,28 +81,48 @@ function Login() {
       localStorage.setItem('nl_token', data.token);
     }
 
-    setUser({
-      id: data.id || data.usuarioId || '1',
-      name: data.nombre || data.name || email.split('@')[0],
+    const userData = {
+      id: data.id || data.usuarioId || "1",
+      name: data.nombre || data.name || email.split("@")[0],
       email: data.correo || data.email || email,
       token: data.token || null,
       avatar: null,
       role: data.rolNombre || data.rol || '',
-    });
+    };
+
+    localStorage.setItem('nl_user', JSON.stringify(userData));
+
+    console.log('SET USER:', userData);
+
+    setUser(userData);
+
+    setSuccessMessage(
+      tab === TAB_LOGIN
+        ? 'Inicio de sesión exitoso'
+        : 'Cuenta creada correctamente'
+    );
+    setEmail('');
+    setPassword('');
+    setName('');
 
     const rolNombre = (data.rolNombre || data.rol || '').toUpperCase().trim();
 
     const esAdmin = rolNombre === 'ROLE_ADMIN' || rolNombre === 'ADMIN';
 
-    navigate(esAdmin ? '/admin' : '/', { replace: true });
+    setTimeout(() => {
+      setSuccessMessage('');
+      navigate(esAdmin ? '/admin' : '/', { replace: true });
+    }, 2000);
+
   } catch (error) {
+    console.log('LOGIN ERROR:', error);
+
     console.error('Error real en login:', error);
     setError(error.message || 'Error al iniciar sesión.');
   } finally {
     setLoading(false);
   }
 }
-
   async function handleGoogleLogin() {
     try {
       setLoading(true);
@@ -163,8 +206,10 @@ function Login() {
           ))}
         </div>
 
-        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
-          {tab === TAB_REGISTER && (
+        <form onSubmit={handleSubmit} 
+          autoComplete="off"
+          style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+            {tab === TAB_REGISTER && (
             <div style={{ position: 'relative' }}>
               <User size={16} style={iconStyle} />
               <input type="text" placeholder="Tu nombre" value={name} onChange={(e) => setName(e.target.value)} style={inputStyle} required />
@@ -173,13 +218,14 @@ function Login() {
 
           <div style={{ position: 'relative' }}>
             <Mail size={16} style={iconStyle} />
-            <input type="email" placeholder="tu@email.com" value={email} onChange={(e) => setEmail(e.target.value)} style={inputStyle} required />
+            <input type="email" placeholder="tu@email.com" value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="new-email" style={inputStyle} required />
           </div>
 
           <div style={{ position: 'relative' }}>
             <Lock size={16} style={iconStyle} />
             <input
               type={showPwd ? 'text' : 'password'}
+              autoComplete="new-password"
               placeholder="Contraseña"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -193,11 +239,28 @@ function Login() {
           </div>
 
           {error && <p style={{ color: 'var(--nl-format-movie)', fontSize: '13px' }}>{error}</p>}
+          {successMessage && (
+            <div
+              style={{
+                background: '#22c55e',
+                color: 'white',
+                padding: '12px',
+                borderRadius: '10px',
+                fontSize: '14px',
+                fontWeight: '600',
+              textAlign: 'center',
+              }}
+            >
+              {successMessage}
+            </div>
+          )}
 
           {tab === TAB_LOGIN && (
-            <p style={{ fontSize: '13px', color: 'var(--nl-text-muted)', textAlign: 'right' }}>
-              <span style={{ cursor: 'pointer', textDecoration: 'underline' }}
-                onClick={() => setError('Función disponible cuando exista el backend.')}>
+            <p>
+              <span
+                style={{ cursor: 'pointer', textDecoration: 'underline' }}
+                onClick={() => navigate('/forgot-password')}
+              >
                 ¿Olvidaste tu contraseña?
               </span>
             </p>
@@ -229,7 +292,7 @@ function Login() {
 
         <p style={{ textAlign: 'center', fontSize: '12px', color: 'var(--nl-text-muted)', marginTop: 'var(--space-4)' }}>
           Al continuar aceptas los{' '}
-          <Link to="/" style={{ color: 'var(--nl-accent)', textDecoration: 'underline' }}>términos de uso</Link>.
+          <Link to="/terms" style={{ color: 'var(--nl-accent)', textDecoration: 'underline' }}>términos de uso</Link>.
         </p>
       </motion.div>
     </div>

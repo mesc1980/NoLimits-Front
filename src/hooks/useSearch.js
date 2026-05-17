@@ -30,6 +30,7 @@ import { searchAnime }                   from '@/services/jikan';
 import { searchBooks }                   from '@/services/openLibrary';
 import { searchGames, searchGamesForSaga } from '@/services/rawg';
 import { searchMusicReleaseGroups }      from '@/services/musicbrainz';
+import { buscarProductosNoLimits } from '@/services/productos';
 import {
   normalizeTmdbMovie,
   normalizeTmdbSeries,
@@ -83,6 +84,10 @@ export function useSearch(query, type = 'all') {
             (r) => (r['release-groups'] ?? []).map(normalizeMusicBrainzRelease)
           )
         );
+      }
+
+      if (type === 'all') {
+        tasks.push(buscarProductosNoLimits(query));
       }
 
       // Promise.allSettled: si Jikan falla (rate limit), igual muestra TMDB e IGDB.

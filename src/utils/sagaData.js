@@ -111,7 +111,7 @@ export const CURATED_SAGAS = {
  * "Spider-Man" → "spider-man", "STAR WARS" → "star wars"
  */
 export function normalizeSagaKey(name) {
-  return name.toLowerCase().trim().replace(/-/g, ' ');
+  return name.toLowerCase().trim();
 }
 
 /**

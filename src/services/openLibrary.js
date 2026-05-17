@@ -44,7 +44,16 @@ export async function searchBooks(query, page = 1) {
  */
 export async function fetchBooksBySubject(subject = 'science_fiction') {
   const params = new URLSearchParams({ limit: 20 });
-  return apiFetch(`${OPENLIBRARY_BASE_URL}/subjects/${subject}.json?${params}`);
+
+  const response = await fetch(
+    `${OPENLIBRARY_BASE_URL}/subjects/${subject}.json?${params}`
+  );
+
+  if (!response.ok) {
+    throw new Error('No se pudieron cargar los libros');
+  }
+
+  return response.json();
 }
 
 /* ============================================================
@@ -56,5 +65,13 @@ export async function fetchBooksBySubject(subject = 'science_fiction') {
  * @param {string} workKey - Ej: "/works/OL45804W"
  */
 export async function fetchBookDetail(workKey) {
-  return apiFetch(`${OPENLIBRARY_BASE_URL}${workKey}.json`);
+  const response = await fetch(
+    `${OPENLIBRARY_BASE_URL}${workKey}.json`
+  );
+
+  if (!response.ok) {
+    throw new Error('No se pudo cargar el detalle del libro');
+  }
+
+  return response.json();
 }

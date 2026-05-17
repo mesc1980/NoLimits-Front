@@ -21,6 +21,12 @@ import SkeletonCard from '@/components/ui/SkeletonCard';
 import SearchBar    from '@/components/ui/SearchBar';
 import { useSearch } from '@/hooks/useSearch';
 import { MEDIA_TYPES, CARD_STAGGER_DELAY } from '@/utils/constants';
+import { useTrendingMovies, useTrendingSeries } from '@/hooks/useTMDB';
+import { useTopAnime } from '@/hooks/useJikan';
+import { useBooksBySubject } from '@/hooks/useOpenLibrary';
+import { useTopGames } from '@/hooks/useIGDB';
+import { useMusicSearch } from '@/hooks/useMusicBrainz';
+import { BOOK_SUBJECTS } from '@/utils/constants';
 
 /* ── Configuración de grupos por tipo ─────────────────────── */
 const TYPE_GROUPS = [
@@ -102,6 +108,10 @@ function GroupHeader({ icon: Icon, label, count, index }) {
 function ResultGroup({ group, obras, groupIndex, activeType }) {
   if (!obras || obras.length === 0) return null;
 
+  const uniqueObras = Array.from(
+    new Map(obras.map((obra) => [obra.id, obra])).values()
+  );
+
   /* Libros: grid horizontal */
   const gridClass = group.cardType === 'book'
     ? 'nl-grid nl-grid--books'
@@ -119,7 +129,7 @@ function ResultGroup({ group, obras, groupIndex, activeType }) {
         <GroupHeader
           icon={group.icon}
           label={group.label}
-          count={obras.length}
+          count={uniqueObras.length}
           index={groupIndex}
         />
       )}
@@ -130,7 +140,7 @@ function ResultGroup({ group, obras, groupIndex, activeType }) {
         initial="hidden"
         animate="visible"
       >
-        {obras.slice(0, 12).map((obra) => (
+        {uniqueObras.slice(0, 24).map((obra) => (
           <CardForType key={obra.id} obra={obra} cardType={group.cardType} />
         ))}
       </motion.div>
@@ -147,13 +157,62 @@ function SearchResults() {
 
   const { data: results, isLoading, isFetching } = useSearch(query, type);
 
+  const isDefaultView = !query.trim();
+
+  const defaultMovies = useTrendingMovies();
+  const defaultSeries = useTrendingSeries();
+  const defaultAnime  = useTopAnime();
+  const defaultBooks  = useBooksBySubject(BOOK_SUBJECTS.SCI_FI);
+  const defaultGames  = useTopGames();
+  const defaultMusic  = useMusicSearch('soundtrack');
+
+  const defaultQueryByType = {
+    [MEDIA_TYPES.MOVIE]:  defaultMovies,
+    [MEDIA_TYPES.SERIES]: defaultSeries,
+    [MEDIA_TYPES.ANIME]:  defaultAnime,
+    [MEDIA_TYPES.BOOK]:   defaultBooks,
+    [MEDIA_TYPES.GAME]:   defaultGames,
+    [MEDIA_TYPES.MUSIC]:  defaultMusic,
+  };
+
+  const activeDefaultQuery = defaultQueryByType[type];
+
+  const allDefaultResults = [
+    ...(defaultMovies.data ?? []),
+    ...(defaultSeries.data ?? []),
+    ...(defaultAnime.data ?? []),
+    ...(defaultBooks.data ?? []),
+    ...(defaultGames.data ?? []),
+    ...(defaultMusic.data ?? []),
+  ];
+
+  const allDefaultIsLoading =
+    defaultMovies.isLoading ||
+    defaultSeries.isLoading ||
+    defaultAnime.isLoading ||
+    defaultBooks.isLoading ||
+    defaultGames.isLoading ||
+    defaultMusic.isLoading;
+
+  const finalResults = isDefaultView
+    ? type === 'all'
+      ? allDefaultResults
+      : activeDefaultQuery?.data ?? []
+    : results ?? [];
+
+  const finalIsLoading = isDefaultView
+    ? type === 'all'
+      ? allDefaultIsLoading
+      : activeDefaultQuery?.isLoading
+    : isLoading;
+
+  const totalCount = finalResults.length;
+
   /* Agrupa los resultados por tipo */
   const grouped = TYPE_GROUPS.reduce((acc, group) => {
-    acc[group.type] = (results ?? []).filter((o) => o.type === group.type);
+    acc[group.type] = finalResults.filter((o) => o.type === group.type);
     return acc;
   }, {});
-
-  const totalCount = results?.length ?? 0;
 
   return (
     <div style={{ paddingBottom: 'var(--space-16)' }}>
@@ -185,7 +244,7 @@ function SearchResults() {
           </div>
 
           {/* Título con query */}
-          {query && (
+          {(query || isDefaultView) && (
             <motion.h1
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1,  y: 0 }}
@@ -197,20 +256,45 @@ function SearchResults() {
                 marginBottom:  'var(--space-4)',
               }}
             >
-              {isLoading ? (
-                <>Buscando <span style={{ color: 'var(--nl-accent)' }}>"{query}"</span>…</>
+              {finalIsLoading ? (
+                query ? (
+                  <>Buscando <span style={{ color: 'var(--nl-accent)' }}>"{query}"</span>…</>
+                ) : (
+                  <>Cargando contenido…</>
+                )
               ) : totalCount > 0 ? (
-                <>
-                  <span style={{ color: 'var(--nl-accent)' }}>{totalCount}</span>
-                  {' '}resultado{totalCount !== 1 ? 's' : ''} para{' '}
-                  <span style={{ color: 'var(--nl-text-secondary)', fontWeight: 500 }}>"{query}"</span>
-                </>
+                query ? (
+                  <>
+                    <span style={{ color: 'var(--nl-accent)' }}>{totalCount}</span>
+                    {' '}resultado{totalCount !== 1 ? 's' : ''} para{' '}
+                    <span style={{ color: 'var(--nl-text-secondary)', fontWeight: 500 }}>
+                      "{query}"
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    <span style={{ color: 'var(--nl-accent)' }}>{totalCount}</span>
+                    {' '}
+                    {type === 'all'
+                      ? 'contenidos disponibles'
+                      : `${TYPE_GROUPS.find((g) => g.type === type)?.label.toLowerCase()} disponibles`}
+                  </>
+                )
               ) : (
-                <>Sin resultados para <span style={{ color: 'var(--nl-text-secondary)' }}>"{query}"</span></>
+                query ? (
+                  <>
+                    Sin resultados para{' '}
+                    <span style={{ color: 'var(--nl-text-secondary)' }}>
+                      "{query}"
+                    </span>
+                  </>
+                ) : (
+                  <>Sin contenido disponible</>
+                )
               )}
 
               {/* Indicador de fetch en progreso */}
-              {isFetching && !isLoading && (
+              {isFetching && !finalIsLoading && !isDefaultView && (
                 <motion.span
                   animate={{ opacity: [0.4, 1, 0.4] }}
                   transition={{ duration: 1.2, repeat: Infinity }}
@@ -230,14 +314,14 @@ function SearchResults() {
       {/* ── CONTENIDO ─────────────────────────────────────── */}
       <div className="container">
         {/* Skeleton */}
-        {isLoading && (
+        {finalIsLoading && (
           <div className="nl-grid nl-grid--search">
             <SkeletonCard count={12} />
           </div>
         )}
 
         {/* Grupos de resultados */}
-        {!isLoading && totalCount > 0 && (
+        {!finalIsLoading && totalCount > 0 && (
           TYPE_GROUPS.map((group, i) => (
             grouped[group.type]?.length > 0 && (
               <ResultGroup
@@ -252,18 +336,54 @@ function SearchResults() {
         )}
 
         {/* Estado vacío */}
-        {!isLoading && totalCount === 0 && query && (
+        {!finalIsLoading && totalCount === 0 && query && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             style={{ textAlign: 'center', padding: 'var(--space-16) 0' }}
           >
-            <p style={{ fontFamily: 'var(--font-display)', fontSize: '24px', fontWeight: 700, letterSpacing: '-0.02em', marginBottom: 'var(--space-3)' }}>
+            <p
+              style={{
+                fontFamily: 'var(--font-display)',
+                fontSize: '24px',
+                fontWeight: 700,
+                letterSpacing: '-0.02em',
+                marginBottom: 'var(--space-3)',
+              }}
+            >
               Sin resultados
             </p>
-            <p style={{ color: 'var(--nl-text-muted)', fontSize: '14px', marginBottom: 'var(--space-6)' }}>
-              Intenta con otro término o explora una saga completa.
+
+            <p
+              style={{
+                color: 'var(--nl-text-muted)',
+                fontSize: '14px',
+                marginBottom: 'var(--space-6)',
+              }}
+            >
+              {type === 'all'
+                ? (
+                  <>
+                    No se encontraron resultados para{" "}
+                    <span style={{ color: 'var(--nl-text-secondary)' }}>
+                      "{query}"
+                    </span>.
+                  </>
+                )
+                : (
+                  <>
+                    No se encontraron{" "}
+                    <span style={{ color: 'var(--nl-accent)' }}>
+                      {TYPE_GROUPS.find((g) => g.type === type)?.label.toLowerCase()}
+                    </span>{" "}
+                    para{" "}
+                    <span style={{ color: 'var(--nl-text-secondary)' }}>
+                      "{query}"
+                    </span>.
+                  </>
+                )}
             </p>
+
             <button
               onClick={() => navigate(`/saga/${encodeURIComponent(query)}`)}
               className="nl-btn nl-btn--primary nl-btn--md"

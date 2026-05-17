@@ -230,22 +230,29 @@ export async function registrarUsuario(desdeFormulario) {
   const text = await res.text();
 
   if (!res.ok) {
+    console.error("BACKEND RESPONSE:", text);
+
     let error;
     try {
       error = JSON.parse(text);
     } catch {
       throw new Error(text || "Error al registrar usuario");
     }
-    throw new Error(error.message || "Error al registrar usuario");
-  }
+    throw new Error(
+      error.message ||
+      error.mensaje ||
+      JSON.stringify(error) ||
+      "Error al registrar usuario");
+  };
 
-  try {
+}
+
+ /* try {
     return JSON.parse(text);
   } catch {
     return null;
   }
-}
-
+}*/
 // ==========================================================
 // PERFIL
 // ==========================================================

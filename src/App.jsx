@@ -11,6 +11,8 @@
  */
 
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import ForgotPassword from '@/pages/ForgotPassword';
+import ResetPassword  from '@/pages/ResetPassword';
 import Layout        from '@/components/layout/Layout';
 import Home          from '@/pages/Home';
 import SearchResults from '@/pages/SearchResults';
@@ -32,12 +34,17 @@ const router = createBrowserRouter([
       { path: 'my-list',         element: <MyList />        },
       { path: 'saga/:sagaName',  element: <Saga />          },
       { path: 'saga',            element: <Saga />          },
+      
       { path: 'login',           element: <Login />         },
-      { path: 'terms',           element: <Terms />         },
+      { path: 'forgot-password', element: <ForgotPassword /> },
+    
+      { path: '/terms',           element: <Terms />         },
       // Callback de Google/Supabase
       { path: 'auth/callback',   element: <AuthCallback />  },
     ],
   },
+
+  { path: 'reset-password',  element: <ResetPassword />  },
 ]);
 
 function App() {

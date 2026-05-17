@@ -5,7 +5,7 @@
 
 import { useNavigate } from 'react-router-dom';
 import { motion }      from 'motion/react';
-import { BookmarkPlus, BookmarkCheck } from 'lucide-react';
+import { Star } from 'lucide-react';
 import PropTypes  from 'prop-types';
 import Badge      from '@/components/ui/Badge';
 import useAppStore from '@/store/useAppStore';
@@ -14,10 +14,39 @@ import { mediaIdToSlug } from '@/utils/formatters';
 
 const POSTER_FALLBACK = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 267"%3E%3Crect width="200" height="267" fill="%231C1C1F"/%3E%3C/svg%3E';
 
-function AnimeCard({ obra, onClick, style }) {
+function AnimeCard({ obra, onClick, style, hideFavoriteButton = false }) {
   const navigate   = useNavigate();
   const isInList   = useAppStore((s) => s.isInList(obra.id));
   const toggleList = useAppStore((s) => s.toggleList);
+  const isLoggedIn = () => {
+  const token = localStorage.getItem("nl_token");
+  const user = localStorage.getItem("nl_user");
+  const auth = localStorage.getItem("nl_auth");
+
+  if (!token || !user) return false;
+
+  if (auth !== "1" && auth !== "true") return false;
+
+  try {
+    const parsedUser = JSON.parse(user);
+    return !!parsedUser?.id || !!parsedUser?.correo || !!parsedUser?.email;
+  } catch {
+    return false;
+  }
+};
+
+function handleSave(e) {
+  e.preventDefault();
+  e.stopPropagation();
+
+  if (!isLoggedIn()) {
+    alert("Debes iniciar sesión para guardar en favoritos");
+    navigate("/login");
+    return;
+  }
+
+  toggleList(obra);
+}
 
   function handleClick() {
     if (onClick) return onClick(obra);
@@ -47,6 +76,39 @@ function AnimeCard({ obra, onClick, style }) {
           loading="lazy"
           onError={(e) => { e.currentTarget.src = POSTER_FALLBACK; }}
         />
+
+        {!hideFavoriteButton && (
+          <button
+            onClick={handleSave}
+            aria-label={isInList ? 'Quitar de favoritos' : 'Agregar a favoritos'}
+            title={isInList ? 'Quitar de favoritos' : 'Agregar a favoritos'}
+            style={{
+              position: 'absolute',
+              top: '8px',
+              left: '8px',
+              zIndex: 10,
+              width: '34px',
+              height: '34px',
+              borderRadius: '999px',
+              border: isInList
+                ? '1px solid #facc15'
+                : '1px solid rgba(255,255,255,0.25)',
+              background: 'rgba(10,10,11,0.78)',
+              color: isInList ? '#facc15' : '#fff',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              backdropFilter: 'blur(4px)',
+            }}
+          >
+            <Star
+              size={18}
+              color={isInList ? '#facc15' : '#fff'}
+              fill="none"
+            />
+          </button>
+        )}
 
         {/* Rating overlay */}
         {obra.rating !== '—' && (
@@ -93,17 +155,6 @@ function AnimeCard({ obra, onClick, style }) {
           <span style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', color: 'var(--nl-text-muted)' }}>
             {obra.year !== '—' ? obra.year : ''} · <Badge type={obra.type} />
           </span>
-
-          <button
-            className="nl-media-card__save"
-            onClick={(e) => { e.stopPropagation(); toggleList(obra); }}
-            aria-label={isInList ? 'Quitar' : 'Guardar'}
-          >
-            {isInList
-              ? <BookmarkCheck size={13} color="var(--nl-accent)" />
-              : <BookmarkPlus  size={13} />
-            }
-          </button>
         </div>
       </div>
     </motion.article>
@@ -121,6 +172,7 @@ AnimeCard.propTypes = {
   }).isRequired,
   onClick: PropTypes.func,
   style:   PropTypes.object,
+  hideFavoriteButton: PropTypes.bool,
 };
 
 export default AnimeCard;

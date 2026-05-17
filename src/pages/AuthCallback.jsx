@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "../lib/supabase";
+import useAppStore from '@/store/useAppStore';
 
 const API_BASE = (
   import.meta.env.VITE_API_URL ||
@@ -9,6 +10,8 @@ const API_BASE = (
 
 export default function AuthCallback() {
   const navigate = useNavigate();
+
+  const setUser = useAppStore((s) => s.setUser);
 
   useEffect(() => {
     const finishGoogleLogin = async () => {
@@ -23,6 +26,24 @@ export default function AuthCallback() {
 
         if (data?.session?.user) {
           const user = data.session.user;
+
+           const userData = {
+            id: user.id,
+            name:
+              user.user_metadata?.full_name ||
+              user.email?.split('@')[0],
+
+            email: user.email,
+            token: data.session.access_token,
+            avatar: user.user_metadata?.avatar_url || null,
+            role: 'USER',
+          };
+
+          localStorage.setItem('nl_auth', '1');
+          localStorage.setItem('nl_user', JSON.stringify(userData));
+          localStorage.setItem('nl_token', data.session.access_token);
+
+          setUser(userData);
 
           // ==============================
           // SINCRONIZAR CON BACKEND

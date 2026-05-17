@@ -75,12 +75,26 @@ export function mediaIdToSlug(mediaId) {
  */
 export function parseMediaSlug(slug) {
   if (!slug) return { source: '', type: '', nativeId: '' };
+
+  // Productos propios de NoLimits: "nolimits-10"
+  if (slug.startsWith('nolimits-')) {
+    return {
+      source: 'nolimits',
+      type: 'producto',
+      nativeId: slug.replace('nolimits-', ''),
+    };
+  }
+
   const idx1 = slug.indexOf('-');
   const idx2 = slug.indexOf('-', idx1 + 1);
-  if (idx1 === -1 || idx2 === -1) return { source: slug, type: '', nativeId: '' };
+
+  if (idx1 === -1 || idx2 === -1) {
+    return { source: slug, type: '', nativeId: '' };
+  }
+
   return {
-    source:   slug.slice(0, idx1),
-    type:     slug.slice(idx1 + 1, idx2),
+    source: slug.slice(0, idx1),
+    type: slug.slice(idx1 + 1, idx2),
     nativeId: slug.slice(idx2 + 1),
   };
 }
