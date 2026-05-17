@@ -28,7 +28,7 @@ import { useQuery }                      from '@tanstack/react-query';
 import { searchMovies, searchSeries }    from '@/services/tmdb';
 import { searchAnime }                   from '@/services/jikan';
 import { searchBooks }                   from '@/services/openLibrary';
-import { searchGames }                   from '@/services/igdb';
+import { searchGames, searchGamesForSaga } from '@/services/rawg';
 import { searchMusicReleaseGroups }      from '@/services/musicbrainz';
 import { buscarProductosNoLimits } from '@/services/productos';
 import {
@@ -36,7 +36,7 @@ import {
   normalizeTmdbSeries,
   normalizeJikanAnime,
   normalizeOpenLibraryBook,
-  normalizeIgdbGame,
+  normalizeRawgGame,
   normalizeMusicBrainzRelease,
 } from '@/utils/normalizeMedia';
 import { MEDIA_TYPES } from '@/utils/constants';
@@ -72,7 +72,11 @@ export function useSearch(query, type = 'all') {
         tasks.push(searchBooks(query).then((r) => (r.docs ?? []).map(normalizeOpenLibraryBook)));
       }
       if (type === 'all' || type === MEDIA_TYPES.GAME) {
-        tasks.push(searchGames(query).then((r) => (r ?? []).map(normalizeIgdbGame)));
+        tasks.push(searchGames(query).then((r) => 
+          (r.results ?? [])
+            .map(normalizeRawgGame)
+            .filter((g) => g.poster && g.rating !== '—' && parseFloat(g.rating) >= 6)
+        ));
       }
       if (type === 'all' || type === MEDIA_TYPES.MUSIC) {
         tasks.push(
@@ -115,23 +119,45 @@ export function useSagaSearch(sagaName) {
       if (!sagaName?.trim()) return {};
 
       const [movies, series, anime, books, games, music] = await Promise.allSettled([
-        searchMovies(sagaName).then((r) => r.results.map(normalizeTmdbMovie)),
-        searchSeries(sagaName).then((r) => r.results.map(normalizeTmdbSeries)),
+        Promise.all([searchMovies(sagaName, 1), searchMovies(sagaName, 2)])
+          .then(([p1, p2]) => [...p1.results, ...p2.results].map(normalizeTmdbMovie)),
+        Promise.all([searchSeries(sagaName, 1), searchSeries(sagaName, 2)])
+          .then(([p1, p2]) => [...p1.results, ...p2.results].map(normalizeTmdbSeries)),
         searchAnime(sagaName).then((r) => r.data.map(normalizeJikanAnime)),
         searchBooks(sagaName).then((r) => (r.docs ?? []).map(normalizeOpenLibraryBook)),
-        searchGames(sagaName).then((r) => (r ?? []).map(normalizeIgdbGame)),
+        searchGamesForSaga(sagaName).then((r) =>
+          (r.results ?? [])
+            .map(normalizeRawgGame)
+            .filter((g) => {
+              const title = g.title.toLowerCase();
+              const saga  = sagaName.toLowerCase();
+              const excluded = ['virtual reality', 'pc port', 'amazing spider-man 2'];
+              return title.includes(saga) && !excluded.some((e) => title.includes(e));
+            })
+            .sort((a, b) => parseFloat(b.rating ?? '0') - parseFloat(a.rating ?? '0'))
+        ),
         searchMusicReleaseGroups(sagaName).then(
           (r) => (r['release-groups'] ?? []).map(normalizeMusicBrainzRelease)
         ),
       ]);
 
+      const minRating = 6;
+      const filterAndSort = (arr, isMusic = false) => {
+        const filtered = arr
+          .filter((o) => isMusic || o.poster)
+          .filter((o) => isMusic || (o.rating !== '—' && parseFloat(o.rating) >= minRating && parseFloat(o.rating) < 9.5))
+          .filter((o) => !o.year || o.year === '—' || parseInt(o.year) >= 1970)
+          .filter((o) => o.source !== 'tmdb' || (o.voteCount ?? 0) >= 200);
+        return filtered.sort((a, b) => (b.year ?? '0').localeCompare(a.year ?? '0'));
+      };
+
       return {
-        movies: movies.status === 'fulfilled' ? movies.value : [],
-        series: series.status === 'fulfilled' ? series.value : [],
-        anime:  anime.status  === 'fulfilled' ? anime.value  : [],
-        books:  books.status  === 'fulfilled' ? books.value  : [],
-        games:  games.status  === 'fulfilled' ? games.value  : [],
-        music:  music.status  === 'fulfilled' ? music.value  : [],
+        movies: movies.status === 'fulfilled' ? filterAndSort(movies.value) : [], 
+        series: series.status === 'fulfilled' ? filterAndSort(series.value) : [],
+        anime:  anime.status  === 'fulfilled' ? filterAndSort(anime.value)  : [],
+        books:  books.status  === 'fulfilled' ? filterAndSort(books.value)  : [],
+        games:  games.status  === 'fulfilled' ? filterAndSort(games.value)  : [],
+        music:  music.status  === 'fulfilled' ? filterAndSort(music.value, true) : [],
       };
     },
 
