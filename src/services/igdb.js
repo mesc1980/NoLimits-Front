@@ -99,9 +99,10 @@ export async function searchGameSeries(sagaName) {
 export async function fetchGameDetail(id) {
   const results = await igdbQuery('/games', `
     fields name, cover.url, rating, first_release_date,
-           genres.name, platforms.name, summary,
-           involved_companies.company.name, screenshots.url,
-           similar_games.name, collection.name, franchise.name;
+          genres.name, platforms.name, summary,
+          involved_companies.company.name, screenshots.url,
+          similar_games.name, collection.name, franchise.name,
+          websites.url, websites.category;
     where id = ${id};
     limit 1;
   `);

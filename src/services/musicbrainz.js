@@ -26,7 +26,7 @@ function mbUrl(path, params = {}) {
  * @param {string} query
  * @param {number} limit
  */
-export async function searchMusicReleaseGroups(query, limit = 20) {
+export async function searchMusicReleaseGroups(query, limit = 100) {
   return apiFetch(
     mbUrl('/release-group', { query: `releasegroup:"${query}"`, limit }),
     { headers: MB_HEADERS }

@@ -23,7 +23,7 @@ export async function searchBooks(query, page = 1) {
   const params = new URLSearchParams({
     q:      query,
     page,
-    limit:  20,
+    limit:  40,
     fields: [
       'key', 'title', 'author_name', 'first_publish_year',
       'cover_i', 'ratings_average', 'subject',

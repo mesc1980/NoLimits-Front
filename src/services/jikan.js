@@ -53,7 +53,7 @@ export async function fetchSeasonNowAnime() {
  * @param {number} page
  */
 export async function searchAnime(query, page = 1) {
-  return apiFetch(jikanUrl('/anime', { q: query, page, limit: 20, sfw: true }));
+  return apiFetch(jikanUrl('/anime', { q: query, page, limit: 40, sfw: true }));
 }
 
 /* ============================================================

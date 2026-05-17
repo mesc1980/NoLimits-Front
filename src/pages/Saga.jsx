@@ -18,6 +18,7 @@ import { useQuery } from '@tanstack/react-query';
 import MediaCard    from '@/components/cards/MediaCard';
 import AnimeCard    from '@/components/cards/AnimeCard';
 import BookCard     from '@/components/cards/BookCard';
+import GameCard from '@/components/cards/GameCard';
 import SkeletonCard from '@/components/ui/SkeletonCard';
 import WhereToFind  from '@/components/ui/WhereToFind';
 import { useSagaSearch } from '@/hooks/useSearch';
@@ -46,6 +47,10 @@ function CardByType({ obra, cardType }) {
 function SagaSection({ section, obras, accentColor }) {
   if (!obras || obras.length === 0) return null;
   const Icon = section.icon;
+  const [page, setPage] = useState(0);
+  const PAGE_SIZE = section.key === 'games' ? 8 : 10;
+  const totalPages = Math.ceil(obras.length / PAGE_SIZE);
+  const visible = obras.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
 
   return (
     <motion.section
@@ -63,16 +68,58 @@ function SagaSection({ section, obras, accentColor }) {
         <span style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', color: accentColor || 'var(--nl-accent)' }}>
           {obras.length}
         </span>
+        {/* Botones de paginación */}
+        {totalPages > 1 && (
+          <div style={{ marginLeft: 'auto', display: 'flex', gap: '6px', alignItems: 'center' }}>
+            <button
+              onClick={() => setPage((p) => Math.max(0, p - 1))}
+              disabled={page === 0}
+              style={{
+                width: '36px', height: '36px', borderRadius: '50%',
+                background: 'transparent',
+                border: `2px solid ${page === 0 ? 'rgba(255,255,255,0.3)' : '#C9A84C'}`,
+                cursor: page === 0 ? 'default' : 'pointer',
+                color: page === 0 ? 'rgba(255,255,255,0.3)' : '#C9A84C',
+                fontSize: '20px', fontWeight: 700,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                transition: 'border-color 150ms ease, color 150ms ease',
+              }}
+            >‹</button>
+
+            <span style={{ fontFamily: 'var(--font-mono)', fontSize: '13px', fontWeight: 600, color: 'var(--nl-text-primary)', minWidth: '40px', textAlign: 'center' }}>
+              {page + 1}/{totalPages}
+            </span>
+
+            <button
+              onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
+              disabled={page === totalPages - 1}
+              style={{
+                width: '36px', height: '36px', borderRadius: '50%',
+                background: 'transparent',
+                border: `2px solid ${page === totalPages - 1 ? 'rgba(255,255,255,0.3)' : '#C9A84C'}`,
+                cursor: page === totalPages - 1 ? 'default' : 'pointer',
+                color: page === totalPages - 1 ? 'rgba(255,255,255,0.3)' : '#C9A84C',
+                fontSize: '20px', fontWeight: 700,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                transition: 'border-color 150ms ease, color 150ms ease',
+              }}
+            >›</button>
+          </div>
+        )}
       </div>
 
       <motion.div
-        className={section.cardType === 'book' ? 'nl-grid nl-grid--books' : 'nl-grid nl-grid--cards'}
+        className={
+          section.cardType === 'book' ? 'nl-grid nl-grid--books' :
+          section.key === 'games' ? 'nl-grid nl-grid--games' :
+          'nl-grid nl-grid--cards'
+        }
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, margin: '-40px' }}
         variants={{ visible: { transition: { staggerChildren: CARD_STAGGER_DELAY } } }}
       >
-        {obras.slice(0, 10).map((obra) => (
+        {visible.map((obra) => (
           <div key={obra.id}>
             <CardByType obra={obra} cardType={section.cardType} />
             <div style={{ marginTop: '6px' }}>
