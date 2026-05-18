@@ -61,16 +61,16 @@ function MediaCard({ obra, onClick, style, hideFavoriteButton = false }) {
 
   return (
     <motion.article
-      style={style}
       variants={FADE_UP_VARIANTS}
       initial="hidden"
       animate="visible"
       whileHover={{ scale: 1.03, transition: { duration: 0.18, ease: [0.22, 1, 0.36, 1] } }}
       className="nl-media-card"
+      style={{ ...style, minHeight: obra.type === 'game' ? '0px' : undefined }}
       onClick={handleClick}
       role="button"
       tabIndex={0}
-      aria-label={`Ver ${obra.title}`}
+      aria-label={`Ver ${obra.title}`}  
       onKeyDown={(e) => e.key === 'Enter' && handleClick()}
     >
       {/* Poster — sin filtros ni marcos */}
@@ -80,6 +80,7 @@ function MediaCard({ obra, onClick, style, hideFavoriteButton = false }) {
           src={obra.poster ?? POSTER_FALLBACK}
           alt={`Poster de ${obra.title}`}
           loading="lazy"
+          style={obra.type === 'game' ? { aspectRatio: '4/3' } : undefined}
           onError={(e) => { e.currentTarget.src = POSTER_FALLBACK; }}
         />
 

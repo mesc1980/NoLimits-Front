@@ -61,16 +61,11 @@ export function normalizeTmdbMovie(item) {
     title:     item.title || item.original_title || 'Sin título',
     year:      formatYear(item.release_date),
     rating:    formatRating(item.vote_average),
-    poster:
-      buildTmdbImageUrl(item.poster_path, TMDB_POSTER_SIZES.MD)
-      || FALLBACK_IMAGES.video,
-
-    backdrop:
-      buildTmdbImageUrl(item.backdrop_path, TMDB_BACKDROP_SIZES.LG)
-      || FALLBACK_IMAGES.video,
+    voteCount: item.vote_count ?? 0,
+    poster:    buildTmdbImageUrl(item.poster_path, TMDB_POSTER_SIZES.MD) || FALLBACK_IMAGES.video,
+    backdrop:  buildTmdbImageUrl(item.backdrop_path, TMDB_BACKDROP_SIZES.LG) || FALLBACK_IMAGES.video,
     synopsis:  item.overview || '',
     genres:    item.genres?.map((g) => g.name) ?? item.genre_ids?.map(String) ?? [],
-    // belongs_to_collection solo disponible en el endpoint de detalle, no en listados
     saga:      item.belongs_to_collection?.name ?? null,
     platforms: [],
     source:    DATA_SOURCES.TMDB,
@@ -87,17 +82,12 @@ export function normalizeTmdbSeries(item) {
     title:     item.name || item.original_name || 'Sin título',
     year:      formatYear(item.first_air_date),
     rating:    formatRating(item.vote_average),
-    poster:
-      buildTmdbImageUrl(item.poster_path, TMDB_POSTER_SIZES.MD)
-      || FALLBACK_IMAGES.video,
-
-    backdrop:
-      buildTmdbImageUrl(item.backdrop_path, TMDB_BACKDROP_SIZES.LG)
-      || FALLBACK_IMAGES.video,
+    voteCount: item.vote_count ?? 0,
+    poster:    buildTmdbImageUrl(item.poster_path, TMDB_POSTER_SIZES.MD) || FALLBACK_IMAGES.video,
+    backdrop:  buildTmdbImageUrl(item.backdrop_path, TMDB_BACKDROP_SIZES.LG) || FALLBACK_IMAGES.video,
     synopsis:  item.overview || '',
     genres:    item.genres?.map((g) => g.name) ?? item.genre_ids?.map(String) ?? [],
     saga:      null,
-    // networks = cadenas de TV (Netflix, HBO…), útil para saber dónde ver
     platforms: item.networks?.map((n) => n.name) ?? [],
     source:    DATA_SOURCES.TMDB,
   };
@@ -211,6 +201,22 @@ function igdbYear(timestamp) {
 }
 
 export function normalizeIgdbGame(item) {
+  const STORE_URL_PATTERNS = [
+    { pattern: 'store.steampowered.com',  label: 'Steam',         accent: true  },
+    { pattern: 'epicgames.com',           label: 'Epic Games',    accent: true  },
+    { pattern: 'gog.com',                 label: 'GOG',           accent: true  },
+    { pattern: 'store.playstation.com',   label: 'PlayStation',   accent: true  },
+    { pattern: 'xbox.com',               label: 'Xbox',           accent: true  },
+    { pattern: 'nintendo.com',           label: 'Nintendo',       accent: true  },
+  ];
+
+  const gameStores = (item.websites ?? [])
+    .map((w) => {
+      const match = STORE_URL_PATTERNS.find((p) => w.url?.includes(p.pattern));
+      if (!match) return null;
+      return { label: match.label, url: w.url, accent: match.accent };
+    })
+    .filter(Boolean);
   return {
     id:        buildMediaId(DATA_SOURCES.IGDB, item.id, MEDIA_TYPES.GAME),
     type:      MEDIA_TYPES.GAME,
@@ -231,7 +237,53 @@ export function normalizeIgdbGame(item) {
     // collection/franchise = nombre de la saga (Spider-Man, Zelda, etc.)
     saga:      item.collection?.name ?? item.franchise?.name ?? null,
     platforms: item.platforms?.map((p) => p.name) ?? [],
+    gameStores: gameStores,
     source:    DATA_SOURCES.IGDB,
+  };
+}
+
+// ─────────────────────────────────────────────────────────────────
+// RAWG — Videojuegos
+// Referencia: https://rawg.io/apidocs
+// ─────────────────────────────────────────────────────────────────
+export function normalizeRawgGame(item) {
+  const STORE_URL_PATTERNS = [
+    { pattern: 'store.steampowered.com', label: 'Steam',          accent: true  },
+    { pattern: 'epicgames.com',          label: 'Epic Games',     accent: true  },
+    { pattern: 'gog.com',               label: 'GOG',             accent: true  },
+    { pattern: 'store.playstation.com', label: 'PlayStation',     accent: true  },
+    { pattern: 'xbox.com',              label: 'Xbox',            accent: true  },
+    { pattern: 'nintendo.com',          label: 'Nintendo eShop',  accent: true  },
+  ];
+
+  // Intentar primero con stores reales de RAWG
+  const gameStores = (item.stores ?? [])
+    .map((s) => {
+      const url = s.url ?? s.store?.domain ?? '';
+      if (!url || !url.startsWith('http')) return null;
+      const match = STORE_URL_PATTERNS.find((p) => url.includes(p.pattern));
+      if (!match) return null;
+      return { label: match.label, url, accent: match.accent };
+    })
+    .filter(Boolean);
+
+  // Si no hay stores, generar links por plataforma
+  const platforms = (item.platforms ?? []).map((p) => p.platform?.name ?? p.name ?? '');
+
+  return {
+    id:         buildMediaId(DATA_SOURCES.RAWG ?? 'rawg', item.id, MEDIA_TYPES.GAME),
+    type:       MEDIA_TYPES.GAME,
+    title:      item.name || 'Sin título',
+    year:       formatYear(item.released),
+    rating:     item.rating ? formatRating(item.rating * 2) : '—', // RAWG es /5 → *2 para /10
+    poster:     item.background_image ?? null,
+    backdrop:   item.background_image_additional ?? item.background_image ?? null,
+    synopsis:   item.description_raw || item.description || '',
+    genres:     (item.genres ?? []).map((g) => g.name),
+    saga:       null,
+    platforms,
+    gameStores,
+    source:     'rawg',
   };
 }
 

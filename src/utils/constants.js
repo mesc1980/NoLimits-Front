@@ -18,6 +18,7 @@ export const DATA_SOURCES = {
   OPENLIBRARY:  'openlibrary',
   IGDB:         'igdb',
   MUSICBRAINZ:  'musicbrainz',
+  RAWG:        'rawg',
 };
 
 /* ── Tipos de obra ────────────────────────────────────────── */

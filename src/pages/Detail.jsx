@@ -24,9 +24,9 @@ import WhereToFind    from '@/components/ui/WhereToFind';
 import ContentSection from '@/components/sections/ContentSection';
 import { useMovieDetail, useSeriesDetail } from '@/hooks/useTMDB';
 import { useAnimeDetail }                  from '@/hooks/useJikan';
-import { useGameDetail }                   from '@/hooks/useIGDB';
-import { useBookDetail }  from '@/hooks/useOpenLibrary';
-import { useMusicDetail } from '@/hooks/useMusicBrainz';
+import { useGameDetail }                   from '@/hooks/useRAWG';
+import { useBookDetail }                   from '@/hooks/useOpenLibrary';
+import { useMusicDetail }                  from '@/hooks/useMusicBrainz';
 import { fetchMovieProviders, fetchSeriesProviders } from '@/services/whereToWatch';
 import { useSagaSearch }   from '@/hooks/useSearch';
 import useAppStore         from '@/store/useAppStore';
@@ -226,9 +226,9 @@ function Detail() {
   const isMovie  = source === DATA_SOURCES.TMDB && type === MEDIA_TYPES.MOVIE;
   const isSeries = source === DATA_SOURCES.TMDB && type === MEDIA_TYPES.SERIES;
   const isAnime  = source === DATA_SOURCES.JIKAN;
-  const isGame   = source === DATA_SOURCES.IGDB;
+  const isGame   = source === DATA_SOURCES.IGDB || source === 'rawg';
   const isBook   = source === DATA_SOURCES.OPENLIBRARY && type === MEDIA_TYPES.BOOK;
-  const isMusic = source === DATA_SOURCES.MUSICBRAINZ && type === MEDIA_TYPES.MUSIC;
+  const isMusic  = source === DATA_SOURCES.MUSICBRAINZ && type === MEDIA_TYPES.MUSIC;
 
   const movieRes  = useMovieDetail (isMovie  ? nativeId : null);
   const seriesRes = useSeriesDetail(isSeries ? nativeId : null);
