@@ -445,12 +445,23 @@ export async function obtenerFavoritosUsuario(usuarioId) {
   }
 }
 
-export async function agregarFavoritoUsuario(usuarioId, productoId) {
+export async function agregarFavoritoUsuario(usuarioId, obra) {
+  const payload = {
+    obraId: obra.id,
+    titulo: obra.title,
+    tipo: obra.type,
+    poster: obra.poster,
+    source: obra.source,
+  };
+
   const res = await fetch(
-    `${API_BASE}/api/v1/usuarios/${usuarioId}/favoritos/${productoId}`,
+    `${API_BASE}/api/v1/usuarios/${usuarioId}/favoritos`,
     {
       method: "POST",
-      headers: authHeaders(),
+      headers: authHeaders({
+        "Content-Type": "application/json",
+      }),
+      body: JSON.stringify(payload),
     }
   );
 
@@ -469,9 +480,9 @@ export async function agregarFavoritoUsuario(usuarioId, productoId) {
   }
 }
 
-export async function eliminarFavoritoUsuario(usuarioId, productoId) {
+export async function eliminarFavoritoUsuario(usuarioId, obraId) {
   const res = await fetch(
-    `${API_BASE}/api/v1/usuarios/${usuarioId}/favoritos/${productoId}`,
+    `${API_BASE}/api/v1/usuarios/${usuarioId}/favoritos/${encodeURIComponent(obraId)}`,
     {
       method: "DELETE",
       headers: authHeaders(),

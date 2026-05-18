@@ -17,6 +17,10 @@ import Badge      from '@/components/ui/Badge';
 import useAppStore from '@/store/useAppStore';
 import { FADE_UP_VARIANTS } from '@/utils/constants';
 import { mediaIdToSlug } from '@/utils/formatters';
+import {
+  agregarFavoritoUsuario,
+  eliminarFavoritoUsuario,
+} from '@/services/usuarios';
 
 const POSTER_FALLBACK = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 300"%3E%3Crect width="200" height="300" fill="%231C1C1F"/%3E%3C/svg%3E';
 
@@ -46,17 +50,42 @@ function MediaCard({ obra, onClick, style, hideFavoriteButton = false }) {
     navigate(`/detail/${mediaIdToSlug(obra.id)}`);
   }
 
-  function handleSave(e) {
+  async function handleSave(e) {
     e.preventDefault();
     e.stopPropagation();
 
-    if (!isLoggedIn()) {
-      alert("Debes iniciar sesión para guardar en favoritos");
-      navigate("/login");
-      return;
-    }
+    try {
+      if (!isLoggedIn()) {
+        alert("Debes iniciar sesión para guardar en favoritos");
+        navigate("/login");
+        return;
+      }
 
-    toggleList(obra);
+      const user = JSON.parse(localStorage.getItem("nl_user") || "null");
+
+      const usuarioId =
+        user?.backendId ||
+        user?.idUsuario ||
+        user?.usuarioId ||
+        user?.id ||
+        localStorage.getItem("nl_userId");
+
+      if (!usuarioId) {
+        alert("No se pudo identificar tu usuario. Cierra sesión e inicia sesión otra vez.");
+        return;
+      }
+
+      if (isInList) {
+        await eliminarFavoritoUsuario(usuarioId, obra.id);
+      } else {
+        await agregarFavoritoUsuario(usuarioId, obra);
+      }
+
+      toggleList(obra);
+    } catch (error) {
+      console.error("Error actualizando favorito desde card:", error);
+      alert("No se pudo actualizar favoritos");
+    }
   }
 
   return (
