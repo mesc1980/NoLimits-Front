@@ -33,6 +33,12 @@ import useAppStore         from '@/store/useAppStore';
 import { parseMediaSlug }  from '@/utils/formatters';
 import { DATA_SOURCES, MEDIA_TYPES } from '@/utils/constants';
 import { obtenerProducto } from '@/services/productos';
+import {
+  guardarReview,
+  obtenerReviewsPorObra,
+  eliminarReview,
+  reaccionarReview
+} from '@/services/reviewService';
 
 /* ── Etiqueta de sección estilo brandbook ─────────────────── */
 function SectionLabel({ number, children }) {
@@ -324,12 +330,132 @@ function Detail() {
     toggleList(obra);
   };
 
+  const handleGuardarReview = async () => {
+    try {
+      if (!isLoggedIn()) {
+        alert("Debes iniciar sesión para guardar reseñas");
+        navigate("/login");
+        return;
+      }
+
+      const user = JSON.parse(localStorage.getItem("nl_user"));
+
+      const usuarioId = user?.backendId || user?.idUsuario || user?.usuarioId || user?.id;
+
+      if (!usuarioId) {
+        console.error("Usuario sin ID de backend:", user);
+        alert("No se pudo identificar tu usuario. Cierra sesión e inicia sesión otra vez.");
+        return;
+      }
+
+      await guardarReview(usuarioId, {
+        obraId: obra.id,
+        contenido: reviewText,
+        rating: 10,
+      });
+
+      setReview(obra.id, reviewText);
+
+      const reviewsActualizadas = await obtenerReviewsPorObra(obra.id);
+      setReviews(reviewsActualizadas);
+
+      setReviewText('');
+      setReviewSaved(true);
+      setEditingReviewId(null);
+
+    } catch (error) {
+      console.error(error);
+      alert("No se pudo guardar la reseña");
+    }
+  };
+
+  const handleEliminarReview = async (obraId) => {
+    try {
+      const user = JSON.parse(localStorage.getItem("nl_user"));
+
+      const usuarioId =
+        user?.backendId ||
+        user?.idUsuario ||
+        user?.usuarioId ||
+        user?.id;
+
+      if (!usuarioId) {
+        alert("No se pudo identificar el usuario");
+        return;
+      }
+
+      await eliminarReview(usuarioId, obraId);
+
+      const reviewsActualizadas = await obtenerReviewsPorObra(obraId);
+      setReviews(reviewsActualizadas);
+
+      setReviewText('');
+      setEditingReviewId(null);
+      setReviewSaved(false);
+
+    } catch (error) {
+      console.error(error);
+      alert("No se pudo eliminar la reseña");
+    }
+  };
+
+  const handleReaccionReview = async (reviewId, tipoReaccion) => {
+    try {
+      const user = JSON.parse(localStorage.getItem("nl_user"));
+
+      const usuarioId =
+        user?.backendId ||
+        user?.idUsuario ||
+        user?.usuarioId ||
+        user?.id;
+
+      if (!usuarioId) {
+        alert("Debes iniciar sesión");
+        return;
+      }
+
+      await reaccionarReview(
+        reviewId,
+        usuarioId,
+        tipoReaccion
+      );
+
+      const reviewsActualizadas = await obtenerReviewsPorObra(obra.id);
+      setReviews(reviewsActualizadas);
+
+    } catch (error) {
+      console.error(error);
+      alert("No se pudo registrar la reacción");
+    }
+  };
+
   const isInList   = useAppStore((s) => obra ? s.isInList(obra.id) : false);
   const toggleList = useAppStore((s) => s.toggleList);
   const getReview  = useAppStore((s) => s.getReview);
   const setReview  = useAppStore((s) => s.setReview);
   const [reviewText, setReviewText] = useState('');
+  const [reviewSaved, setReviewSaved] = useState(false);
+  const [reviews, setReviews] = useState([]);
+  const [editingReviewId, setEditingReviewId] = useState(null);
+
   useEffect(() => { if (obra) setReviewText(getReview(obra.id)); }, [obra?.id]);
+
+  useEffect(() => {
+    if (!obra?.id) return;
+
+    obtenerReviewsPorObra(obra.id)
+      .then(setReviews)
+      .catch((error) => {
+        console.error("Error cargando reseñas:", error);
+      });
+  }, [obra?.id]);
+
+  const currentUser = JSON.parse(localStorage.getItem("nl_user") || "null");
+  const usuarioActualId =
+    currentUser?.backendId ||
+    currentUser?.idUsuario ||
+    currentUser?.usuarioId ||
+    currentUser?.id;
 
   /* ── Loading ────────────────────────────────────────────── */
   if (isLoading) {
@@ -678,14 +804,117 @@ function Detail() {
               <Button
                 variant="secondary"
                 size="sm"
-                onClick={() => setReview(obra.id, reviewText)}
+                onClick={handleGuardarReview}
               >
-                Guardar reseña
+                {editingReviewId ? 'Actualizar reseña' : 'Guardar reseña'}
               </Button>
-              {reviewText && getReview(obra.id) === reviewText && (
+              {reviewSaved && (
                 <span style={{ marginLeft: 'var(--space-3)', fontFamily: 'var(--font-mono)', fontSize: '11px', color: 'var(--nl-text-muted)' }}>
                   ✓ guardada
                 </span>
+              )}
+            </div>
+
+            {/* 06 · RESEÑAS */}
+            <div>
+              <SectionLabel number={6}>Reseñas</SectionLabel>
+
+              {reviews.length === 0 ? (
+                <p style={{ color: 'var(--nl-text-muted)', fontSize: '14px' }}>
+                  Todavía no hay reseñas para esta obra.
+                </p>
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
+                  {reviews.map((review) => (
+                    <div
+                      key={review.id}
+                      style={{
+                        background: 'var(--nl-bg-elevated)',
+                        border: '1px solid var(--nl-border)',
+                        borderRadius: 'var(--radius-card)',
+                        padding: 'var(--space-4)',
+                      }}
+                    >
+                      <div style={{ display: 'flex', justifyContent: 'space-between', gap: 'var(--space-3)', marginBottom: 'var(--space-2)' }}>
+                        <strong style={{ color: 'var(--nl-text-primary)', fontSize: '14px' }}>
+                          {review.nombreUsuario}
+                        </strong>
+
+                        <span style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', color: 'var(--nl-text-muted)' }}>
+                          {new Date(review.fechaCreacion).toLocaleDateString('es-CL')}
+                          {review.editado && ' · editado'}
+                        </span>
+                      </div>
+
+                      <p style={{ color: 'var(--nl-text-secondary)', fontSize: '14px', lineHeight: 1.7, whiteSpace: 'pre-line' }}>
+                        {review.contenido}
+                      </p>
+
+                      <div
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '12px',
+                          marginTop: 'var(--space-3)',
+                        }}
+                      >
+                        <button
+                          onClick={() => handleReaccionReview(review.id, 'LIKE')}
+                          style={{
+                            background: 'transparent',
+                            border: 'none',
+                            cursor: 'pointer',
+                            color: 'var(--nl-text-secondary)',
+                            fontSize: '14px',
+                          }}
+                        >
+                          👍 {review.likes ?? 0}
+                        </button>
+
+                        <button
+                          onClick={() => handleReaccionReview(review.id, 'DISLIKE')}
+                          style={{
+                            background: 'transparent',
+                            border: 'none',
+                            cursor: 'pointer',
+                            color: 'var(--nl-text-secondary)',
+                            fontSize: '14px',
+                          }}
+                        >
+                          👎 {review.dislikes ?? 0}
+                        </button>
+                      </div>
+
+                      {review.usuarioId === usuarioActualId && (
+                        <div style={{ display: 'flex', gap: '8px', marginTop: 'var(--space-3)' }}>
+                          <Button
+                            variant="secondary"
+                            size="sm"
+                            onClick={() => {
+                              setReviewText(review.contenido);
+                              setEditingReviewId(review.id);
+                              window.scrollTo({ top: 0, behavior: 'smooth' });
+                            }}
+                          >
+                            Editar reseña
+                          </Button>
+
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleEliminarReview(review.obraId)}
+                            style={{
+                              color: '#ff6b6b',
+                              borderColor: 'rgba(255,107,107,0.2)',
+                            }}
+                          >
+                            Eliminar reseña
+                          </Button>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
               )}
             </div>
           </motion.div>
