@@ -39,6 +39,10 @@ import {
   eliminarReview,
   reaccionarReview
 } from '@/services/reviewService';
+import {
+  agregarFavoritoUsuario,
+  eliminarFavoritoUsuario,
+} from '@/services/usuarios';
 
 /* ── Etiqueta de sección estilo brandbook ─────────────────── */
 function SectionLabel({ number, children }) {
@@ -320,14 +324,39 @@ function Detail() {
     }
   };
 
-  const handleToggleList = () => {
-    if (!isLoggedIn()) {
-      alert("Debes iniciar sesión para guardar en favoritos");
-      navigate("/login");
-      return;
-    }
+  const handleToggleList = async () => {
+    try {
+      if (!isLoggedIn()) {
+        alert("Debes iniciar sesión para guardar en favoritos");
+        navigate("/login");
+        return;
+      }
 
-    toggleList(obra);
+      const user = JSON.parse(localStorage.getItem("nl_user") || "null");
+
+      const usuarioId =
+        user?.backendId ||
+        user?.idUsuario ||
+        user?.usuarioId ||
+        user?.id ||
+        localStorage.getItem("nl_userId");
+
+      if (!usuarioId) {
+        alert("No se pudo identificar tu usuario. Cierra sesión e inicia sesión otra vez.");
+        return;
+      }
+
+      if (isInList) {
+        await eliminarFavoritoUsuario(usuarioId, obra.id);
+      } else {
+        await agregarFavoritoUsuario(usuarioId, obra);
+      }
+
+      toggleList(obra);
+    } catch (error) {
+      console.error("Error actualizando favorito:", error);
+      alert("No se pudo actualizar favoritos");
+    }
   };
 
   const handleGuardarReview = async () => {
