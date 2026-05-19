@@ -14,7 +14,7 @@ export const CURATED_SAGAS = {
     description: 'Desde el cómic hasta el metaverso cinematográfico, Spider-Man es la franquicia más adaptada de Marvel. Películas live-action, series animadas, videojuegos icónicos y anime japonés —todos forman el universo del trepamuros más famoso del mundo.',
     heroQuery:   'Spider-Man No Way Home',
     accent:      '#60A5FA',
-    types:       ['movies', 'series', 'anime', 'games'],
+    types:       ['movies', 'series', 'anime', 'games', 'books', 'music'],
   },
   'star wars': {
     displayName: 'Star Wars',
@@ -22,7 +22,7 @@ export const CURATED_SAGAS = {
     description: 'Una galaxia muy, muy lejana. Más de cuatro décadas de películas, series, novelas, cómics y videojuegos construyen el universo de ciencia ficción más expansivo de la historia.',
     heroQuery:   'Star Wars Return Jedi',
     accent:      '#FBBF24',
-    types:       ['movies', 'series', 'games', 'books'],
+    types:       ['movies', 'series', 'games', 'books', 'music'],
   },
   'batman': {
     displayName: 'Batman',
@@ -30,7 +30,7 @@ export const CURATED_SAGAS = {
     description: 'El Caballero Oscuro de Gotham. Desde los cómics de 1939 hasta blockbusters globales y videojuegos premiados, Batman es el superhéroe más versátil de DC Comics.',
     heroQuery:   'The Dark Knight',
     accent:      '#A78BFA',
-    types:       ['movies', 'series', 'games'],
+    types:       ['movies', 'series', 'games', 'books', 'music'],
   },
   'dragon ball': {
     displayName: 'Dragon Ball',
@@ -38,7 +38,7 @@ export const CURATED_SAGAS = {
     description: 'La saga shonen más influyente de todos los tiempos. Cuatro series de anime, más de veinte películas, decenas de videojuegos y un manga que redefinió la cultura pop global.',
     heroQuery:   'Dragon Ball Super Broly',
     accent:      '#FB923C',
-    types:       ['anime', 'games', 'movies'],
+    types:       ['anime', 'games', 'movies', 'books', 'music'],
   },
   'harry potter': {
     displayName: 'Harry Potter',
@@ -46,7 +46,7 @@ export const CURATED_SAGAS = {
     description: 'El universo mágico de J.K. Rowling que conquistó generaciones. Ocho películas, una saga paralela, libros que marcaron una era, parques temáticos y videojuegos como Hogwarts Legacy.',
     heroQuery:   'Harry Potter Sorcerer Stone',
     accent:      '#FBBF24',
-    types:       ['movies', 'games', 'books'],
+    types:       ['movies', 'series', 'games', 'books', 'music'],
   },
   'the witcher': {
     displayName: 'The Witcher',
@@ -56,13 +56,13 @@ export const CURATED_SAGAS = {
     accent:      '#34D399',
     types:       ['series', 'games', 'books'],
   },
-  'marvel': {
-    displayName: 'Marvel',
-    tagline:     'Parte de algo mayor.',
-    description: 'El MCU —universo cinematográfico más exitoso de la historia— reúne más de 30 películas, decenas de series en Disney+, videojuegos y cómics que llevan décadas construyendo héroes.',
-    heroQuery:   'Avengers Endgame',
-    accent:      '#FF4D4D',
-    types:       ['movies', 'series', 'games'],
+  'attack on titan': {
+    displayName: 'Attack on Titan',
+    tagline:     'La humanidad luchará.',
+    description: 'La obra maestra del manga y anime de Hajime Isayama. La humanidad sobrevive dentro de enormes murallas mientras los titanes acechan. Una historia épica de supervivencia, libertad y secretos que redefinió el anime moderno.',
+    heroQuery:   'Attack on Titan',
+    accent:      '#B91C1C',
+    types:       ['anime', 'movies', 'games', 'books', 'music'],
   },
   'the last of us': {
     displayName: 'The Last of Us',
@@ -70,7 +70,7 @@ export const CURATED_SAGAS = {
     description: 'De PlayStation a HBO. La historia de Joel y Ellie en un mundo post-apocalíptico redefinió los videojuegos narrativos y produjo una de las mejores series de televisión recientes.',
     heroQuery:   'The Last of Us',
     accent:      '#34D399',
-    types:       ['series', 'games'],
+    types:       ['series', 'games', 'books', 'music'],
   },
   'one piece': {
     displayName: 'One Piece',
@@ -102,10 +102,11 @@ export const CURATED_SAGAS = {
     description: 'La obra maestra de Tolkien adaptada al cine por Peter Jackson con tres películas que ganaron 17 Oscars. El universo de la Tierra Media se expande con El Hobbit y la serie Los Anillos de Poder en Prime Video.',
     heroQuery:   'Lord of the Rings Fellowship',
     accent:      '#FBBF24',
-    types:       ['movies', 'series', 'books', 'games'],
+    types:       ['movies', 'series', 'books', 'games', 'music'],
+    searchAlias: 'Lord of the Rings',
   },
 };
-
+CURATED_SAGAS['el señor de los anillos'] = CURATED_SAGAS['lord of the rings'];
 /**
  * Normaliza un nombre de saga a la clave del diccionario.
  * "Spider-Man" → "spider-man", "STAR WARS" → "star wars"

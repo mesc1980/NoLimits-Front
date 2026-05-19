@@ -83,7 +83,7 @@ function ContentSection({
               fontSize:      '11px',
               letterSpacing: '0.1em',
               textTransform: 'uppercase',
-              color:         'var(--nl-text-muted)',
+              color:         'white',
             }}
           >
             {title}
@@ -118,7 +118,7 @@ function ContentSection({
 
         {/* Error */}
         {error && !isLoading && (
-          <p style={{ color: 'var(--nl-text-muted)', fontFamily: 'var(--font-mono)', fontSize: '12px', padding: 'var(--space-4) 0' }}>
+          <p style={{ color: 'white', fontFamily: 'var(--font-mono)', fontSize: '12px', padding: 'var(--space-4) 0' }}>
             No se pudo cargar esta sección.
           </p>
         )}
@@ -142,7 +142,7 @@ function ContentSection({
 
         {/* Vacío */}
         {!isLoading && !error && visibleObras.length === 0 && (
-          <p style={{ color: 'var(--nl-text-muted)', fontSize: '13px', padding: 'var(--space-4) 0' }}>
+          <p style={{ color: 'white', fontSize: '13px', padding: 'var(--space-4) 0' }}>
             Sin contenido en esta sección.
           </p>
         )}

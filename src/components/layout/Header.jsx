@@ -4,7 +4,7 @@
  * Modo claro desactivado (dark-first permanente).
  */
 
-import { useState }              from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { NavLink, useNavigate }  from 'react-router-dom';
 import { Search, X, BookMarked, LogIn, LogOut, User } from 'lucide-react';
 import Logo      from './Logo';
@@ -13,6 +13,18 @@ import useAppStore from '@/store/useAppStore';
 
 function Header() {
   const [searchOpen, setSearchOpen] = useState(false);
+  const searchRef = useRef(null);
+
+  useEffect(() => {
+    if (!searchOpen) return;
+    function handleClickOutside(e) {
+      if (searchRef.current && !searchRef.current.contains(e.target)) {
+        setSearchOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [searchOpen]);
   const navigate    = useNavigate();
 
   const myListCount = useAppStore((s) => s.myList.length);
@@ -55,7 +67,7 @@ function Header() {
           </NavLink>
         </nav>
 
-        <div className="nl-header__actions">
+        <div className="nl-header__actions" ref={searchRef}>
           {searchOpen && (
             <div style={{ width: '260px' }}>
               <SearchBar compact />

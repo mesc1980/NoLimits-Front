@@ -58,9 +58,9 @@ export async function fetchTopGames() {
   return igdbQuery('/games', `
     fields name, cover.url, rating, first_release_date,
            genres.name, platforms.name, summary, involved_companies.company.name;
-    where rating != null & rating_count > 20 & cover != null;
+    where rating != null & rating_count > 500 & cover != null;
     sort rating desc;
-    limit 20;
+    limit 18;
   `);
 }
 

@@ -48,7 +48,7 @@ function SagaSection({ section, obras, accentColor }) {
   if (!obras || obras.length === 0) return null;
   const Icon = section.icon;
   const [page, setPage] = useState(0);
-  const PAGE_SIZE = section.key === 'games' ? 8 : 10;
+  const PAGE_SIZE = section.key === 'games' ? 8 : section.key === 'books' ? 12 : 10;
   const totalPages = Math.ceil(obras.length / PAGE_SIZE);
   const visible = obras.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
 
@@ -66,7 +66,7 @@ function SagaSection({ section, obras, accentColor }) {
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', marginBottom: 'var(--space-5)', paddingBottom: 'var(--space-3)', borderBottom: '1px solid var(--nl-border)' }}>
         <Icon size={14} color={accentColor || 'var(--nl-accent)'} />
-        <h2 style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--nl-text-muted)' }}>
+        <h2 style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'white' }}>
           {section.label}
         </h2>
         <span style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', color: accentColor || 'var(--nl-accent)' }}>
@@ -141,7 +141,7 @@ function SagaSection({ section, obras, accentColor }) {
 ════════════════════════════════════════════════════════════ */
 function CuratedSagaView({ sagaName, curated }) {
   const navigate = useNavigate();
-  const { grouped, isLoading } = useSagaSearch(sagaName);
+  const { grouped, isLoading } = useSagaSearch(sagaName, curated?.searchAlias, curated?.displayName);
 
   /* Backdrop de la saga desde TMDB */
   const { data: backdropUrl } = useQuery({
@@ -164,7 +164,7 @@ function CuratedSagaView({ sagaName, curated }) {
   };
 
   const availableSections = SECTIONS.filter((section) => {
-    return grouped[section.key]?.length > 0;
+    return curated.types.includes(section.key) && grouped[section.key]?.length > 0;
   });
 
   return (
@@ -298,14 +298,17 @@ function CuratedSagaView({ sagaName, curated }) {
         )}
 
         {/* Secciones por tipo */}
-        {!isLoading && SECTIONS.map((section) => (
-          <SagaSection
-            key={section.key}
-            section={section}
-            obras={grouped[section.key]}
-            accentColor={curated.accent}
-          />
-        ))}
+        {!isLoading && SECTIONS
+          .filter((section) => curated.types.includes(section.key))
+          .map((section) => (
+            <SagaSection
+              key={section.key}
+              section={section}
+              obras={grouped[section.key]}
+              accentColor={curated.accent}
+            />
+          ))
+        }
       </div>
     </>
   );

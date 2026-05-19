@@ -33,17 +33,14 @@ function SearchBar({ initialQuery = '', initialType = 'all', onSearch, compact =
       <div className="nl-searchbar__input-wrap">
         <Search size={20} className="nl-searchbar__icon" aria-hidden="true" />
         <input
-          type="search"
+          type="text"
           className="nl-searchbar__input"
-          placeholder="Busca cualquier película, libro, juego, anime…"
+          placeholder="Busca cualquier producto"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           aria-label="Buscar obras"
           autoComplete="off"
         />
-        {query && (
-          <span className="nl-searchbar__hint" aria-hidden="true">↵ buscar</span>
-        )}
       </div>
 
       {!compact && (
