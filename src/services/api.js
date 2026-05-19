@@ -56,11 +56,23 @@ export async function apiFetch(url, options = {}) {
     // ...authHeader,   ← descomentar con el bloque de arriba
   };
 
-  const response = await fetch(url, { ...options, headers });
+  try {
+    const response = await fetch(url, { ...options, headers });
 
-  if (!response.ok) {
-    throw new Error(`HTTP ${response.status}: ${url}`);
+    // Jikan a veces responde 400 para búsquedas no-anime
+    if (!response.ok) {
+      console.warn(`⚠️ API error ${response.status}: ${url}`);
+
+      // Evita romper búsquedas globales
+      return { data: [] };
+    }
+
+    return response.json();
+
+  } catch (error) {
+    console.warn('⚠️ Error en apiFetch:', error);
+
+    // fallback seguro
+    return { data: [] };
   }
-
-  return response.json();
 }
