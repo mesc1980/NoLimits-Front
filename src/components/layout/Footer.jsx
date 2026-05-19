@@ -6,11 +6,12 @@ import { Link } from 'react-router-dom';
 import Logo from './Logo';
 
 const DATA_SOURCES = [
-  { label: 'TMDB API',     href: 'https://www.themoviedb.org' },
-  { label: 'Jikan / MAL',  href: 'https://jikan.moe' },
-  { label: 'Open Library', href: 'https://openlibrary.org' },
-  { label: 'IGDB',         href: 'https://www.igdb.com' },
-  { label: 'MusicBrainz',  href: 'https://musicbrainz.org' },
+  { label: 'TMDB API',      href: 'https://www.themoviedb.org' },
+  { label: 'Jikan / MAL',   href: 'https://jikan.moe' },
+  { label: 'Google Books',  href: 'https://books.google.com' },
+  { label: 'IGDB',          href: 'https://www.igdb.com' },
+  { label: 'RAWG',          href: 'https://rawg.io' },
+  { label: 'MusicBrainz',   href: 'https://musicbrainz.org' },
 ];
 
 function Footer() {

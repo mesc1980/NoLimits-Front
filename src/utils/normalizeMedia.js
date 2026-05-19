@@ -133,7 +133,7 @@ export function normalizeOpenLibraryBook(item) {
     ?? item.edition_key?.[0]
     ?? String(item.cover_i ?? item.covers?.[0] ?? Math.random());
 
-  const coverId = item.cover_i ?? item.covers?.[0] ?? item.cover_id;
+  const coverId = item.cover_i ?? item.cover_edition_key ?? item.covers?.[0];
 
   return {
     id:        buildMediaId(DATA_SOURCES.OPENLIBRARY, nativeId, MEDIA_TYPES.BOOK),
@@ -308,5 +308,28 @@ export function normalizeMusicBrainzRelease(item) {
     saga:      null,
     platforms: [],
     source:    DATA_SOURCES.MUSICBRAINZ,
+  };
+}
+
+// ─────────────────────────────────────────────────────────────────
+// Normalizar libros.
+// ─────────────────────────────────────────────────────────────────
+
+export function normalizeGoogleBook(item) {
+  const info = item.volumeInfo ?? {};
+  const coverId = item.id;
+  return {
+    id:       buildMediaId(DATA_SOURCES.OPENLIBRARY, coverId, MEDIA_TYPES.BOOK),
+    type:     MEDIA_TYPES.BOOK,
+    title:    (info.title || 'Sin título').split(/[:/]/)[0].trim(),
+    year:     String(info.publishedDate?.slice(0, 4) || '—'),
+    rating:   info.averageRating ? formatRating(info.averageRating * 2) : '—',
+    poster:   info.imageLinks?.thumbnail?.replace('http://', 'https://') ?? FALLBACK_IMAGES.book,
+    backdrop: info.imageLinks?.thumbnail?.replace('http://', 'https://') ?? FALLBACK_IMAGES.book,
+    synopsis: info.description || '',
+    genres:   info.categories ?? [],
+    saga:     null,
+    platforms: [],
+    source:   DATA_SOURCES.OPENLIBRARY,
   };
 }
