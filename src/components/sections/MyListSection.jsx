@@ -20,7 +20,7 @@ function MyListSection() {
     return (
       <section className="nl-section">
         <div className="container">
-          <h2 className="nl-section__title" style={{ marginBottom: 'var(--space-4)' }}>
+          <h2 className="nl-section__title" style={{ marginBottom: 'var(--space-4)', color: 'white' }}>
             MI BIBLIOTECA
           </h2>
           <p style={{ color: 'var(--nl-text-muted)', fontSize: '14px' }}>

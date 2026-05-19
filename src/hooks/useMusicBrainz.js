@@ -23,7 +23,7 @@ export function useMusicSearch(query) {
     queryKey: ['musicbrainz', 'search', query],
     queryFn: async () => {
       const res = await searchMusicReleaseGroups(query);
-      return (res['release-groups'] ?? []).map(normalizeMusicBrainzRelease);
+      return (res['release-groups'] ?? []).map(normalizeMusicBrainzRelease).slice(0, 18);
     },
     enabled:   Boolean(query?.trim()),
     staleTime: STALE_TIME,
@@ -39,7 +39,7 @@ export function useFranchiseSoundtracks(franchise) {
     queryKey: ['musicbrainz', 'soundtrack', franchise],
     queryFn: async () => {
       const res = await searchSoundtrack(franchise);
-      return (res['release-groups'] ?? []).map(normalizeMusicBrainzRelease);
+      return (res['release-groups'] ?? []).map(normalizeMusicBrainzRelease).slice(0, 18);
     },
     enabled:   Boolean(franchise?.trim()),
     staleTime: STALE_TIME,

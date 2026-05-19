@@ -238,7 +238,7 @@ function Detail() {
   const seriesRes = useSeriesDetail(isSeries ? nativeId : null);
   const animeRes  = useAnimeDetail (isAnime  ? nativeId : null);
   const gameRes   = useGameDetail  (isGame   ? nativeId : null);
-  const bookWorkKey = isBook ? `/works/${nativeId}` : null;
+  const bookWorkKey = isBook ? nativeId : null;
   const bookRes     = useBookDetail(bookWorkKey);
   const musicRes = useMusicDetail(isMusic ? nativeId : null);
 

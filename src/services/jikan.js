@@ -31,7 +31,7 @@ function jikanUrl(path, params = {}) {
  * @param {number} page
  */
 export async function fetchTopAnime(page = 1) {
-  return apiFetch(jikanUrl('/top/anime', { page, limit: 20 }));
+  return apiFetch(jikanUrl('/top/anime', { page, limit: 18 }));
 }
 
 /**
@@ -39,7 +39,7 @@ export async function fetchTopAnime(page = 1) {
  * Útil para la sección "Esta temporada" en el home.
  */
 export async function fetchSeasonNowAnime() {
-  return apiFetch(jikanUrl('/seasons/now', { limit: 20 }));
+  return apiFetch(jikanUrl('/seasons/now', { limit: 18 }));
 }
 
 /* ============================================================

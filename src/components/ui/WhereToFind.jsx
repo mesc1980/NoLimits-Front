@@ -202,11 +202,11 @@ function WhereToFind({ obra, compact = false, providers = null }) {
 
   /* ── Libros ─────────────────────────────────────────── */
   if (type === MEDIA_TYPES.BOOK) {
-    const openLibraryId = obra.id.replace('openlibrary:book:', '');
-    const url = `https://openlibrary.org/works/${openLibraryId}`;
+    const googleBooksId = obra.id.replace('openlibrary:book:', '');
+    const url = `https://books.google.com/books?id=${googleBooksId}`;
     return (
       <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-        <LinkButton href={url} label="Leer gratis" icon={BookOpen} accent />
+        <LinkButton href={url} label="Ver en Google Books" icon={BookOpen} accent />
       </div>
     );
   }

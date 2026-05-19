@@ -53,7 +53,7 @@ function GameCard({ obra, onClick, style }) {
           src={obra.poster ?? FALLBACK}
           alt={`Poster de ${obra.title}`}
           loading="lazy"
-          style={{ width: '100%', aspectRatio: '4/3', objectFit: 'cover', display: 'block' }}
+          style={{ width: '100%', aspectRatio: '2/3', objectFit: 'cover', display: 'block' }}
           onError={(e) => { e.currentTarget.src = FALLBACK; }}
         />
         {obra.rating !== '—' && (
