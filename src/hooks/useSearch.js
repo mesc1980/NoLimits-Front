@@ -66,7 +66,7 @@ export function useSearch(query, type = 'all') {
       const tasks = [];
 
       const q = normalizeQuery(query).toLowerCase();
-      const byTitle = (a) => a.title?.toLowerCase().includes(q);
+      const byTitle = (a) => normalizeQuery(a.title ?? '').toLowerCase().includes(q);
 
       if (type === 'all' || type === MEDIA_TYPES.MOVIE) {
         tasks.push(
@@ -74,7 +74,7 @@ export function useSearch(query, type = 'all') {
             r.results
               .map(normalizeTmdbMovie)
               .filter((m) => {
-                const title = m.title?.toLowerCase() ?? '';
+                const title = normalizeQuery(m.title ?? '').toLowerCase();
                 const words = q.split(' ').filter((w) => w.length > 2);
                 const isRelevant = title.includes(q) || words.every((w) => title.includes(w));
                 return m.poster && (m.voteCount ?? 0) >= 50 && isRelevant;
@@ -90,7 +90,7 @@ export function useSearch(query, type = 'all') {
             r.results
               .map(normalizeTmdbSeries)
               .filter((s) => {
-                const title = s.title?.toLowerCase() ?? '';
+                const title = normalizeQuery(s.title ?? '').toLowerCase();
                 const words = q.split(' ').filter((w) => w.length > 2);
                 const isRelevant = title.includes(q) || words.every((w) => title.includes(w));
                 return s.poster && (s.voteCount ?? 0) >= 50 && isRelevant;
@@ -117,7 +117,7 @@ export function useSearch(query, type = 'all') {
             (r.items ?? [])
               .map(normalizeGoogleBook)
               .filter((b) => {
-                const title = b.title?.toLowerCase() ?? '';
+                const title = normalizeQuery(b.title ?? '').toLowerCase();
                 const words = q.split(' ').filter((w) => w.length > 3);
                 return title.includes(q) || words.every((word) => title.includes(word));
               })
@@ -132,7 +132,7 @@ export function useSearch(query, type = 'all') {
             (r.results ?? [])
               .map(normalizeRawgGame)
               .filter((g) => {
-                const title = g.title?.toLowerCase() ?? '';
+                const title = normalizeQuery(g.title ?? '').toLowerCase();
                 const words = q.split(' ').filter((w) => w.length > 1);
                 if (words.length === 0) return true;
                 const matches = words.filter((w) => title.includes(w));
