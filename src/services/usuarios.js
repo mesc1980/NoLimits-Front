@@ -324,16 +324,13 @@ export async function actualizarMiPerfil(payload) {
     if (res.status === 401 || res.status === 403) throw new Error("SESION_EXPIRADA");
     throw new Error("ERROR_ACTUALIZAR");
   }
-
-  if (text) {
-    return {
-      ...usuarioGuardado,
-      ...payload,
-    };
-  }
-
   try {
-    return JSON.parse(text);
+    return text
+      ? JSON.parse(text)
+      : {
+          ...usuarioGuardado,
+          ...payload,
+      };
   } catch {
     return {
       ...usuarioGuardado,
