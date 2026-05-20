@@ -31,11 +31,11 @@ export async function obtenerReviewsPorObra(obraId) {
   return response.json();
 }
 
-export async function eliminarReview(usuarioId, obraId) {
+export async function eliminarReview(usuarioId, reviewId) {
   const token = localStorage.getItem("nl_token");
 
   const response = await fetch(
-    `${BASE_URL}/api/v1/reviews/${usuarioId}/${encodeURIComponent(obraId)}`,
+    `${BASE_URL}/api/v1/reviews/${usuarioId}/review/${reviewId}`,
     {
       method: "DELETE",
       headers: {

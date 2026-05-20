@@ -72,7 +72,6 @@ function Login() {
       setError("Error al procesar respuesta del servidor.");
       return;
     }
-    console.log('LOGIN DATA:', data);
 
     localStorage.setItem('nl_auth', '1');
     localStorage.setItem('nl_user', JSON.stringify(data));
@@ -92,8 +91,6 @@ function Login() {
     };
 
     localStorage.setItem('nl_user', JSON.stringify(userData));
-
-    console.log('SET USER:', userData);
 
     setUser(userData);
 
@@ -116,8 +113,6 @@ function Login() {
     }, 2000);
 
   } catch (error) {
-    console.log('LOGIN ERROR:', error);
-
     console.error('Error real en login:', error);
     setError(error.message || 'Error al iniciar sesión.');
   } finally {
