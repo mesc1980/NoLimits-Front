@@ -413,26 +413,33 @@ function Profile() {
         .from("avatars")
         .getPublicUrl(nombreArchivo);
 
-      await actualizarMiPerfil({
+      //await actualizarMiPerfil({
+      //  fotoPerfil: publicUrl,
+      //});
+      console.log("PUBLIC URL:", publicUrl);
+
+      const response = await actualizarMiPerfil({
         fotoPerfil: publicUrl,
       });
 
-      setUsuario({
+      console.log("RESPUESTA PATCH:", response);
+
+      const usuarioActualizado = {
         ...usuario,
         fotoPerfil: publicUrl,
-      });
+      };
+
+      setUsuario(usuarioActualizado);
+
+      localStorage.setItem(
+        "nl_user",
+        JSON.stringify(usuarioActualizado)
+      );
 
       setFormData({
         ...formData,
-        fotoPerfil: publicUrl,
-      });
-
-    } catch (error) {
-      console.error(error);
-
-      alert(
-        "Error subiendo imagen"
-      );
+        fotoPerfil: publicUrl
+      })
     } finally {
       setSubiendoFoto(false);
     }
