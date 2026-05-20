@@ -22,6 +22,7 @@ import Saga          from '@/pages/Saga';
 import Login         from '@/pages/Login';
 import Terms         from '@/pages/Terms';
 import AuthCallback  from '@/pages/AuthCallback';
+import Profile       from "./pages/Profile";
 
 const router = createBrowserRouter([
   {
@@ -34,7 +35,7 @@ const router = createBrowserRouter([
       { path: 'my-list',         element: <MyList />        },
       { path: 'saga/:sagaName',  element: <Saga />          },
       { path: 'saga',            element: <Saga />          },
-      
+      { path: 'profile',         element: <Profile />       },
       { path: 'login',           element: <Login />         },
       { path: 'forgot-password', element: <ForgotPassword /> },
     
