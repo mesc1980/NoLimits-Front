@@ -424,22 +424,15 @@ function Profile() {
 
       console.log("RESPUESTA PATCH:", response);
 
-      const usuarioActualizado = {
-        ...usuario,
-        fotoPerfil: publicUrl,
-      };
+      await cargarPerfil();
 
-      setUsuario(usuarioActualizado);
-
-      localStorage.setItem(
-        "nl_user",
-        JSON.stringify(usuarioActualizado)
+      setImgError(false);
+    } catch (error) {
+      console.error(
+        "Error subiendo foto:",
+        error
       );
-
-      setFormData({
-        ...formData,
-        fotoPerfil: publicUrl
-      })
+    
     } finally {
       setSubiendoFoto(false);
     }
