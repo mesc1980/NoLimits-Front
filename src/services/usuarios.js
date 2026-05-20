@@ -337,10 +337,20 @@ export async function actualizarMiPerfil(payload) {
     throw new Error("ERROR_ACTUALIZAR");
   }
 
+  if (text) {
+    return {
+      ...usuarioGuardado,
+      ...payload,
+    };
+  }
+
   try {
     return JSON.parse(text);
   } catch {
-    return null;
+    return {
+      ...usuarioGuardado,
+      ...payload,
+    };
   }
 }
 
@@ -358,16 +368,67 @@ export const verificarCorreoRegistrado = async (correo) => {
 };
 
 export async function cambiarPassword(payload) {
-  const res = await fetch(`${API_BASE}/api/v1/usuarios/me/password`, {
-    method: "PATCH",
-    headers: authHeaders({ "Content-Type": "application/json" }),
-    credentials: "include",
-    body: JSON.stringify(payload),
-  });
 
-  if (!res.ok) throw new Error("Error cambiando contraseña");
-  return res.json();
+  const res = await fetch(
+    `${API_BASE}/api/v1/usuarios/me/password`,
+    {
+      method: "PATCH",
+      headers: authHeaders({
+        "Content-Type": "application/json",
+      }),
+      credentials: "include",
+      body: JSON.stringify(payload),
+    }
+  );
+
+  if (!res.ok) {
+
+    const errorText = await res.text();
+
+    console.error(
+      "[cambiarPassword] backend:",
+      errorText
+    );
+
+    throw new Error("Error cambiando contraseña");
+  }
+
+  return true;
 }
+
+export const cambiarCorreo = async (
+  data
+) => {
+  const token =
+    localStorage.getItem("nl_token");
+
+  const response = await fetch(
+    `${API_BASE}/api/v1/usuarios/cambiar-correo`,
+    {
+      method: "PATCH",
+      headers: {
+        "Content-Type":
+          "application/json",
+
+        Authorization:
+          `Bearer ${token}`,
+      },
+      body: JSON.stringify(data),
+    }
+  );
+
+  if (!response.ok) {
+    const errorData =
+      await response.json();
+    
+    throw new Error(
+      errorData.message ||
+        "Error actualizando correo"
+    );
+  }
+  return response.text();
+};
+
 
 export async function obtenerMisCompras(usuarioId) {
   const res = await fetch(`${API_BASE}/api/v1/usuarios/${usuarioId}/compras`, {
