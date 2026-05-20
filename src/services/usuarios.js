@@ -58,8 +58,6 @@ export async function listarUsuarios(page = 1, search = "") {
     endpoint = `${API_BASE}/api/v1/usuarios/nombre/${encodeURIComponent(trimmed)}`;
   }
 
-  console.log("[listarUsuarios] endpoint:", endpoint);
-
   const res = await fetch(endpoint, {
     headers: authHeaders(),
   });
@@ -76,7 +74,6 @@ export async function listarUsuarios(page = 1, search = "") {
   }
 
   const data = await res.json();
-  console.log("[listarUsuarios] raw data:", data);
 
   let contenido = [];
   if (Array.isArray(data)) contenido = data;
@@ -87,7 +84,6 @@ export async function listarUsuarios(page = 1, search = "") {
 
 export async function listarUsuariosPaginado(page = 1, size = 4) {
   const url = `${API_BASE}/api/v1/usuarios/paginado?page=${page}&size=${size}`;
-  console.log("[listarUsuariosPaginado] url:", url);
 
   const res = await fetch(url, {
     headers: authHeaders(),
@@ -158,9 +154,6 @@ export async function crearUsuario(payload) {
 export async function editarUsuario(id, payload) {
   const url = `${API_BASE}/api/v1/usuarios/${id}`;
 
-  console.log("[editarUsuario] url:", url);
-  console.log("[editarUsuario] payload:", payload);
-
   const res = await fetch(url, {
     method: "PATCH",
     headers: authHeaders({ "Content-Type": "application/json" }),
@@ -168,9 +161,6 @@ export async function editarUsuario(id, payload) {
   });
 
   const text = await res.text().catch(() => "");
-
-  console.log("[editarUsuario] status:", res.status);
-  console.log("[editarUsuario] body:", text);
 
   if (!res.ok) {
     let error;
@@ -218,8 +208,6 @@ export async function registrarUsuario(desdeFormulario) {
     telefono: telefonoNumero,
     password: (desdeFormulario.contrasena || "").trim(),
   };
-
-  console.log("[registrarUsuario] payload:", payload);
 
   const res = await fetch(`${API_BASE}/api/v1/usuarios/registro`, {
     method: "POST",
@@ -383,8 +371,6 @@ export async function obtenerMisCompras(usuarioId) {
 // LOGIN
 // ==========================================================
 export async function login(correo, password) {
-  console.log("[usuarios.js][login] API_BASE:", API_BASE);
-  console.log("[usuarios.js][login] payload:", { correo, password });
 
   const res = await fetch(`${API_BASE}/api/v1/auth/login`, {
     method: "POST",
@@ -394,9 +380,6 @@ export async function login(correo, password) {
   });
 
   const text = await res.text();
-
-  console.log("[usuarios.js][login] status:", res.status);
-  console.log("[usuarios.js][login] body crudo:", text);
 
   if (!res.ok) {
     console.error("[login] status:", res.status, text);

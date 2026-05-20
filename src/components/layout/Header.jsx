@@ -17,7 +17,6 @@ function Header() {
 
   const myListCount = useAppStore((s) => s.myList.length);
   const user        = useAppStore((state) => state.user);
-  console.log('USER HEADER:', user);
   const clearUser   = useAppStore((s) => s.clearUser);
 
   return (
