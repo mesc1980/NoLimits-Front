@@ -41,6 +41,12 @@ import {
 } from '@/utils/normalizeMedia';
 import { MEDIA_TYPES } from '@/utils/constants';
 
+function normalizeQuery(str) {
+  return str
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '');
+}
+
 /**
  * Busca en todas las fuentes disponibles según el tipo de filtro.
  *
@@ -50,7 +56,7 @@ import { MEDIA_TYPES } from '@/utils/constants';
  */
 export function useSearch(query, type = 'all') {
   return useQuery({
-    queryKey: ['search', query, type],
+    queryKey: ['search', normalizeQuery(query), type],
 
     queryFn: async () => {
       if (!query?.trim()) return [];
@@ -59,16 +65,16 @@ export function useSearch(query, type = 'all') {
       // Con backend: reemplazar TODO este bloque por una sola llamada.
       const tasks = [];
 
-      const q = query.toLowerCase();
-      const byTitle = (a) => a.title?.toLowerCase().includes(q);
+      const q = normalizeQuery(query).toLowerCase();
+      const byTitle = (a) => normalizeQuery(a.title ?? '').toLowerCase().includes(q);
 
       if (type === 'all' || type === MEDIA_TYPES.MOVIE) {
         tasks.push(
-          searchMovies(query).then((r) =>
+          searchMovies(normalizeQuery(query)).then((r) =>
             r.results
               .map(normalizeTmdbMovie)
               .filter((m) => {
-                const title = m.title?.toLowerCase() ?? '';
+                const title = normalizeQuery(m.title ?? '').toLowerCase();
                 const words = q.split(' ').filter((w) => w.length > 2);
                 const isRelevant = title.includes(q) || words.every((w) => title.includes(w));
                 return m.poster && (m.voteCount ?? 0) >= 50 && isRelevant;
@@ -80,11 +86,11 @@ export function useSearch(query, type = 'all') {
 
       if (type === 'all' || type === MEDIA_TYPES.SERIES) {
         tasks.push(
-          searchSeries(query).then((r) =>
+          searchSeries(normalizeQuery(query)).then((r) =>
             r.results
               .map(normalizeTmdbSeries)
               .filter((s) => {
-                const title = s.title?.toLowerCase() ?? '';
+                const title = normalizeQuery(s.title ?? '').toLowerCase();
                 const words = q.split(' ').filter((w) => w.length > 2);
                 const isRelevant = title.includes(q) || words.every((w) => title.includes(w));
                 return s.poster && (s.voteCount ?? 0) >= 50 && isRelevant;
@@ -96,7 +102,7 @@ export function useSearch(query, type = 'all') {
 
       if (type === 'all' || type === MEDIA_TYPES.ANIME) {
         tasks.push(
-          searchAnime(query).then((r) =>
+          searchAnime(normalizeQuery(query)).then((r) =>
             r.data
               .map(normalizeJikanAnime)
               .filter((a) => byTitle(a) && a.poster)
@@ -107,11 +113,11 @@ export function useSearch(query, type = 'all') {
 
       if (type === 'all' || type === MEDIA_TYPES.BOOK) {
         tasks.push(
-          searchBooks(query).then((r) =>
+          searchBooks(normalizeQuery(query)).then((r) =>
             (r.items ?? [])
               .map(normalizeGoogleBook)
               .filter((b) => {
-                const title = b.title?.toLowerCase() ?? '';
+                const title = normalizeQuery(b.title ?? '').toLowerCase();
                 const words = q.split(' ').filter((w) => w.length > 3);
                 return title.includes(q) || words.every((word) => title.includes(word));
               })
@@ -122,11 +128,11 @@ export function useSearch(query, type = 'all') {
 
       if (type === 'all' || type === MEDIA_TYPES.GAME) {
         tasks.push(
-          searchGames(query).then((r) =>
+          searchGames(normalizeQuery(query)).then((r) =>
             (r.results ?? [])
               .map(normalizeRawgGame)
               .filter((g) => {
-                const title = g.title?.toLowerCase() ?? '';
+                const title = normalizeQuery(g.title ?? '').toLowerCase();
                 const words = q.split(' ').filter((w) => w.length > 1);
                 if (words.length === 0) return true;
                 const matches = words.filter((w) => title.includes(w));
@@ -140,7 +146,7 @@ export function useSearch(query, type = 'all') {
 
       if (type === 'all' || type === MEDIA_TYPES.MUSIC) {
         tasks.push(
-          searchMusicReleaseGroups(query).then((r) =>
+          searchMusicReleaseGroups(normalizeQuery(query)).then((r) =>
             (r['release-groups'] ?? [])
               .map(normalizeMusicBrainzRelease)
               .filter(byTitle)
@@ -150,7 +156,7 @@ export function useSearch(query, type = 'all') {
       }
 
       if (type === 'all') {
-        tasks.push(buscarProductosNoLimits(query));
+        tasks.push(buscarProductosNoLimits(normalizeQuery(query)));
       }
 
       // Promise.allSettled: si Jikan falla (rate limit), igual muestra TMDB e IGDB.
