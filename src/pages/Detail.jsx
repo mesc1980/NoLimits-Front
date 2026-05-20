@@ -592,6 +592,16 @@ function Detail() {
     }));
   };
 
+  const limpiarNombreUsuario = (nombre) => {
+    if (!nombre) return 'Usuario';
+
+    return nombre
+      .replace(/\s*\+\s*(Google|Temporal|Supabase|NoLimits)$/i, '')
+      .replace(/\s*-\s*(Google|Temporal|Supabase|NoLimits)$/i, '')
+      .replace(/\s*\((Google|Temporal|Supabase|NoLimits)\)$/i, '')
+      .trim();
+  };
+
   /* ── Loading ────────────────────────────────────────────── */
   if (isLoading) {
     return (
@@ -972,7 +982,7 @@ function Detail() {
         >
           <div style={{ display: 'flex', justifyContent: 'space-between', gap: 'var(--space-3)', marginBottom: 'var(--space-2)' }}>
             <strong style={{ color: 'var(--nl-text-primary)', fontSize: '14px' }}>
-              {review.nombreUsuario}
+              {limpiarNombreUsuario(review.nombreUsuario)}
             </strong>
 
             <span style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', color: 'var(--nl-text-muted)' }}>
@@ -1148,7 +1158,7 @@ function Detail() {
                       fontSize: '13px',
                     }}
                   >
-                    {respuesta.nombreUsuario}
+                    {limpiarNombreUsuario(respuesta.nombreUsuario)}
                   </strong>
 
                   <span
