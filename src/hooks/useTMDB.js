@@ -37,7 +37,7 @@ export function useTrendingMovies() {
     queryKey: ['tmdb', 'trending', 'movies'],
     queryFn: async () => {
       const res = await fetchTrendingMovies();
-      return res.results.map(normalizeTmdbMovie);
+      return res.results.map(normalizeTmdbMovie).slice(0, 18);
     },
     staleTime: STALE_TIME_TRENDING,
   });
@@ -51,7 +51,7 @@ export function useTrendingSeries() {
     queryKey: ['tmdb', 'trending', 'series'],
     queryFn: async () => {
       const res = await fetchTrendingSeries();
-      return res.results.map(normalizeTmdbSeries);
+      return res.results.map(normalizeTmdbSeries).slice(0, 18);
     },
     staleTime: STALE_TIME_TRENDING,
   });

@@ -22,9 +22,9 @@ import ChatBot from '@/components/ui/ChatBot';
 import useAppStore from '@/store/useAppStore';
 
 const PAGE_VARIANTS = {
-  initial: { opacity: 0, y: 8  },
-  animate: { opacity: 1, y: 0  },
-  exit:    { opacity: 0, y: -8 },
+  initial: { opacity: 0 },
+  animate: { opacity: 1 },
+  exit:    { opacity: 0 },
 };
 
 function Layout() {
@@ -45,19 +45,9 @@ function Layout() {
       <ScrollToTop />
       <Header />
 
-      <AnimatePresence mode="wait">
-        <motion.main
-          key={location.pathname}
-          variants={PAGE_VARIANTS}
-          initial="initial"
-          animate="animate"
-          exit="exit"
-          transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
-          style={{ flex: 1 }}
-        >
-          <Outlet />
-        </motion.main>
-      </AnimatePresence>
+      <main style={{ flex: 1 }}>
+        <Outlet />
+      </main>
 
       <Footer />
 

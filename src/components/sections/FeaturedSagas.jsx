@@ -23,42 +23,43 @@ const FEATURED_SAGAS = [
   {
     name:   'Spider-Man',
     query:  'Spider-Man No Way Home',
-    types:  ['movies', 'games', 'anime'],
+    types:  ['movies', 'games', 'anime', 'books', 'music'],
   },
   {
     name:   'Star Wars',
     query:  'Star Wars A New Hope',
-    types:  ['movies', 'series', 'games', 'books'],
+    types:  ['movies', 'series', 'games', 'books', 'music']
   },
   {
     name:   'Batman',
     query:  'The Dark Knight',
-    types:  ['movies', 'series', 'games'],
+    types:  ['movies', 'series', 'games', 'books', 'music']
   },
   {
     name:   'Dragon Ball',
     query:  'Dragon Ball Super Broly',
-    types:  ['anime', 'games', 'movies'],
+    types:  ['anime', 'games', 'movies', 'books', 'music']
   },
   {
     name:   'Harry Potter',
     query:  'Harry Potter Sorcerer Stone',
-    types:  ['movies', 'books', 'games'],
+    types:  ['movies', 'series', 'books', 'games', 'music']
   },
   {
-    name:   'The Witcher',
-    query:  'The Witcher',
-    types:  ['series', 'games', 'books'],
-  },
-  {
-    name:   'Marvel',
-    query:  'Avengers Endgame',
-    types:  ['movies', 'series', 'games'],
+    name:        'Lord of the Rings',
+    displayName: 'El Señor de los Anillos',
+    query:       'Lord of the Rings Fellowship',
+    types:       ['movies', 'series', 'books', 'games', 'music']
   },
   {
     name:   'The Last of Us',
     query:  'The Last of Us',
-    types:  ['series', 'games'],
+    types:  ['series', 'games', 'books', 'music']
+  },
+  {
+    name:   'Attack on Titan',
+    query:  'Attack on Titan',
+    types:  ['anime', 'movies', 'games', 'books', 'music']
   },
 ];
 
@@ -190,7 +191,7 @@ function SagaCard({ saga, backdropUrl, index }) {
             marginBottom:  '8px',
           }}
         >
-          {saga.name}
+          {saga.displayName ?? saga.name}
         </h3>
 
         {/* Tipos de contenido */}
@@ -275,7 +276,7 @@ function FeaturedSagas() {
             fontSize:      '11px',
             letterSpacing: '0.1em',
             textTransform: 'uppercase',
-            color:         'var(--nl-text-muted)',
+            color:         'white',
           }}
         >
           Sagas destacadas · Explora el universo completo

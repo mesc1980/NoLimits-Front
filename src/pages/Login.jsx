@@ -20,6 +20,7 @@ function Login() {
   const [email,    setEmail]    = useState('');
   const [password, setPassword] = useState('');
   const [name,     setName]     = useState('');
+  const [lastName, setLastName] = useState('');
   const [showPwd,  setShowPwd]  = useState(false);
   const [loading,  setLoading]  = useState(false);
   const [error,    setError]    = useState('');
@@ -60,7 +61,7 @@ function Login() {
     } else {
       await registrarUsuario({ 
         nombre: name,
-        apellidos: "Temporal",
+        apellidos: lastName,
         correo: email,
         telefono: "99999999",
         contrasena: password
@@ -205,10 +206,25 @@ function Login() {
           autoComplete="off"
           style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
             {tab === TAB_REGISTER && (
-            <div style={{ position: 'relative' }}>
-              <User size={16} style={iconStyle} />
-              <input type="text" placeholder="Tu nombre" value={name} onChange={(e) => setName(e.target.value)} style={inputStyle} required />
-            </div>
+            <>
+              <div style={{ position: 'relative' }}>
+                <User size={16} style={iconStyle} />
+                <input type="text" placeholder="Tu nombre" value={name} onChange={(e) => setName(e.target.value)} style={inputStyle} required />
+              </div>
+              <div style={{  position: 'relative' }}>
+                <User size={16} style={iconStyle}/>
+                <input
+                  type='"text'
+                  placeholder="Tus apellidos"
+                  value={lastName}
+                  onChange={(e) =>
+                    setLastName(e.target.value)
+                  }
+                  style={inputStyle}
+                  required
+                />
+              </div>
+            </>
           )}
 
           <div style={{ position: 'relative' }}>

@@ -17,6 +17,7 @@ import { Film, Tv, Zap, Sword, BookOpen, Music, Search } from 'lucide-react';
 import MediaCard    from '@/components/cards/MediaCard';
 import AnimeCard    from '@/components/cards/AnimeCard';
 import BookCard     from '@/components/cards/BookCard';
+import GameCard from '@/components/cards/GameCard';
 import SkeletonCard from '@/components/ui/SkeletonCard';
 import SearchBar    from '@/components/ui/SearchBar';
 import { useSearch } from '@/hooks/useSearch';
@@ -33,7 +34,7 @@ const TYPE_GROUPS = [
   { type: MEDIA_TYPES.MOVIE,  label: 'Películas',   icon: Film,     cardType: 'media' },
   { type: MEDIA_TYPES.SERIES, label: 'Series',      icon: Tv,       cardType: 'media' },
   { type: MEDIA_TYPES.ANIME,  label: 'Anime',       icon: Zap,      cardType: 'anime' },
-  { type: MEDIA_TYPES.GAME,   label: 'Videojuegos', icon: Sword,    cardType: 'media' },
+  { type: MEDIA_TYPES.GAME,   label: 'Videojuegos', icon: Sword,    cardType: 'game'  },
   { type: MEDIA_TYPES.BOOK,   label: 'Libros',      icon: BookOpen, cardType: 'book'  },
   { type: MEDIA_TYPES.MUSIC,  label: 'Música',      icon: Music,    cardType: 'media' },
 ];
@@ -42,6 +43,7 @@ const TYPE_GROUPS = [
 function CardForType({ obra, cardType }) {
   if (cardType === 'anime') return <AnimeCard obra={obra} />;
   if (cardType === 'book')  return <BookCard  obra={obra} />;
+  if (cardType === 'game')  return <GameCard  obra={obra} />;
   return <MediaCard obra={obra} />;
 }
 
@@ -84,7 +86,7 @@ function GroupHeader({ icon: Icon, label, count, index }) {
           fontSize:      '11px',
           letterSpacing: '0.08em',
           textTransform: 'uppercase',
-          color:         'var(--nl-text-muted)',
+          color:         'white',
         }}
       >
         {label}
@@ -122,17 +124,15 @@ function ResultGroup({ group, obras, groupIndex, activeType }) {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1,  y: 0  }}
       transition={{ duration: 0.45, delay: groupIndex * 0.07, ease: [0.22, 1, 0.36, 1] }}
-      style={{ marginBottom: 'var(--space-10)' }}
+      style={{ marginBottom: 'var(--space-10)', marginTop: 'var(--space-12)' }}
+
     >
-      {/* Solo muestra el encabezado de grupo cuando el filtro es "todo" */}
-      {activeType === 'all' && (
-        <GroupHeader
-          icon={group.icon}
-          label={group.label}
-          count={uniqueObras.length}
-          index={groupIndex}
-        />
-      )}
+      <GroupHeader
+        icon={group.icon}
+        label={group.label}
+        count={uniqueObras.length}
+        index={groupIndex}
+      />
 
       <motion.div
         className={gridClass}
@@ -140,7 +140,7 @@ function ResultGroup({ group, obras, groupIndex, activeType }) {
         initial="hidden"
         animate="visible"
       >
-        {uniqueObras.slice(0, 24).map((obra) => (
+        {uniqueObras.slice(0, 18).map((obra) => (
           <CardForType key={obra.id} obra={obra} cardType={group.cardType} />
         ))}
       </motion.div>
@@ -275,9 +275,15 @@ function SearchResults() {
                   <>
                     <span style={{ color: 'var(--nl-accent)' }}>{totalCount}</span>
                     {' '}
-                    {type === 'all'
-                      ? 'contenidos disponibles'
-                      : `${TYPE_GROUPS.find((g) => g.type === type)?.label.toLowerCase()} disponibles`}
+                    {{
+                      all:    'contenidos en tendencia',
+                      movie:  'películas en tendencia',
+                      series: 'series en tendencia',
+                      anime:  'animes destacados',
+                      book:   'libros recomendados',
+                      game:   'juegos destacados',
+                      music:  'álbumes destacados',
+                    }[type] ?? 'contenidos disponibles'}
                   </>
                 )
               ) : (

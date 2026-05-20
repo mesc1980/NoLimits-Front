@@ -238,7 +238,7 @@ function Detail() {
   const seriesRes = useSeriesDetail(isSeries ? nativeId : null);
   const animeRes  = useAnimeDetail (isAnime  ? nativeId : null);
   const gameRes   = useGameDetail  (isGame   ? nativeId : null);
-  const bookWorkKey = isBook ? `/works/${nativeId}` : null;
+  const bookWorkKey = isBook ? nativeId : null;
   const bookRes     = useBookDetail(bookWorkKey);
   const musicRes = useMusicDetail(isMusic ? nativeId : null);
 
@@ -509,6 +509,12 @@ function Detail() {
 
   const handleReaccionReview = async (reviewId, tipoReaccion) => {
     try {
+      if (!isLoggedIn()) {
+        alert("Debes iniciar sesión para reaccionar a una reseña");
+        navigate("/login");
+        return;
+      }
+
       const user = JSON.parse(localStorage.getItem("nl_user"));
 
       const usuarioId =
@@ -945,370 +951,360 @@ function Detail() {
             </div>
 
             {/* 06 · RESEÑAS */}
-            <div>
-              <SectionLabel number={6}>Reseñas</SectionLabel>
+<div>
+  <SectionLabel number={6}>Reseñas</SectionLabel>
 
-              {reviews.length === 0 ? (
-                <p style={{ color: 'var(--nl-text-muted)', fontSize: '14px' }}>
-                  Todavía no hay reseñas para esta obra.
-                </p>
-              ) : (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
-                  {comentariosPrincipales.map((review) => (
-                    <div
-                      key={review.id}
+  {reviews.length === 0 ? (
+    <p style={{ color: 'var(--nl-text-muted)', fontSize: '14px' }}>
+      Todavía no hay reseñas para esta obra.
+    </p>
+  ) : (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
+      {comentariosPrincipales.map((review) => (
+        <div
+          key={review.id}
+          style={{
+            background: 'var(--nl-bg-elevated)',
+            border: '1px solid var(--nl-border)',
+            borderRadius: 'var(--radius-card)',
+            padding: 'var(--space-4)',
+          }}
+        >
+          <div style={{ display: 'flex', justifyContent: 'space-between', gap: 'var(--space-3)', marginBottom: 'var(--space-2)' }}>
+            <strong style={{ color: 'var(--nl-text-primary)', fontSize: '14px' }}>
+              {review.nombreUsuario}
+            </strong>
+
+            <span style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', color: 'var(--nl-text-muted)' }}>
+              {new Date(review.fechaCreacion).toLocaleDateString('es-CL')}
+              {review.editado && ' · editado'}
+            </span>
+          </div>
+
+          <p style={{ color: 'var(--nl-text-secondary)', fontSize: '14px', lineHeight: 1.7, whiteSpace: 'pre-line' }}>
+            {review.contenido}
+          </p>
+
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              marginTop: 'var(--space-3)',
+              gap: 'var(--space-3)',
+              flexWrap: 'wrap',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <button
+                onClick={() => handleReaccionReview(review.id, 'LIKE')}
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  cursor: 'pointer',
+                  color: 'var(--nl-text-secondary)',
+                  fontSize: '14px',
+                }}
+              >
+                👍 {review.likes ?? 0}
+              </button>
+
+              <button
+                onClick={() => handleReaccionReview(review.id, 'DISLIKE')}
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  cursor: 'pointer',
+                  color: 'var(--nl-text-secondary)',
+                  fontSize: '14px',
+                }}
+              >
+                👎 {review.dislikes ?? 0}
+              </button>
+
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setReplyingToId(review.id)}
+              >
+                Responder
+              </Button>
+            </div>
+
+            {review.usuarioId === usuarioActualId && (
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => {
+                    setReviewText(review.contenido);
+                    setEditingReviewId(review.id);
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }}
+                >
+                  Editar reseña
+                </Button>
+
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => handleEliminarReview(review.id)}
+                  style={{
+                    color: '#ff6b6b',
+                    borderColor: 'rgba(255,107,107,0.2)',
+                  }}
+                >
+                  Eliminar reseña
+                </Button>
+              </div>
+            )}
+          </div>
+
+          {replyingToId === review.id && (
+            <div style={{ marginTop: 'var(--space-3)' }}>
+              <textarea
+                value={replyText}
+                onChange={(e) => setReplyText(e.target.value)}
+                placeholder="Escribe una respuesta…"
+                rows={3}
+                style={{
+                  width: '100%',
+                  background: 'var(--nl-bg-subtle)',
+                  border: '1px solid var(--nl-border)',
+                  borderRadius: 'var(--radius-card)',
+                  color: 'var(--nl-text-primary)',
+                  padding: 'var(--space-3)',
+                  fontSize: '14px',
+                  resize: 'vertical',
+                }}
+              />
+
+              <div style={{ display: 'flex', gap: '8px', marginTop: 'var(--space-2)' }}>
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => handleResponderReview(review.id)}
+                >
+                  Publicar respuesta
+                </Button>
+
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    setReplyingToId(null);
+                    setReplyText('');
+                  }}
+                >
+                  Cancelar
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {obtenerRespuestas(review.id).length > 0 && (
+            <button
+              onClick={() => toggleRespuestas(review.id)}
+              style={{
+                marginTop: 'var(--space-3)',
+                background: 'transparent',
+                border: 'none',
+                color: 'var(--nl-accent)',
+                cursor: 'pointer',
+                fontSize: '13px',
+                fontWeight: 600,
+              }}
+            >
+              {expandedReplies[review.id]
+                ? 'Ocultar respuestas ▲'
+                : `${obtenerRespuestas(review.id).length} ${
+                    obtenerRespuestas(review.id).length === 1 ? 'respuesta' : 'respuestas'
+                  } ▼`}
+            </button>
+          )}
+
+          {expandedReplies[review.id] &&
+            obtenerRespuestas(review.id).map((respuesta) => (
+              <div
+                key={respuesta.id}
+                style={{
+                  marginTop: 'var(--space-3)',
+                  marginLeft: 'var(--space-5)',
+                  paddingLeft: 'var(--space-3)',
+                  borderLeft: '2px solid var(--nl-border)',
+                }}
+              >
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    gap: 'var(--space-2)',
+                    marginBottom: '6px',
+                  }}
+                >
+                  <strong
+                    style={{
+                      color: 'var(--nl-text-primary)',
+                      fontSize: '13px',
+                    }}
+                  >
+                    {respuesta.nombreUsuario}
+                  </strong>
+
+                  <span
+                    style={{
+                      fontFamily: 'var(--font-mono)',
+                      fontSize: '10px',
+                      color: 'var(--nl-text-muted)',
+                    }}
+                  >
+                    {new Date(respuesta.fechaCreacion).toLocaleDateString('es-CL')}
+                    {respuesta.editado && ' · editado'}
+                  </span>
+                </div>
+
+                {editingReplyId === respuesta.id ? (
+                  <div style={{ marginTop: 'var(--space-2)' }}>
+                    <textarea
+                      value={editingReplyText}
+                      onChange={(e) => setEditingReplyText(e.target.value)}
+                      rows={3}
                       style={{
-                        background: 'var(--nl-bg-elevated)',
+                        width: '100%',
+                        background: 'var(--nl-bg-subtle)',
                         border: '1px solid var(--nl-border)',
                         borderRadius: 'var(--radius-card)',
-                        padding: 'var(--space-4)',
+                        color: 'var(--nl-text-primary)',
+                        padding: 'var(--space-3)',
+                        fontSize: '14px',
+                        resize: 'vertical',
                       }}
-                    >
-                      <div style={{ display: 'flex', justifyContent: 'space-between', gap: 'var(--space-3)', marginBottom: 'var(--space-2)' }}>
-                        <strong style={{ color: 'var(--nl-text-primary)', fontSize: '14px' }}>
-                          {review.nombreUsuario}
-                        </strong>
+                    />
 
-                        <span style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', color: 'var(--nl-text-muted)' }}>
-                          {new Date(review.fechaCreacion).toLocaleDateString('es-CL')}
-                          {review.editado && ' · editado'}
-                        </span>
-                      </div>
-
-                      <p style={{ color: 'var(--nl-text-secondary)', fontSize: '14px', lineHeight: 1.7, whiteSpace: 'pre-line' }}>
-                        {review.contenido}
-                      </p>
-
-                      <div
-                        style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '12px',
-                          marginTop: 'var(--space-3)',
-                        }}
+                    <div style={{ display: 'flex', gap: '8px', marginTop: 'var(--space-2)' }}>
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        onClick={() => handleActualizarRespuesta(respuesta.id)}
                       >
-                        <button
-                          onClick={() => handleReaccionReview(review.id, 'LIKE')}
-                          style={{
-                            background: 'transparent',
-                            border: 'none',
-                            cursor: 'pointer',
-                            color: 'var(--nl-text-secondary)',
-                            fontSize: '14px',
-                          }}
-                        >
-                          👍 {review.likes ?? 0}
-                        </button>
-
-                        <button
-                          onClick={() => handleReaccionReview(review.id, 'DISLIKE')}
-                          style={{
-                            background: 'transparent',
-                            border: 'none',
-                            cursor: 'pointer',
-                            color: 'var(--nl-text-secondary)',
-                            fontSize: '14px',
-                          }}
-                        >
-                          👎 {review.dislikes ?? 0}
-                        </button>
-                      </div>
+                        Guardar cambios
+                      </Button>
 
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => setReplyingToId(review.id)}
-                        style={{ marginTop: 'var(--space-2)' }}
+                        onClick={() => {
+                          setEditingReplyId(null);
+                          setEditingReplyText('');
+                        }}
                       >
-                        Responder
+                        Cancelar
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <p
+                    style={{
+                      color: 'var(--nl-text-secondary)',
+                      fontSize: '14px',
+                      lineHeight: 1.7,
+                      whiteSpace: 'pre-line',
+                    }}
+                  >
+                    {respuesta.contenido}
+                  </p>
+                )}
+
+                <div style={{ display: 'flex', gap: '8px', marginTop: 'var(--space-2)', flexWrap: 'wrap' }}>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      setReplyingToId(respuesta.id);
+                      setReplyText('');
+                    }}
+                  >
+                    Responder
+                  </Button>
+
+                  {respuesta.usuarioId === usuarioActualId && (
+                    <>
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        onClick={() => {
+                          setEditingReplyId(respuesta.id);
+                          setEditingReplyText(respuesta.contenido);
+                        }}
+                      >
+                        Editar
                       </Button>
 
-                      {replyingToId === review.id && (
-                        <div style={{ marginTop: 'var(--space-3)' }}>
-                          <textarea
-                            value={replyText}
-                            onChange={(e) => setReplyText(e.target.value)}
-                            placeholder="Escribe una respuesta…"
-                            rows={3}
-                            style={{
-                              width: '100%',
-                              background: 'var(--nl-bg-subtle)',
-                              border: '1px solid var(--nl-border)',
-                              borderRadius: 'var(--radius-card)',
-                              color: 'var(--nl-text-primary)',
-                              padding: 'var(--space-3)',
-                              fontSize: '14px',
-                              resize: 'vertical',
-                            }}
-                          />
-
-                          <div
-                            style={{
-                              display: 'flex',
-                              gap: '8px',
-                              marginTop: 'var(--space-2)',
-                            }}
-                          >
-                            <Button
-                              variant="secondary"
-                              size="sm"
-                              onClick={() => handleResponderReview(review.id)}
-                            >
-                              Publicar respuesta
-                            </Button>
-
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => {
-                                setReplyingToId(null);
-                                setReplyText('');
-                              }}
-                            >
-                              Cancelar
-                            </Button>
-                          </div>
-                        </div>
-                      )}
-
-                      {review.usuarioId === usuarioActualId && (
-                        <div style={{ display: 'flex', gap: '8px', marginTop: 'var(--space-3)' }}>
-                          <Button
-                            variant="secondary"
-                            size="sm"
-                            onClick={() => {
-                              setReviewText(review.contenido);
-                              setEditingReviewId(review.id);
-                              window.scrollTo({ top: 0, behavior: 'smooth' });
-                            }}
-                          >
-                            Editar reseña
-                          </Button>
-
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleEliminarReview(review.id)}
-                            style={{
-                              color: '#ff6b6b',
-                              borderColor: 'rgba(255,107,107,0.2)',
-                            }}
-                          >
-                            Eliminar reseña
-                          </Button>
-                        </div>
-                      )}
-
-                      {obtenerRespuestas(review.id).length > 0 && (
-                        <button
-                          onClick={() => toggleRespuestas(review.id)}
-                          style={{
-                            marginTop: 'var(--space-3)',
-                            background: 'transparent',
-                            border: 'none',
-                            color: 'var(--nl-accent)',
-                            cursor: 'pointer',
-                            fontSize: '13px',
-                            fontWeight: 600,
-                          }}
-                        >
-                          {expandedReplies[review.id]
-                            ? 'Ocultar respuestas ▲'
-                            : `${obtenerRespuestas(review.id).length} ${
-                                obtenerRespuestas(review.id).length === 1 ? 'respuesta' : 'respuestas'
-                              } ▼`}
-                        </button>
-                      )}
-
-                      {expandedReplies[review.id] && obtenerRespuestas(review.id).map((respuesta) => (
-                        <div
-                          key={respuesta.id}
-                          style={{
-                            marginTop: 'var(--space-3)',
-                            marginLeft: 'var(--space-5)',
-                            paddingLeft: 'var(--space-3)',
-                            borderLeft: '2px solid var(--nl-border)',
-                          }}
-                        >
-                          <div
-                            style={{
-                              display: 'flex',
-                              justifyContent: 'space-between',
-                              gap: 'var(--space-2)',
-                              marginBottom: '6px',
-                            }}
-                          >
-                            <strong
-                              style={{
-                                color: 'var(--nl-text-primary)',
-                                fontSize: '13px',
-                              }}
-                            >
-                              {respuesta.nombreUsuario}
-                            </strong>
-
-                            <span
-                              style={{
-                                fontFamily: 'var(--font-mono)',
-                                fontSize: '10px',
-                                color: 'var(--nl-text-muted)',
-                              }}
-                            >
-                              {new Date(respuesta.fechaCreacion).toLocaleDateString('es-CL')}
-                            </span>
-                          </div>
-
-                          {editingReplyId === respuesta.id ? (
-                            <div style={{ marginTop: 'var(--space-2)' }}>
-                              <textarea
-                                value={editingReplyText}
-                                onChange={(e) => setEditingReplyText(e.target.value)}
-                                rows={3}
-                                style={{
-                                  width: '100%',
-                                  background: 'var(--nl-bg-subtle)',
-                                  border: '1px solid var(--nl-border)',
-                                  borderRadius: 'var(--radius-card)',
-                                  color: 'var(--nl-text-primary)',
-                                  padding: 'var(--space-3)',
-                                  fontSize: '14px',
-                                  resize: 'vertical',
-                                }}
-                              />
-
-                              <div style={{ display: 'flex', gap: '8px', marginTop: 'var(--space-2)' }}>
-                                <Button
-                                  variant="secondary"
-                                  size="sm"
-                                  onClick={() => handleActualizarRespuesta(respuesta.id)}
-                                >
-                                  Guardar cambios
-                                </Button>
-
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() => {
-                                    setEditingReplyId(null);
-                                    setEditingReplyText('');
-                                  }}
-                                >
-                                  Cancelar
-                                </Button>
-                              </div>
-                            </div>
-                          ) : (
-                            <p
-                              style={{
-                                color: 'var(--nl-text-secondary)',
-                                fontSize: '14px',
-                                lineHeight: 1.7,
-                                whiteSpace: 'pre-line',
-                              }}
-                            >
-                              {respuesta.contenido}
-                            </p>
-                          )}
-
-                          <button
-                            onClick={() => {
-                              setReplyingToId(respuesta.id);
-                              setReplyText('');
-                            }}
-                            style={{
-                              marginTop: 'var(--space-2)',
-                              background: 'transparent',
-                              border: 'none',
-                              color: 'var(--nl-text-secondary)',
-                              cursor: 'pointer',
-                              fontSize: '13px',
-                              fontWeight: 600,
-                            }}
-                          >
-                            Responder
-                          </button>
-
-                          {replyingToId === respuesta.id && (
-                            <div style={{ marginTop: 'var(--space-3)' }}>
-                              <textarea
-                                value={replyText}
-                                onChange={(e) => setReplyText(e.target.value)}
-                                placeholder="Escribe una respuesta…"
-                                rows={3}
-                                style={{
-                                  width: '100%',
-                                  background: 'var(--nl-bg-subtle)',
-                                  border: '1px solid var(--nl-border)',
-                                  borderRadius: 'var(--radius-card)',
-                                  color: 'var(--nl-text-primary)',
-                                  padding: 'var(--space-3)',
-                                  fontSize: '14px',
-                                  resize: 'vertical',
-                                }}
-                              />
-
-                              <div
-                                style={{
-                                  display: 'flex',
-                                  gap: '8px',
-                                  marginTop: 'var(--space-2)',
-                                }}
-                              >
-                                <Button
-                                  variant="secondary"
-                                  size="sm"
-                                  onClick={() => handleResponderReview(respuesta.id)}
-                                >
-                                  Publicar respuesta
-                                </Button>
-
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() => {
-                                    setReplyingToId(null);
-                                    setReplyText('');
-                                  }}
-                                >
-                                  Cancelar
-                                </Button>
-                              </div>
-                            </div>
-                          )}
-                          {respuesta.usuarioId === usuarioActualId && (
-                            <div style={{ display: 'flex', gap: '8px', marginTop: 'var(--space-2)' }}>
-                              <Button
-                                variant="secondary"
-                                size="sm"
-                                onClick={() => {
-                                  setEditingReplyId(respuesta.id);
-                                  setEditingReplyText(respuesta.contenido);
-                                }}
-                              >
-                                Editar
-                              </Button>
-
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => handleEliminarReview(respuesta.id)}
-                                style={{
-                                  color: '#ff6b6b',
-                                  borderColor: 'rgba(255,107,107,0.2)',
-                                }}
-                              >
-                                Eliminar
-                              </Button>
-                            </div>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  ))}
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleEliminarReview(respuesta.id)}
+                        style={{
+                          color: '#ff6b6b',
+                          borderColor: 'rgba(255,107,107,0.2)',
+                        }}
+                      >
+                        Eliminar
+                      </Button>
+                    </>
+                  )}
                 </div>
-              )}
-            </div>
-          </motion.div>
+
+                {replyingToId === respuesta.id && (
+                  <div style={{ marginTop: 'var(--space-3)' }}>
+                    <textarea
+                      value={replyText}
+                      onChange={(e) => setReplyText(e.target.value)}
+                      placeholder="Escribe una respuesta…"
+                      rows={3}
+                      style={{
+                        width: '100%',
+                        background: 'var(--nl-bg-subtle)',
+                        border: '1px solid var(--nl-border)',
+                        borderRadius: 'var(--radius-card)',
+                        color: 'var(--nl-text-primary)',
+                        padding: 'var(--space-3)',
+                        fontSize: '14px',
+                        resize: 'vertical',
+                      }}
+                    />
+
+                    <div style={{ display: 'flex', gap: '8px', marginTop: 'var(--space-2)' }}>
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        onClick={() => handleResponderReview(respuesta.id)}
+                      >
+                        Publicar respuesta
+                      </Button>
+
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
+                          setReplyingToId(null);
+                          setReplyText('');
+                        }}
+                      >
+                        Cancelar
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ))}
+        </div>
+      ))}
+    </div>
+  )}
+</div>
+
+</motion.div>
         </div>
 
         {/* Responsive: en pantallas angostas colapsa a 1 col */}
