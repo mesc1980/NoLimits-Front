@@ -3,6 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from "../lib/supabase";
 
 import { Eye, EyeOff } from "lucide-react";
+const API_BASE =
+  import.meta.env.VITE_API_URL ||
+  "http://localhost:8080";
 
 
 export default function ResetPassword() {
@@ -34,7 +37,7 @@ export default function ResetPassword() {
       const correo = localStorage.getItem("reset_email");
 
       const response = await fetch(
-        "http://localhost:8080/api/v1/auth/reset-password",
+         `${API_BASE}/api/v1/auth/reset-password`,
         {
           method: "POST",
           headers: {

@@ -78,53 +78,73 @@ function Header() {
             className="nl-header__search-btn"
             onClick={() => setSearchOpen((v) => !v)}
             aria-label={searchOpen ? 'Cerrar búsqueda' : 'Abrir búsqueda'}
-          >
+        >
             {searchOpen ? <X size={20} /> : <Search size={20} />}
           </button>
 
           {/* Login / logout */}
           {user ? (
+            <>
+              {/* Perfil */}
+              <button
+                className="nl-header__search-btn"
+                onClick={() => navigate('/profile')}
+                aria-label="Mi perfil"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  fontSize: '13px',
+                }}
+              >
+                <User size={16} />
+                Mi Perfil
+              </button>
+
+              {/*Logout */}
+              <button 
+                className="nl-header__search-btn"
+                onClick={() => {
+                  clearUser();
+
+                  localStorage.removeItem('nl_user');
+                  localStorage.removeItem('nl_role');
+                  localStorage.removeItem('nl_token');
+
+                  navigate("/");
+                }}
+                aria-label="Cerrar sesión"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  fontSize: '13px',
+                }}
+              >
+                <LogOut size={16} />
+                Salir
+              </button>
+            </>
+          ) : (
+            /*Usuario no autenticado */
             <button
               className="nl-header__search-btn"
-              onClick={() => {
-                clearUser();
-                localStorage.removeItem('nl_auth');
-                localStorage.removeItem('nl_user');
-                localStorage.removeItem('nl_role');
-                localStorage.removeItem('nl_token');
-                navigate('/');
-              }}
-              aria-label="Cerrar sesión"
+              onClick={() => navigate('/login')}
+              aria-label="Iniciar sesión"
               style={{
                 display: 'flex',
                 alignItems: 'center',
                 gap: '6px',
                 fontSize: '13px',
               }}
-              
             >
-              <LogOut size={16} />
-                Salir
-            </button>
-          ) : (
-            <button
-              className="nl-header__search-btn"
-              onClick={() => navigate('/login')}
-              aria-label='Iniciar sesión'
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "6px",
-                fontSize: "13px",
-              }}
-            >
-              <User size={16} />
-                Perfil
+              <LogIn size={16} />
+              Login
             </button>
           )}
-        </div>
-      </div>
-    </header>
+        </div>      
+      </div>    
+    </header>      
   );
 }
 
