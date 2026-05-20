@@ -1,6 +1,4 @@
-import { OPENLIBRARY_BASE_URL } from '@/utils/constants';
-
-const GOOGLE_BOOKS_KEY = import.meta.env.VITE_GOOGLE_BOOKS_KEY;
+const BACKEND = import.meta.env.VITE_API_BASE_URL;
 
 export async function searchBooks(query, page = 1) {
   const startIndex = (page - 1) * 18;
@@ -9,9 +7,8 @@ export async function searchBooks(query, page = 1) {
     maxResults: 40,
     startIndex,
     printType: 'books',
-    key: GOOGLE_BOOKS_KEY,
   });
-  const res = await fetch(`https://www.googleapis.com/books/v1/volumes?${params}`);
+  const res = await fetch(`${BACKEND}/api/books/volumes?${params}`);
   return res.json();
 }
 
@@ -21,15 +18,12 @@ export async function fetchBooksBySubject(subject = 'science_fiction') {
     maxResults: 18,
     printType: 'books',
     orderBy: 'relevance',
-    key: GOOGLE_BOOKS_KEY,
   });
-  const res = await fetch(`https://www.googleapis.com/books/v1/volumes?${params}`);
+  const res = await fetch(`${BACKEND}/api/books/volumes?${params}`);
   return res.json();
 }
 
 export async function fetchBookDetail(workKey) {
-  const res = await fetch(
-    `https://www.googleapis.com/books/v1/volumes/${workKey}?key=${GOOGLE_BOOKS_KEY}`
-  );
+  const res = await fetch(`${BACKEND}/api/books/volumes/${workKey}`);
   return res.json();
 }
