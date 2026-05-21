@@ -710,18 +710,29 @@ function Detail() {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1,  y: 0  }}
           transition={{ duration: 0.6, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
-          className="container"
+          className="container hero-mobile-content"
           style={{
             position:      'absolute',
             bottom:        0,
-            left:          '50%',
-            transform:     'translateX(-50%)',
+            left:          0,
+            right:         0,
             width:         '100%',
             paddingBottom: 'var(--space-8)',
+            textAlign:     'center',
           }}
         >
           {/* Badge + saga */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginBottom: 'var(--space-3)', flexWrap: 'wrap' }}>
+          <div
+            className="hero-mobile-badge"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 'var(--space-2)',
+              marginBottom: 'var(--space-3)',
+              flexWrap: 'wrap',
+            }}
+          >
             <Badge type={obra.type} />
             {obra.saga && (
               <button
@@ -747,15 +758,17 @@ function Detail() {
           </div>
 
           <h1
+            className="hero-mobile-title"
             style={{
               fontFamily:    'var(--font-display)',
-              fontSize:      'clamp(24px, 4.5vw, 56px)',
+              fontSize: 'clamp(22px, 4.2vw, 56px)',
               fontWeight:    700,
               letterSpacing: '-0.04em',
               lineHeight:    1.05,
               color:         '#fff',
               /* maxWidth evita que títulos largos lleguen a la zona sin gradiente */
-              maxWidth:      'min(72%, 780px)',
+              maxWidth: 'min(86%, 780px)',
+              margin: '0 auto',
               overflowWrap:  'break-word',
               /* Sombra reforzada como segunda línea de defensa */
               textShadow:    '0 1px 0 rgba(0,0,0,0.8), 0 4px 24px rgba(0,0,0,0.7)',
@@ -769,12 +782,13 @@ function Detail() {
       {/* ══ CONTENIDO PRINCIPAL ═════════════════════════════ */}
       <div className="container" style={{ paddingBottom: 'var(--space-16)' }}>
         <div
+          className="detail-grid"
           style={{
-            display:               'grid',
-            gridTemplateColumns:   '220px 1fr',
-            gap:                   'var(--space-8)',
-            alignItems:            'flex-start',
-            marginTop:             'var(--space-8)',
+            display: 'grid',
+            gridTemplateColumns: '220px 1fr',
+            gap: 'var(--space-8)',
+            alignItems: 'flex-start',
+            marginTop: 'var(--space-8)',
           }}
         >
           {/* ── COLUMNA IZQUIERDA: Poster + acciones rápidas ── */}
@@ -1314,7 +1328,46 @@ function Detail() {
         {/* Responsive: en pantallas angostas colapsa a 1 col */}
         <style>{`
           @media (max-width: 767px) {
-            .detail-grid { grid-template-columns: 1fr !important; }
+            .detail-grid {
+              grid-template-columns: 1fr !important;
+              gap: var(--space-6) !important;
+              margin-top: var(--space-6) !important;
+            }
+
+            .detail-grid > div:first-child {
+              max-width: 220px;
+              width: 100%;
+              margin: 0 auto;
+            }
+
+            .detail-grid > div:last-child {
+              gap: var(--space-6) !important;
+              min-width: 0;
+            }
+
+            .container {
+              padding-left: var(--space-4);
+              padding-right: var(--space-4);
+            }
+
+            .hero-mobile-content {
+              text-align: center;
+            }
+
+            .hero-mobile-badge {
+              justify-content: center;
+            }
+
+            .hero-mobile-title {
+              margin: 0 auto;
+              max-width: 100% !important;
+            }
+          }
+
+          @media (max-width: 480px) {
+            .detail-grid > div:first-child {
+              max-width: 190px;
+            }
           }
         `}</style>
 
