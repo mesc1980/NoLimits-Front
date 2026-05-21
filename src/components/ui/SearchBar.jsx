@@ -2,7 +2,7 @@
  * components/ui/SearchBar.jsx — Español neutro.
  */
 
-import { useState }      from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate }   from 'react-router-dom';
 import { Search }        from 'lucide-react';
 import PropTypes         from 'prop-types';
@@ -13,11 +13,19 @@ function SearchBar({ initialQuery = '', initialType = 'all', onSearch, compact =
   const [activeType, setType] = useState(initialType);
   const navigate              = useNavigate();
 
+  useEffect(() => {
+    setQuery(initialQuery);
+    setType(initialType);
+  }, [initialQuery, initialType]);
+
   function handleSubmit(e) {
     e.preventDefault();
     if (!query.trim()) return;
-    if (onSearch) onSearch(query, activeType);
-    navigate(`/search?q=${encodeURIComponent(query.trim())}&type=${activeType}`);
+
+    const cleanQuery = query.trim();
+
+    if (onSearch) onSearch(cleanQuery, activeType);
+    navigate(`/search?q=${encodeURIComponent(cleanQuery)}&type=${activeType}`);
   }
 
   return (
@@ -25,17 +33,14 @@ function SearchBar({ initialQuery = '', initialType = 'all', onSearch, compact =
       <div className="nl-searchbar__input-wrap">
         <Search size={20} className="nl-searchbar__icon" aria-hidden="true" />
         <input
-          type="search"
+          type="text"
           className="nl-searchbar__input"
-          placeholder="Busca cualquier película, libro, juego, anime…"
+          placeholder="Busca cualquier producto"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           aria-label="Buscar obras"
           autoComplete="off"
         />
-        {query && (
-          <span className="nl-searchbar__hint" aria-hidden="true">↵ buscar</span>
-        )}
       </div>
 
       {!compact && (
@@ -47,7 +52,19 @@ function SearchBar({ initialQuery = '', initialType = 'all', onSearch, compact =
               role="tab"
               aria-selected={activeType === tab.id}
               className={`nl-searchbar__tab ${activeType === tab.id ? 'nl-searchbar__tab--active' : ''}`}
-              onClick={() => setType(tab.id)}
+              onClick={() => {
+                setType(tab.id);
+
+                const cleanQuery = query.trim();
+
+                if (onSearch) onSearch(cleanQuery, tab.id);
+
+                if (cleanQuery) {
+                  navigate(`/search?q=${encodeURIComponent(cleanQuery)}&type=${tab.id}`);
+                } else {
+                  navigate(`/search?type=${tab.id}`);
+                }
+              }}
             >
               {tab.label}
             </button>

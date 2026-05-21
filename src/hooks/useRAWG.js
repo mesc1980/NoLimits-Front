@@ -5,7 +5,7 @@
  */
 
 import { useQuery } from '@tanstack/react-query';
-import { fetchTopGames, fetchGameDetail, rawgEnabled } from '@/services/rawg';
+import { fetchTopGames, fetchGameDetail, fetchGameStores, rawgEnabled } from '@/services/rawg';
 import { normalizeRawgGame } from '@/utils/normalizeMedia';
 
 const STALE_TIME = 10 * 60 * 1000;
@@ -28,9 +28,13 @@ export function useGameDetail(rawgId) {
   return useQuery({
     queryKey: ['rawg', 'game', rawgId],
     queryFn: async () => {
-      const res = await fetchGameDetail(rawgId);
-      if (!res) return null;
-      return normalizeRawgGame(res);
+      const [detail, stores] = await Promise.all([
+        fetchGameDetail(rawgId),
+        fetchGameStores(rawgId).catch(() => ({ results: [] })),
+      ]);
+      if (!detail) return null;
+      detail.stores = (stores.results ?? []).map((s) => ({ ...s, url: s.url }));
+      return normalizeRawgGame(detail);
     },
     enabled:   Boolean(rawgId) && rawgEnabled(),
     staleTime: STALE_TIME,

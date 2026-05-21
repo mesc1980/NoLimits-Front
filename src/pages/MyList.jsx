@@ -21,16 +21,22 @@ const LIST_TABS = [
   { id: MEDIA_TYPES.GAME,    label: 'Juegos'     },
 ];
 
-function CardForType({ obra }) {
-  if (obra.type === MEDIA_TYPES.ANIME) return <AnimeCard obra={obra} />;
-  if (obra.type === MEDIA_TYPES.BOOK)  return <BookCard  obra={obra} />;
-  return <MediaCard obra={obra} />;
+function CardForType({ obra, hideFavoriteButton }) {
+  if (obra.type === MEDIA_TYPES.ANIME) {
+    return <AnimeCard obra={obra} hideFavoriteButton={hideFavoriteButton} />;
+  }
+
+  if (obra.type === MEDIA_TYPES.BOOK) {
+    return <BookCard obra={obra} hideFavoriteButton={hideFavoriteButton} />;
+  }
+
+  return <MediaCard obra={obra} hideFavoriteButton={hideFavoriteButton} />;
 }
 
 function MyList() {
   const [activeTab, setActiveTab] = useState('all');
   const myList = useAppStore((s) => s.myList);
-  //para arregral
+
   useEffect(() => {
      const token =
       localStorage.getItem("nl_token");
@@ -39,6 +45,9 @@ function MyList() {
       window.location.href = "/login";
     }
   }, []);
+
+  const toggleList = useAppStore((s) => s.toggleList);
+
 
   const filtered = activeTab === 'all'
     ? myList
@@ -106,7 +115,33 @@ function MyList() {
           variants={{ visible: { transition: { staggerChildren: CARD_STAGGER_DELAY } } }}
         >
           {filtered.map((obra) => (
-            <CardForType key={obra.id} obra={obra} />
+            <div key={obra.id} style={{ position: 'relative' }}>
+              <button
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  toggleList(obra);
+                }}
+                style={{
+                  position: 'absolute',
+                  top: '10px',
+                  right: '10px',
+                  zIndex: 5,
+                  background: 'rgba(10,10,11,0.85)',
+                  color: 'var(--nl-accent)',
+                  border: '1px solid var(--nl-border)',
+                  borderRadius: '999px',
+                  padding: '6px 10px',
+                  cursor: 'pointer',
+                  fontSize: '12px',
+                  fontWeight: 600,
+                }}
+              >
+                Quitar de favoritos
+              </button>
+
+              <CardForType obra={obra} hideFavoriteButton />
+            </div>
           ))}
         </motion.div>
       )}

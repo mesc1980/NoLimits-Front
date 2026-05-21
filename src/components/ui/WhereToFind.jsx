@@ -134,23 +134,79 @@ function WhereToFind({ obra, compact = false, providers = null }) {
   /* ── Videojuegos ────────────────────────────────────── */
   if (type === MEDIA_TYPES.GAME) {
     const knownPlatforms = platforms.slice(0, 5);
+    const gameStores     = obra.gameStores ?? [];
+
+    if (gameStores.length > 0) {
+      return (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+          {knownPlatforms.length > 0 && (
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', alignItems: 'center' }}>
+              {knownPlatforms.map((p) => <PlatformBadge key={p} name={p} />)}
+            </div>
+          )}
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+            {gameStores.map((store) => (
+              <LinkButton
+                key={store.url}
+                href={store.url}
+                label={store.label}
+                icon={Gamepad2}
+                accent={store.accent}
+              />
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+  // Fallback: botones por plataforma detectada
+    const PLATFORM_STORE_LINKS = {
+      'PlayStation 5':  { label: 'PlayStation Store', url: `https://store.playstation.com/es-cl/search/${encodeURIComponent(obra.title)}` },
+      'PlayStation 4':  { label: 'PlayStation Store', url: `https://store.playstation.com/es-cl/search/${encodeURIComponent(obra.title)}` },
+      'PC':             { label: 'Steam',              url: `https://store.steampowered.com/search/?term=${encodeURIComponent(obra.title)}` },
+      'Xbox Series X':  { label: 'Xbox Store',         url: `https://www.xbox.com/es-CL/Search/Results?q=${encodeURIComponent(obra.title)}` },
+      'Xbox One':       { label: 'Xbox Store',         url: `https://www.xbox.com/es-CL/Search/Results?q=${encodeURIComponent(obra.title)}` },
+      'Nintendo Switch':{ label: 'Nintendo eShop',     url: `https://www.nintendo.com/search/#q=${encodeURIComponent(obra.title)}` },
+    };
+
+    const platformButtons = knownPlatforms
+      .map((p) => {
+        const key = Object.keys(PLATFORM_STORE_LINKS).find((k) => p.includes(k) || k.includes(p));
+        return key ? { ...PLATFORM_STORE_LINKS[key] } : null;
+      })
+      .filter(Boolean)
+      .filter((v, i, arr) => arr.findIndex((x) => x.label === v.label) === i);
+
     return (
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', alignItems: 'center' }}>
-        {knownPlatforms.map((p) => <PlatformBadge key={p} name={p} />)}
-        {knownPlatforms.length === 0 && (
-          <span style={{ fontSize: '12px', color: 'var(--nl-text-muted)' }}>PC · Consolas</span>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+        {knownPlatforms.length > 0 && (
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', alignItems: 'center' }}>
+            {knownPlatforms.map((p) => <PlatformBadge key={p} name={p} />)}
+          </div>
         )}
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+          {platformButtons.map((btn) => (
+            <LinkButton key={btn.label} href={btn.url} label={btn.label} icon={Gamepad2} accent />
+          ))}
+          {platformButtons.length === 0 && (
+            <LinkButton
+              href={`https://www.google.com/search?q=${encodeURIComponent(obra.title + ' comprar')}`}
+              label="Buscar dónde comprar"
+              icon={Gamepad2}
+            />
+          )}
+        </div>
       </div>
     );
   }
 
   /* ── Libros ─────────────────────────────────────────── */
   if (type === MEDIA_TYPES.BOOK) {
-    const openLibraryId = obra.id.replace('openlibrary:book:', '');
-    const url = `https://openlibrary.org/works/${openLibraryId}`;
+    const googleBooksId = obra.id.replace('openlibrary:book:', '');
+    const url = `https://books.google.com/books?id=${googleBooksId}`;
     return (
       <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-        <LinkButton href={url} label="Leer gratis" icon={BookOpen} accent />
+        <LinkButton href={url} label="Ver en Google Books" icon={BookOpen} accent />
       </div>
     );
   }
@@ -198,28 +254,41 @@ function WhereToFind({ obra, compact = false, providers = null }) {
     }
 
     if (compact) {
-      /* En la saga page solo mostramos el link a JustWatch */
-      const title     = encodeURIComponent(obra.title);
-      const mediaType = type === MEDIA_TYPES.MOVIE ? 'movie' : 'tv';
+      const title = encodeURIComponent(obra.title);
       return (
-        <LinkButton
-          href={`https://www.justwatch.com/mx/buscar?q=${title}`}
-          label="¿Dónde verlo?"
-          icon={Film}
-        />
+        <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+          <LinkButton
+            href={`https://www.justwatch.com/mx/buscar?q=${title}`}
+            label="JustWatch"
+            icon={Film}
+          />
+          <LinkButton
+            href={`https://www.google.com/search?q=${title}+ver+online`}
+            label="Buscar online"
+            icon={Film}
+          />
+        </div>
       );
     }
 
     if (providers) {
-      const services = providers.flatrate ?? providers.buy ?? [];
+      const services = (providers.flatrate ?? providers.buy ?? [])
+        .filter((s) => s.provider_name !== 'Google Play Movies');
+      
       if (services.length === 0) {
         return (
-          <LinkButton
-            href={providers.link || `https://www.justwatch.com/mx/buscar?q=${encodeURIComponent(obra.title)}`}
-            label="Ver opciones en JustWatch"
-            icon={Film}
-            accent
-          />
+          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+            <LinkButton
+              href={providers.link || `https://www.justwatch.com/mx/buscar?q=${encodeURIComponent(obra.title)}`}
+              label="JustWatch"
+              icon={Film}
+            />
+            <LinkButton
+              href={`https://www.google.com/search?q=${encodeURIComponent(obra.title)}+ver+online`}
+              label="Buscar online"
+              icon={Film}
+            />
+          </div>
         );
       }
       return (
@@ -240,6 +309,11 @@ function WhereToFind({ obra, compact = false, providers = null }) {
               {s.provider_name}
             </a>
           ))}
+          <LinkButton
+            href={`https://www.google.com/search?q=${encodeURIComponent(obra.title)}+ver+online`}
+            label="Buscar online"
+            icon={Film}
+          />
         </div>
       );
     }

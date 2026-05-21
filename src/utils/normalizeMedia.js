@@ -43,6 +43,13 @@ import {
 } from './formatters';
 import { igdbImageUrl } from '@/services/igdb';
 
+const FALLBACK_IMAGES = {
+  video: '/img/fallbacks/movie-tvshow-fallback.webp',
+  book: '/img/fallbacks/book-fallback.webp',
+  game: '/img/fallbacks/videogame-fallback.webp',
+  music: '/img/fallbacks/music-fallback.webp',
+};
+
 // ─────────────────────────────────────────────────────────────────
 // TMDB — Películas
 // Referencia: https://developer.themoviedb.org/reference/movie-details
@@ -54,11 +61,11 @@ export function normalizeTmdbMovie(item) {
     title:     item.title || item.original_title || 'Sin título',
     year:      formatYear(item.release_date),
     rating:    formatRating(item.vote_average),
-    poster:    buildTmdbImageUrl(item.poster_path,   TMDB_POSTER_SIZES.MD),
-    backdrop:  buildTmdbImageUrl(item.backdrop_path, TMDB_BACKDROP_SIZES.LG),
+    voteCount: item.vote_count ?? 0,
+    poster:    buildTmdbImageUrl(item.poster_path, TMDB_POSTER_SIZES.MD) || FALLBACK_IMAGES.video,
+    backdrop:  buildTmdbImageUrl(item.backdrop_path, TMDB_BACKDROP_SIZES.LG) || FALLBACK_IMAGES.video,
     synopsis:  item.overview || '',
     genres:    item.genres?.map((g) => g.name) ?? item.genre_ids?.map(String) ?? [],
-    // belongs_to_collection solo disponible en el endpoint de detalle, no en listados
     saga:      item.belongs_to_collection?.name ?? null,
     platforms: [],
     source:    DATA_SOURCES.TMDB,
@@ -75,12 +82,12 @@ export function normalizeTmdbSeries(item) {
     title:     item.name || item.original_name || 'Sin título',
     year:      formatYear(item.first_air_date),
     rating:    formatRating(item.vote_average),
-    poster:    buildTmdbImageUrl(item.poster_path,   TMDB_POSTER_SIZES.MD),
-    backdrop:  buildTmdbImageUrl(item.backdrop_path, TMDB_BACKDROP_SIZES.LG),
+    voteCount: item.vote_count ?? 0,
+    poster:    buildTmdbImageUrl(item.poster_path, TMDB_POSTER_SIZES.MD) || FALLBACK_IMAGES.video,
+    backdrop:  buildTmdbImageUrl(item.backdrop_path, TMDB_BACKDROP_SIZES.LG) || FALLBACK_IMAGES.video,
     synopsis:  item.overview || '',
     genres:    item.genres?.map((g) => g.name) ?? item.genre_ids?.map(String) ?? [],
     saga:      null,
-    // networks = cadenas de TV (Netflix, HBO…), útil para saber dónde ver
     platforms: item.networks?.map((n) => n.name) ?? [],
     source:    DATA_SOURCES.TMDB,
   };
@@ -99,8 +106,15 @@ export function normalizeJikanAnime(item) {
     year:      item.year ? String(item.year) : formatYear(item.aired?.from),
     // Jikan devuelve rating /10, igual que TMDB — ya es compatible
     rating:    formatRating(item.score),
-    poster:    item.images?.jpg?.large_image_url ?? item.images?.jpg?.image_url ?? null,
-    backdrop:  item.trailer?.images?.maximum_image_url ?? null,
+    poster:
+      item.images?.jpg?.large_image_url ??
+      item.images?.jpg?.image_url ??
+      FALLBACK_IMAGES.video,
+
+    backdrop:
+      item.trailer?.images?.maximum_image_url ??
+      item.images?.jpg?.large_image_url ??
+      FALLBACK_IMAGES.video,
     synopsis:  item.synopsis || '',
     genres:    item.genres?.map((g) => g.name) ?? [],
     saga:      null,
@@ -119,7 +133,7 @@ export function normalizeOpenLibraryBook(item) {
     ?? item.edition_key?.[0]
     ?? String(item.cover_i ?? item.covers?.[0] ?? Math.random());
 
-  const coverId = item.cover_i ?? item.covers?.[0] ?? item.cover_id;
+  const coverId = item.cover_i ?? item.cover_edition_key ?? item.covers?.[0];
 
   return {
     id:        buildMediaId(DATA_SOURCES.OPENLIBRARY, nativeId, MEDIA_TYPES.BOOK),
@@ -127,8 +141,13 @@ export function normalizeOpenLibraryBook(item) {
     title:     item.title || 'Sin título',
     year:      String(item.first_publish_year || item.first_publish_date || '—'),
     rating:    formatRating(item.ratings_average),
-    poster:    buildOpenLibraryCoverUrl(coverId, 'L'),
-    backdrop:  buildOpenLibraryCoverUrl(coverId, 'L'),
+    poster:
+      buildOpenLibraryCoverUrl(coverId, 'L')
+      || FALLBACK_IMAGES.book,
+
+    backdrop:
+      buildOpenLibraryCoverUrl(coverId, 'L')
+      || FALLBACK_IMAGES.book,
     synopsis:  typeof item.description === 'object'
                  ? item.description.value
                  : item.description
@@ -156,8 +175,13 @@ export function normalizeOpenLibrarySubjectWork(item) {
     title:     item.title || 'Sin título',
     year:      '—',
     rating:    '—',
-    poster:    buildOpenLibraryCoverUrl(coverId, 'M'),
-    backdrop:  buildOpenLibraryCoverUrl(coverId, 'L'),
+    poster:
+      buildOpenLibraryCoverUrl(coverId, 'M')
+      || FALLBACK_IMAGES.book,
+
+    backdrop:
+      buildOpenLibraryCoverUrl(coverId, 'L')
+      || FALLBACK_IMAGES.book,
     synopsis:  '',
     genres:    item.subject?.slice(0, 5) ?? [],
     saga:      null,
@@ -177,6 +201,22 @@ function igdbYear(timestamp) {
 }
 
 export function normalizeIgdbGame(item) {
+  const STORE_URL_PATTERNS = [
+    { pattern: 'store.steampowered.com',  label: 'Steam',         accent: true  },
+    { pattern: 'epicgames.com',           label: 'Epic Games',    accent: true  },
+    { pattern: 'gog.com',                 label: 'GOG',           accent: true  },
+    { pattern: 'store.playstation.com',   label: 'PlayStation',   accent: true  },
+    { pattern: 'xbox.com',               label: 'Xbox',           accent: true  },
+    { pattern: 'nintendo.com',           label: 'Nintendo',       accent: true  },
+  ];
+
+  const gameStores = (item.websites ?? [])
+    .map((w) => {
+      const match = STORE_URL_PATTERNS.find((p) => w.url?.includes(p.pattern));
+      if (!match) return null;
+      return { label: match.label, url: w.url, accent: match.accent };
+    })
+    .filter(Boolean);
   return {
     id:        buildMediaId(DATA_SOURCES.IGDB, item.id, MEDIA_TYPES.GAME),
     type:      MEDIA_TYPES.GAME,
@@ -185,14 +225,65 @@ export function normalizeIgdbGame(item) {
     // IGDB usa escala 0-100 → dividir por 10 para consistencia con el resto
     rating:    item.rating ? formatRating(item.rating / 10) : '—',
     // t_cover_big = 264×374px (portrait ~2:3) — compatible con el grid de cards
-    poster:    igdbImageUrl(item.cover?.url, 't_cover_big'),
-    backdrop:  igdbImageUrl(item.screenshots?.[0]?.url, 't_720p'),
+    poster:
+      igdbImageUrl(item.cover?.url, 't_cover_big')
+      || FALLBACK_IMAGES.game,
+
+    backdrop:
+      igdbImageUrl(item.screenshots?.[0]?.url, 't_720p')
+      || FALLBACK_IMAGES.game,
     synopsis:  item.summary || '',
     genres:    item.genres?.map((g) => g.name) ?? [],
     // collection/franchise = nombre de la saga (Spider-Man, Zelda, etc.)
     saga:      item.collection?.name ?? item.franchise?.name ?? null,
     platforms: item.platforms?.map((p) => p.name) ?? [],
+    gameStores: gameStores,
     source:    DATA_SOURCES.IGDB,
+  };
+}
+
+// ─────────────────────────────────────────────────────────────────
+// RAWG — Videojuegos
+// Referencia: https://rawg.io/apidocs
+// ─────────────────────────────────────────────────────────────────
+export function normalizeRawgGame(item) {
+  const STORE_URL_PATTERNS = [
+    { pattern: 'store.steampowered.com', label: 'Steam',          accent: true  },
+    { pattern: 'epicgames.com',          label: 'Epic Games',     accent: true  },
+    { pattern: 'gog.com',               label: 'GOG',             accent: true  },
+    { pattern: 'store.playstation.com', label: 'PlayStation',     accent: true  },
+    { pattern: 'xbox.com',              label: 'Xbox',            accent: true  },
+    { pattern: 'nintendo.com',          label: 'Nintendo eShop',  accent: true  },
+  ];
+
+  // Intentar primero con stores reales de RAWG
+  const gameStores = (item.stores ?? [])
+    .map((s) => {
+      const url = s.url ?? s.store?.domain ?? '';
+      if (!url || !url.startsWith('http')) return null;
+      const match = STORE_URL_PATTERNS.find((p) => url.includes(p.pattern));
+      if (!match) return null;
+      return { label: match.label, url, accent: match.accent };
+    })
+    .filter(Boolean);
+
+  // Si no hay stores, generar links por plataforma
+  const platforms = (item.platforms ?? []).map((p) => p.platform?.name ?? p.name ?? '');
+
+  return {
+    id:         buildMediaId(DATA_SOURCES.RAWG ?? 'rawg', item.id, MEDIA_TYPES.GAME),
+    type:       MEDIA_TYPES.GAME,
+    title:      item.name || 'Sin título',
+    year:       formatYear(item.released),
+    rating:     item.rating ? formatRating(item.rating * 2) : '—', // RAWG es /5 → *2 para /10
+    poster:     item.background_image ?? null,
+    backdrop:   item.background_image_additional ?? item.background_image ?? null,
+    synopsis:   item.description_raw || item.description || '',
+    genres:     (item.genres ?? []).map((g) => g.name),
+    saga:       null,
+    platforms,
+    gameStores,
+    source:     'rawg',
   };
 }
 
@@ -205,18 +296,40 @@ export function normalizeMusicBrainzRelease(item) {
   return {
     id:        buildMediaId(DATA_SOURCES.MUSICBRAINZ, item.id, MEDIA_TYPES.MUSIC),
     type:      MEDIA_TYPES.MUSIC,
-    title:     item.title || 'Sin título',
+    title:     item.title || item.name || item['artist-credit']?.[0]?.artist?.name || 'Sin título',
     year:      formatYear(item['first-release-date'] || item.date),
-    // rating.value en MusicBrainz = promedio de votos (0-5) → *2 para normalizar
     rating:    item.rating?.value ? formatRating(item.rating.value * 2) : '—',
-    // MusicBrainz no provee imágenes directamente — el backend puede complementar
-    // con la Cover Art Archive: https://coverartarchive.org/release-group/{mbid}
-    poster:    null,
-    backdrop:  null,
-    synopsis:  item.disambiguation || '',
+
+    poster:    '/img/fallbacks/music-fallback.webp',
+    backdrop:  '/img/fallbacks/music-fallback.webp',
+
+    synopsis:  item.disambiguation || item['primary-type'] || '',
     genres:    item.tags?.slice(0, 5).map((t) => t.name) ?? [],
     saga:      null,
     platforms: [],
     source:    DATA_SOURCES.MUSICBRAINZ,
+  };
+}
+
+// ─────────────────────────────────────────────────────────────────
+// Normalizar libros.
+// ─────────────────────────────────────────────────────────────────
+
+export function normalizeGoogleBook(item) {
+  const info = item.volumeInfo ?? {};
+  const coverId = item.id;
+  return {
+    id:       buildMediaId(DATA_SOURCES.OPENLIBRARY, coverId, MEDIA_TYPES.BOOK),
+    type:     MEDIA_TYPES.BOOK,
+    title:    (info.title || 'Sin título').split(/[:/]/)[0].trim(),
+    year:     String(info.publishedDate?.slice(0, 4) || '—'),
+    rating:   info.averageRating ? formatRating(info.averageRating * 2) : '—',
+    poster:   info.imageLinks?.thumbnail?.replace('http://', 'https://') ?? FALLBACK_IMAGES.book,
+    backdrop: info.imageLinks?.thumbnail?.replace('http://', 'https://') ?? FALLBACK_IMAGES.book,
+    synopsis: info.description || '',
+    genres:   info.categories ?? [],
+    saga:     null,
+    platforms: [],
+    source:   DATA_SOURCES.OPENLIBRARY,
   };
 }

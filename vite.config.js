@@ -12,15 +12,20 @@
  */
 
 import { defineConfig, loadEnv } from 'vite';
-import react  from '@vitejs/plugin-react';
+import react from '@vitejs/plugin-react';
 import { resolve } from 'path';
 
 export default defineConfig(({ mode }) => {
-  /* Lee variables de .env para usarlas en el proxy (Node.js context) */
   const env = loadEnv(mode, process.cwd(), '');
 
   return {
     plugins: [react()],
+
+    test: {
+      globals: true,
+      environment: 'jsdom',
+      setupFiles: './src/tests/setup.js',
+    },
 
     resolve: {
       alias: {
@@ -31,18 +36,16 @@ export default defineConfig(({ mode }) => {
     server: {
       proxy: {
         '/api/igdb': {
-          target:       'https://api.igdb.com/v4',
+          target: 'https://api.igdb.com/v4',
           changeOrigin: true,
 
-          /* Elimina el prefijo /api/igdb de la ruta antes de enviar */
           rewrite: (path) => path.replace(/^\/api\/igdb/, ''),
 
-          /* Inyecta los headers de IGDB en cada request al proxy */
           configure: (proxy) => {
             proxy.on('proxyReq', (proxyReq) => {
-              proxyReq.setHeader('Client-ID',     env.VITE_IGDB_CLIENT_ID  ?? '');
+              proxyReq.setHeader('Client-ID', env.VITE_IGDB_CLIENT_ID ?? '');
               proxyReq.setHeader('Authorization', `Bearer ${env.VITE_IGDB_TOKEN ?? ''}`);
-              proxyReq.setHeader('Content-Type',  'text/plain');
+              proxyReq.setHeader('Content-Type', 'text/plain');
             });
           },
         },

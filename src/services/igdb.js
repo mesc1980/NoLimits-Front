@@ -58,9 +58,9 @@ export async function fetchTopGames() {
   return igdbQuery('/games', `
     fields name, cover.url, rating, first_release_date,
            genres.name, platforms.name, summary, involved_companies.company.name;
-    where rating != null & rating_count > 20 & cover != null;
+    where rating != null & rating_count > 500 & cover != null;
     sort rating desc;
-    limit 20;
+    limit 18;
   `);
 }
 
@@ -99,9 +99,10 @@ export async function searchGameSeries(sagaName) {
 export async function fetchGameDetail(id) {
   const results = await igdbQuery('/games', `
     fields name, cover.url, rating, first_release_date,
-           genres.name, platforms.name, summary,
-           involved_companies.company.name, screenshots.url,
-           similar_games.name, collection.name, franchise.name;
+          genres.name, platforms.name, summary,
+          involved_companies.company.name, screenshots.url,
+          similar_games.name, collection.name, franchise.name,
+          websites.url, websites.category;
     where id = ${id};
     limit 1;
   `);
