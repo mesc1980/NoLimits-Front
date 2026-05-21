@@ -381,8 +381,6 @@ function Detail() {
         rating: 10,
       });
 
-      setReview(obra.id, reviewText);
-
       const reviewsActualizadas = await obtenerReviewsPorObra(obra.id);
       setReviews(reviewsActualizadas);
 
@@ -545,8 +543,6 @@ function Detail() {
 
   const isInList   = useAppStore((s) => obra ? s.isInList(obra.id) : false);
   const toggleList = useAppStore((s) => s.toggleList);
-  const getReview  = useAppStore((s) => s.getReview);
-  const setReview  = useAppStore((s) => s.setReview);
   const [reviewText, setReviewText] = useState('');
   const [reviewSaved, setReviewSaved] = useState(false);
   const [reviews, setReviews] = useState([]);
@@ -556,8 +552,6 @@ function Detail() {
   const [editingReplyId, setEditingReplyId] = useState(null);
   const [editingReplyText, setEditingReplyText] = useState('');
   const [expandedReplies, setExpandedReplies] = useState({});
-
-  useEffect(() => { if (obra) setReviewText(getReview(obra.id)); }, [obra?.id]);
 
   useEffect(() => {
     if (!obra?.id) return;
