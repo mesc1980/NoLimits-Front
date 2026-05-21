@@ -3,13 +3,15 @@
  * Español neutro.
  */
 
-import { useState }    from 'react';
-import { Link }        from 'react-router-dom';
-import { motion }      from 'motion/react';
+import { useState, useEffect }    from 'react';
+import { Link,} from 'react-router-dom';
+import { motion } from 'motion/react';
+import { useNavigate} from 'react-router-dom';
 import MediaCard from '@/components/cards/MediaCard';
 import AnimeCard from '@/components/cards/AnimeCard';
 import BookCard  from '@/components/cards/BookCard';
 import useAppStore from '@/store/useAppStore';
+
 import { MEDIA_TYPES, CARD_STAGGER_DELAY } from '@/utils/constants';
 
 const LIST_TABS = [
@@ -34,13 +36,34 @@ function CardForType({ obra, hideFavoriteButton }) {
 }
 
 function MyList() {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('all');
   const myList = useAppStore((s) => s.myList);
+  const loadFavorites = useAppStore(
+    (s) => s.loadFavorites
+  );
   const toggleList = useAppStore((s) => s.toggleList);
 
-  const filtered = activeTab === 'all'
-    ? myList
-    : myList.filter((o) => o.type === activeTab);
+  useEffect(() => {
+     const token =
+      localStorage.getItem("nl_token");
+
+    if (!token) {
+      localStorage.clear();
+
+      navigate("/login");
+
+      return;
+    }
+    loadFavorites();
+  }, []);
+
+  const filtered = 
+    activeTab === 'all'
+      ? myList
+      : myList.filter(
+          (o) => o.type === activeTab
+        );
 
   return (
     <div className="container" style={{ paddingTop: 'var(--space-8)', paddingBottom: 'var(--space-16)' }}>
@@ -109,6 +132,13 @@ function MyList() {
                 onClick={(e) => {
                   e.preventDefault();
                   e.stopPropagation();
+
+                  const token = localStorage.getItem("nl_token");
+
+                  if (!token) {
+                    navigate("/login");
+                    return;
+                  }
                   toggleList(obra);
                 }}
                 style={{

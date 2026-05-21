@@ -113,7 +113,7 @@ async function processMessage(text, navigate) {
 
   /* ── Respuestas de contexto ───────────────────────────── */
   if (lower.includes('hola') || lower.includes('hi') || lower.includes('buenas')) {
-    return { text: '¡Hola! Soy el asistente de no/limits. Puedes preguntarme cosas como:\n• "Busca Spider-Man"\n• "Saga de Star Wars"\n• "¿Dónde puedo ver Dune?"\n• "Recomiéndame un anime"\n• "Juegos de Batman"' };
+      return { text: '¡Oye! Soy el asistente de NoLimits. ¿Qué andas buscando? ¡No me subestimes, sé de todo lo que hay aquí!' };
   }
 
   if (lower.includes('gracias') || lower.includes('thanks')) {
@@ -176,7 +176,7 @@ function ChatBot() {
     {
       id:   0,
       role: 'bot',
-      text: '¡Hola!👋 Soy el asistente de NoLimits.\nPuedo orientarle dentro de la plataforma.',
+      text: '¡Oye! 👊 Soy el asistente de NoLimits. ¡No me subestimes, sé de todo lo que hay aquí! ¿Qué andas buscando?',
     },
   ]);
   const [input,    setInput]    = useState('');

@@ -65,7 +65,7 @@ function SectionLabel({ number, children }) {
           fontSize:      '11px',
           letterSpacing: '0.08em',
           textTransform: 'uppercase',
-          color:         'var(--nl-text-muted)',
+          color:         '#ffffff',
         }}
       >
         {children}
@@ -344,11 +344,11 @@ function Detail() {
         return;
       }
 
-      if (isInList) {
-        await eliminarFavoritoUsuario(usuarioId, obra.id);
-      } else {
-        await agregarFavoritoUsuario(usuarioId, obra);
-      }
+      //if (isInList) {
+      //  await eliminarFavoritoUsuario(usuarioId, obra.id);
+      //} else {
+      //  await agregarFavoritoUsuario(usuarioId, obra);
+      //}
 
       toggleList(obra);
     } catch (error) {
@@ -825,7 +825,7 @@ function Detail() {
                   textAlign:    'center',
                 }}
               >
-                <p style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--nl-text-muted)', marginBottom: '6px' }}>
+                <p style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#ffffff', marginBottom: '6px' }}>
                   Valoración
                 </p>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
@@ -833,7 +833,7 @@ function Detail() {
                   <span style={{ fontFamily: 'var(--font-display)', fontSize: '28px', fontWeight: 700, color: 'var(--nl-accent)', letterSpacing: '-0.02em' }}>
                     {obra.rating}
                   </span>
-                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', color: 'var(--nl-text-muted)' }}>/10</span>
+                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', color: '#ffffff' }}>/10</span>
                 </div>
               </div>
             )}
@@ -850,7 +850,7 @@ function Detail() {
                 justifyContent: 'space-between',
               }}
             >
-              <span style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--nl-text-muted)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <span style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', letterSpacing: '0.08em', textTransform: 'uppercase', color: '#ffffff', display: 'flex', alignItems: 'center', gap: '6px' }}>
                 <Calendar size={12} /> Año
               </span>
               <span style={{ fontFamily: 'var(--font-mono)', fontSize: '14px', fontWeight: 600, color: 'var(--nl-text-primary)' }}>
@@ -870,7 +870,7 @@ function Detail() {
 
             {/* WhereToFind */}
             <div>
-              <p style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--nl-text-muted)', marginBottom: 'var(--space-2)' }}>
+              <p style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', letterSpacing: '0.08em', textTransform: 'uppercase', color: '#ffffff', marginBottom: 'var(--space-2)' }}>
                 Dónde encontrarlo
               </p>
               <WhereToFind obra={obra} providers={providers} compact={!providers} />
@@ -993,7 +993,7 @@ function Detail() {
               {limpiarNombreUsuario(review.nombreUsuario)}
             </strong>
 
-            <span style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', color: 'var(--nl-text-muted)' }}>
+            <span style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', color: '#ffffff' }}>
               {new Date(review.fechaCreacion).toLocaleDateString('es-CL')}
               {review.editado && ' · editado'}
             </span>

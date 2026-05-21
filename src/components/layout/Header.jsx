@@ -30,6 +30,7 @@ function Header() {
   const myListCount = useAppStore((s) => s.myList.length);
   const user        = useAppStore((state) => state.user);
   const clearUser   = useAppStore((s) => s.clearUser);
+  const token = localStorage.getItem("nl_token");
 
   return (
     <header className="nl-header">
@@ -52,22 +53,34 @@ function Header() {
           >
             Sagas
           </NavLink>
-
-          <NavLink
-            to="/my-list"
-            className={({ isActive }) => `nl-header__nav-link ${isActive ? 'nl-header__nav-link--active' : ''}`}
-          >
-            Mi biblioteca
-            {myListCount > 0 && (
-              <span style={{ marginLeft: '6px', background: 'var(--nl-accent)', color: '#fff', borderRadius: '10px', padding: '0 6px', fontSize: '11px', fontWeight: 600, verticalAlign: 'middle' }}>
-                {myListCount}
-              </span>
-            )}
-          </NavLink>
-        </nav>
+            <NavLink
+              to="/my-list"
+              className={({ isActive }) => `nl-header__nav-link ${isActive ? 'nl-header__nav-link--active' : ''}`}
+            >
+              Mi biblioteca
+              {user && myListCount > 0 && (
+                <span 
+                  style={{ 
+                    marginLeft: '6px', 
+                    background: 'var(--nl-accent)', 
+                    color: '#fff', 
+                    borderRadius: '10px', 
+                    padding: '0 6px', 
+                    fontSize: '11px', 
+                    fontWeight: 600, 
+                    verticalAlign: 'middle' 
+                  }}
+                  >
+                  {myListCount}
+                </span>
+              )}
+            </NavLink>
+        
+          </nav>
 
         <div className="nl-header__actions" ref={searchRef}>
           {searchOpen && (
+
             <div style={{ width: '260px' }}>
               <SearchBar compact />
             </div>
@@ -106,9 +119,11 @@ function Header() {
                 onClick={() => {
                   clearUser();
 
-                  localStorage.removeItem('nl_user');
-                  localStorage.removeItem('nl_role');
-                  localStorage.removeItem('nl_token');
+                  localStorage.clear();
+
+                  //localStorage.removeItem('nl_user');
+                  //localStorage.removeItem('nl_role');
+                  //localStorage.removeItem('nl_token');
 
                   navigate("/");
                 }}

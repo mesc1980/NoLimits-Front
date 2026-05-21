@@ -74,7 +74,8 @@ function Login() {
     }
 
     localStorage.setItem('nl_auth', '1');
-    localStorage.setItem('nl_user', JSON.stringify(data));
+    localStorage.setItem("nl_user", JSON.stringify(userData))
+    localStorage.setItem('nl_userId', userData.id);
     localStorage.setItem('nl_role', data.rolNombre || data.rol || '');
 
     if (data?.token) {
