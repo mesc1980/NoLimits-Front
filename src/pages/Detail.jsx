@@ -596,9 +596,9 @@ function Detail() {
     if (!nombre) return 'Usuario';
 
     return nombre
-      .replace(/\s*\+\s*(Google|Temporal|Supabase|NoLimits)$/i, '')
-      .replace(/\s*-\s*(Google|Temporal|Supabase|NoLimits)$/i, '')
-      .replace(/\s*\((Google|Temporal|Supabase|NoLimits)\)$/i, '')
+      .replace(/\b(Google|Temporal|Supabase|NoLimits)\b/gi, '')
+      .replace(/[+()-]/g, '')
+      .replace(/\s{2,}/g, ' ')
       .trim();
   };
 
