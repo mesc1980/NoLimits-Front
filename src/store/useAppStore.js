@@ -38,6 +38,10 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
+const API_BASE =
+  import.meta.env.VITE_API_URL ||
+  "http://localhost:8080";
+
 const useAppStore = create(
   persist(
     (set, get) => ({
@@ -82,7 +86,7 @@ const useAppStore = create(
           if (!token || !usuarioId) return;
 
           const response = await fetch(
-            `http://localhost:8080/api/v1/usuarios/${usuarioId}/favoritos`,
+            `${API_BASE}/api/v1/usuarios/${usuarioId}/favoritos`,
             {
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -146,7 +150,7 @@ const useAppStore = create(
           }
 
           const response = await fetch(
-            `http://localhost:8080/api/v1/usuarios/${usuarioId}/favoritos`,
+            `${API_BASE}/api/v1/usuarios/${usuarioId}/favoritos`,
             {
               method: "POST",
 
@@ -213,7 +217,7 @@ const useAppStore = create(
           }
 
           const response = await fetch(
-            `http://localhost:8080/api/v1/usuarios/${usuarioId}/favoritos/${obraId}`,
+            `${API_BASE}/api/v1/usuarios/${usuarioId}/favoritos/${obraId}`,
             {
               method: "DELETE",
 
