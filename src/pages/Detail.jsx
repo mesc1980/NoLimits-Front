@@ -65,7 +65,7 @@ function SectionLabel({ number, children }) {
           fontSize:      '11px',
           letterSpacing: '0.08em',
           textTransform: 'uppercase',
-          color:         'var(--nl-text-muted)',
+          color:         '#ffffff',
         }}
       >
         {children}
@@ -381,8 +381,6 @@ function Detail() {
         rating: 10,
       });
 
-      setReview(obra.id, reviewText);
-
       const reviewsActualizadas = await obtenerReviewsPorObra(obra.id);
       setReviews(reviewsActualizadas);
 
@@ -545,8 +543,6 @@ function Detail() {
 
   const isInList   = useAppStore((s) => obra ? s.isInList(obra.id) : false);
   const toggleList = useAppStore((s) => s.toggleList);
-  const getReview  = useAppStore((s) => s.getReview);
-  const setReview  = useAppStore((s) => s.setReview);
   const [reviewText, setReviewText] = useState('');
   const [reviewSaved, setReviewSaved] = useState(false);
   const [reviews, setReviews] = useState([]);
@@ -556,8 +552,6 @@ function Detail() {
   const [editingReplyId, setEditingReplyId] = useState(null);
   const [editingReplyText, setEditingReplyText] = useState('');
   const [expandedReplies, setExpandedReplies] = useState({});
-
-  useEffect(() => { if (obra) setReviewText(getReview(obra.id)); }, [obra?.id]);
 
   useEffect(() => {
     if (!obra?.id) return;
@@ -817,7 +811,7 @@ function Detail() {
                   textAlign:    'center',
                 }}
               >
-                <p style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--nl-text-muted)', marginBottom: '6px' }}>
+                <p style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#ffffff', marginBottom: '6px' }}>
                   Valoración
                 </p>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
@@ -825,7 +819,7 @@ function Detail() {
                   <span style={{ fontFamily: 'var(--font-display)', fontSize: '28px', fontWeight: 700, color: 'var(--nl-accent)', letterSpacing: '-0.02em' }}>
                     {obra.rating}
                   </span>
-                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', color: 'var(--nl-text-muted)' }}>/10</span>
+                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', color: '#ffffff' }}>/10</span>
                 </div>
               </div>
             )}
@@ -842,7 +836,7 @@ function Detail() {
                 justifyContent: 'space-between',
               }}
             >
-              <span style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--nl-text-muted)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <span style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', letterSpacing: '0.08em', textTransform: 'uppercase', color: '#ffffff', display: 'flex', alignItems: 'center', gap: '6px' }}>
                 <Calendar size={12} /> Año
               </span>
               <span style={{ fontFamily: 'var(--font-mono)', fontSize: '14px', fontWeight: 600, color: 'var(--nl-text-primary)' }}>
@@ -862,7 +856,7 @@ function Detail() {
 
             {/* WhereToFind */}
             <div>
-              <p style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--nl-text-muted)', marginBottom: 'var(--space-2)' }}>
+              <p style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', letterSpacing: '0.08em', textTransform: 'uppercase', color: '#ffffff', marginBottom: 'var(--space-2)' }}>
                 Dónde encontrarlo
               </p>
               <WhereToFind obra={obra} providers={providers} compact={!providers} />
@@ -985,7 +979,7 @@ function Detail() {
               {limpiarNombreUsuario(review.nombreUsuario)}
             </strong>
 
-            <span style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', color: 'var(--nl-text-muted)' }}>
+            <span style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', color: '#ffffff' }}>
               {new Date(review.fechaCreacion).toLocaleDateString('es-CL')}
               {review.editado && ' · editado'}
             </span>
