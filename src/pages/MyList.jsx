@@ -4,13 +4,14 @@
  */
 
 import { useState, useEffect }    from 'react';
-import { Link }        from 'react-router-dom';
+import { Link, Navigate }        from 'react-router-dom';
 import { motion }      from 'motion/react';
 import MediaCard from '@/components/cards/MediaCard';
 import AnimeCard from '@/components/cards/AnimeCard';
 import BookCard  from '@/components/cards/BookCard';
 import useAppStore from '@/store/useAppStore';
 import { MEDIA_TYPES, CARD_STAGGER_DELAY } from '@/utils/constants';
+import { useNavigate } from 'react-router-dom';
 
 const LIST_TABS = [
   { id: 'all',               label: 'Todo'       },
@@ -34,16 +35,22 @@ function CardForType({ obra, hideFavoriteButton }) {
 }
 
 function MyList() {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('all');
   const myList = useAppStore((s) => s.myList);
+  const loadFavorites = useAppStore(
+    (s) => s.loadFavorites
+  );
 
   useEffect(() => {
      const token =
       localStorage.getItem("nl_token");
     if (!token) {
       localStorage.clear();
-      window.location.href = "/login";
+      navigate("/login");
+      return;
     }
+    loadFavorites;
   }, []);
 
   const toggleList = useAppStore((s) => s.toggleList);
@@ -120,6 +127,13 @@ function MyList() {
                 onClick={(e) => {
                   e.preventDefault();
                   e.stopPropagation();
+
+                  const token = localStorage.getItem("nl_token");
+
+                  if (token) {
+                    window.location.href = "/login";
+                    return;
+                  }
                   toggleList(obra);
                 }}
                 style={{

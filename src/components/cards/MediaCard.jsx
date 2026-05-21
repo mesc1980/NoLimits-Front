@@ -75,11 +75,11 @@ function MediaCard({ obra, onClick, style, hideFavoriteButton = false }) {
         return;
       }
 
-      if (isInList) {
-        await eliminarFavoritoUsuario(usuarioId, obra.id);
-      } else {
-        await agregarFavoritoUsuario(usuarioId, obra);
-      }
+      i//f (isInList) {
+      // await eliminarFavoritoUsuario(usuarioId, obra.id);
+      //} else {
+      //  await agregarFavoritoUsuario(usuarioId, obra);
+     // }
 
       toggleList(obra);
     } catch (error) {

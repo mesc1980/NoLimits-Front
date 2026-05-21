@@ -34,6 +34,7 @@
  * @module store/useAppStore
  */
 
+import { title } from 'motion/react-client';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
@@ -71,16 +72,128 @@ const useAppStore = create(
       // Tabla relacionada: user_lists (user_id, obra_id, created_at)
       myList: [],
 
+      loadFavorites: async () => {
+        try {
+          const token = localStorage.getItem("nl_token");
+
+          const usuario = JSON.parse(
+            localStorage.getItem("nl_user")
+          );
+          if (!token || !usuario?.id) return;
+
+          const response = await fetch(
+            `http://localhost:8080/api/v1/usuarios/${usuario.id}/favoritos`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+          if (!response.ok) {
+            throw new Error(
+              "Error cargando favoritos"
+            );
+          }
+          const data = await response.json();
+
+          const favoritosMapeados = data.map((fav) => ({
+            id: fav.obraId,
+            title: fav.titulo,
+            tipo: fav.tipo,
+            poster: fav.poster,
+            source: fav.source,
+          }));
+          set({
+            myList: favoritosMapeados,
+          });
+        } catch (error) {
+          console.error(error);
+
+          alert("Error GET favoritos")
+        }
+      },
+
       /**
        * Agrega una obra a la lista. Ignora duplicados.
        * INTEGRACIÓN BACKEND: también llamar POST /api/user/list
        * @param {Object} obra — Objeto normalizado al modelo Obra
        */
-      addToList: (obra) => {
-        const { myList } = get();
-        if (myList.some((item) => item.id === obra.id)) return;
-        set({ myList: [...myList, obra] });
-        // TODO backend: apiFetch(`${API}/api/user/list`, { method: 'POST', body: JSON.stringify({ obraId: obra.id }) })
+      addToList: async (obra) => {
+
+        try {
+          const token = localStorage.getItem("nl_token");
+
+          const usuario = JSON.parse(localStorage.getItem("nl_user"));
+
+          if (!token || !usuario?.id) {
+            window.location.href = "/login";
+            return;
+          }
+
+          const { myList } = get();
+
+          if (
+            myList.some(
+              (item) => item.id === obra.id
+            )
+          ) {
+
+            alert(
+              "Esta obra ya está en favoritos"
+            );
+
+              return;
+          }
+
+          const response = await fetch(
+            `http://localhost:8080/api/v1/usuarios/${usuario.id}/favoritos`,
+            {
+              method: "POST",
+
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+              },
+              body: JSON.stringify({
+                obraId: obra.id,
+
+                titulo: obra.title || obra.titulo,
+
+                tipo: obra.type || obra.tipo,
+
+                poster: obra.image || obra.poster,
+
+                source: obra.source || "frontend",
+              }),
+            }
+          );
+
+          if (!response.ok) {
+
+            const error = 
+              await response.json();
+
+            console.log(
+              "ERROR BACKEND:", error
+            );
+
+            alert(
+              error.message ||
+              "Error guardando favoritos"
+            );
+            return;
+          }
+          set({
+            myList: [...myList, obra]
+          });
+
+        } catch (error) {
+          console.error(error);
+
+          alert(
+            "Error actualizando favoritos"
+          );
+        }
       },
 
       /**
@@ -88,9 +201,46 @@ const useAppStore = create(
        * INTEGRACIÓN BACKEND: también llamar DELETE /api/user/list/:obraId
        * @param {string} obraId — ej: "tmdb:movie:12345"
        */
-      removeFromList: (obraId) => {
-        set((state) => ({ myList: state.myList.filter((item) => item.id !== obraId) }));
-        // TODO backend: apiFetch(`${API}/api/user/list/${encodeURIComponent(obraId)}`, { method: 'DELETE' })
+      removeFromList: async (obraId) => {
+        try {
+          const token = localStorage.getItem("nl_token");
+
+          const usuario = JSON.parse(localStorage.getItem("nl_user"));
+
+          if (!token || !usuario?.id) {
+            window.location.href = "/login";
+            return;
+          }
+
+          const response = await fetch(
+            `http://localhost:8080/api/v1/usuarios/${usuario.id}/favoritos/${obraId}`,
+            {
+              method: "DELETE",
+
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+
+          if (!response.ok) {
+            throw new Error(
+              "Error eliminando favorito"
+            );
+          }
+          set((state) => ({
+            myList: state.myList.filter(
+              (item) => item.id !== obraId
+            ),
+          }));
+        } catch (error) {
+          console.error(error);
+
+          alert(
+            "No errrrrrrrrroooor favoritos"
+          );
+        }
+       
       },
 
       /**
