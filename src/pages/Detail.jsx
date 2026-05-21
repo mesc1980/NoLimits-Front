@@ -344,11 +344,11 @@ function Detail() {
         return;
       }
 
-      if (isInList) {
-        await eliminarFavoritoUsuario(usuarioId, obra.id);
-      } else {
-        await agregarFavoritoUsuario(usuarioId, obra);
-      }
+      //if (isInList) {
+      //  await eliminarFavoritoUsuario(usuarioId, obra.id);
+      //} else {
+      //  await agregarFavoritoUsuario(usuarioId, obra);
+      //}
 
       toggleList(obra);
     } catch (error) {

@@ -124,6 +124,11 @@ function Profile() {
       localStorage.getItem("nl_token");
 
     if (!token) {
+
+      localStorage.clear();
+
+      window.location.href = "/login";
+
       return;
     }
     cargarPerfil();
@@ -551,7 +556,7 @@ function Profile() {
   // ERROR
   // =========================
 
-  if (!usuario) {
+  if (!usuario || !localStorage.getItem("nl_token")) {
     return (
       <div
         style={{
