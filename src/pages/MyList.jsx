@@ -3,7 +3,7 @@
  * Español neutro.
  */
 
-import { useState }    from 'react';
+import { useState, useEffect }    from 'react';
 import { Link }        from 'react-router-dom';
 import { motion }      from 'motion/react';
 import MediaCard from '@/components/cards/MediaCard';
@@ -30,6 +30,15 @@ function CardForType({ obra }) {
 function MyList() {
   const [activeTab, setActiveTab] = useState('all');
   const myList = useAppStore((s) => s.myList);
+  //para arregral
+  useEffect(() => {
+     const token =
+      localStorage.getItem("nl_token");
+    if (!token) {
+      localStorage.clear();
+      window.location.href = "/login";
+    }
+  }, []);
 
   const filtered = activeTab === 'all'
     ? myList
