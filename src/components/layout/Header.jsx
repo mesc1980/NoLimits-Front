@@ -58,8 +58,19 @@ function Header() {
               className={({ isActive }) => `nl-header__nav-link ${isActive ? 'nl-header__nav-link--active' : ''}`}
             >
               Mi biblioteca
-              {myListCount > 0 && (
-                <span style={{ marginLeft: '6px', background: 'var(--nl-accent)', color: '#fff', borderRadius: '10px', padding: '0 6px', fontSize: '11px', fontWeight: 600, verticalAlign: 'middle' }}>
+              {user && myListCount > 0 && (
+                <span 
+                  style={{ 
+                    marginLeft: '6px', 
+                    background: 'var(--nl-accent)', 
+                    color: '#fff', 
+                    borderRadius: '10px', 
+                    padding: '0 6px', 
+                    fontSize: '11px', 
+                    fontWeight: 600, 
+                    verticalAlign: 'middle' 
+                  }}
+                  >
                   {myListCount}
                 </span>
               )}

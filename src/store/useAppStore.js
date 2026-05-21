@@ -34,7 +34,7 @@
  * @module store/useAppStore
  */
 
-import { title } from 'motion/react-client';
+//import { title } from 'motion/react-client';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
@@ -62,6 +62,7 @@ const useAppStore = create(
       clearUser: () => {
         localStorage.removeItem('nl_auth');
         localStorage.removeItem('nl_user');
+        localStorage.removeItem('nl_userId');
         localStorage.removeItem('nl_role');
         localStorage.removeItem('nl_token');
 
@@ -76,13 +77,12 @@ const useAppStore = create(
         try {
           const token = localStorage.getItem("nl_token");
 
-          const usuario = JSON.parse(
-            localStorage.getItem("nl_user")
-          );
-          if (!token || !usuario?.id) return;
+          const usuarioId = localStorage.getItem("nl_userId");
+
+          if (!token || !usuarioId) return;
 
           const response = await fetch(
-            `http://localhost:8080/api/v1/usuarios/${usuario.id}/favoritos`,
+            `http://localhost:8080/api/v1/usuarios/${usuarioId}/favoritos`,
             {
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -99,7 +99,7 @@ const useAppStore = create(
           const favoritosMapeados = data.map((fav) => ({
             id: fav.obraId,
             title: fav.titulo,
-            tipo: fav.tipo,
+            type: fav.tipo,
             poster: fav.poster,
             source: fav.source,
           }));
@@ -123,9 +123,9 @@ const useAppStore = create(
         try {
           const token = localStorage.getItem("nl_token");
 
-          const usuario = JSON.parse(localStorage.getItem("nl_user"));
+          const usuarioId = localStorage.getItem("nl_userId");
 
-          if (!token || !usuario?.id) {
+          if (!token || !usuarioId) {
             window.location.href = "/login";
             return;
           }
@@ -146,7 +146,7 @@ const useAppStore = create(
           }
 
           const response = await fetch(
-            `http://localhost:8080/api/v1/usuarios/${usuario.id}/favoritos`,
+            `http://localhost:8080/api/v1/usuarios/${usuarioId}/favoritos`,
             {
               method: "POST",
 
@@ -205,15 +205,15 @@ const useAppStore = create(
         try {
           const token = localStorage.getItem("nl_token");
 
-          const usuario = JSON.parse(localStorage.getItem("nl_user"));
+          const usuarioId = localStorage.getItem("nl_userId");
 
-          if (!token || !usuario?.id) {
+          if (!token || !usuarioId) {
             window.location.href = "/login";
             return;
           }
 
           const response = await fetch(
-            `http://localhost:8080/api/v1/usuarios/${usuario.id}/favoritos/${obraId}`,
+            `http://localhost:8080/api/v1/usuarios/${usuarioId}/favoritos/${obraId}`,
             {
               method: "DELETE",
 

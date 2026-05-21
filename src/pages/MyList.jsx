@@ -4,14 +4,15 @@
  */
 
 import { useState, useEffect }    from 'react';
-import { Link, Navigate }        from 'react-router-dom';
-import { motion }      from 'motion/react';
+import { Link,} from 'react-router-dom';
+import { motion } from 'motion/react';
+import { useNavigate} from 'react-router-dom';
 import MediaCard from '@/components/cards/MediaCard';
 import AnimeCard from '@/components/cards/AnimeCard';
 import BookCard  from '@/components/cards/BookCard';
 import useAppStore from '@/store/useAppStore';
+
 import { MEDIA_TYPES, CARD_STAGGER_DELAY } from '@/utils/constants';
-import { useNavigate } from 'react-router-dom';
 
 const LIST_TABS = [
   { id: 'all',               label: 'Todo'       },
@@ -41,24 +42,28 @@ function MyList() {
   const loadFavorites = useAppStore(
     (s) => s.loadFavorites
   );
+  const toggleList = useAppStore((s) => s.toggleList);
 
   useEffect(() => {
      const token =
       localStorage.getItem("nl_token");
+
     if (!token) {
       localStorage.clear();
+
       navigate("/login");
+
       return;
     }
-    loadFavorites;
+    loadFavorites();
   }, []);
 
-  const toggleList = useAppStore((s) => s.toggleList);
-
-
-  const filtered = activeTab === 'all'
-    ? myList
-    : myList.filter((o) => o.type === activeTab);
+  const filtered = 
+    activeTab === 'all'
+      ? myList
+      : myList.filter(
+          (o) => o.type === activeTab
+        );
 
   return (
     <div className="container" style={{ paddingTop: 'var(--space-8)', paddingBottom: 'var(--space-16)' }}>
@@ -130,8 +135,8 @@ function MyList() {
 
                   const token = localStorage.getItem("nl_token");
 
-                  if (token) {
-                    window.location.href = "/login";
+                  if (!token) {
+                    navigate("/login");
                     return;
                   }
                   toggleList(obra);
