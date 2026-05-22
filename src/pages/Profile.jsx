@@ -147,10 +147,14 @@ function Profile() {
 
       setFormData({
         nombre:
-          `${data.nombre || ""} ${data.apellidos || ""}`.trim(),
-        telefono: data.telefono 
+          data.proveedor === "google"
+            ? (data.nombre || "").trim()
+            : `${data.nombre || ""} ${data.apellidos || ""}`.trim(),
+
+        telefono: data.telefono
           ? `${String(data.telefono).slice(0,1)} ${String(data.telefono).slice(1)}`
           : "",
+
         fotoPerfil: data.fotoPerfil || "",
       });
 
@@ -725,7 +729,9 @@ function Profile() {
 
               }}
             >
-              {usuario?.nombre}
+              {usuario?.proveedor === "google"
+                ? usuario?.nombre
+                : `${usuario?.nombre || ""} ${usuario?.apellidos || ""}`.trim()}
             </h1>
           </div>
         </div>
