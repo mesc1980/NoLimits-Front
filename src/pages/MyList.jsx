@@ -121,13 +121,14 @@ function MyList() {
       {filtered.length > 0 && (
         <motion.div
           className="nl-grid nl-grid--cards"
+          style={{ alignItems: 'stretch' }}
           key={activeTab}
           initial="hidden"
           animate="visible"
           variants={{ visible: { transition: { staggerChildren: CARD_STAGGER_DELAY } } }}
         >
           {filtered.map((obra) => (
-            <div key={obra.id} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <div key={obra.id} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', height: '100%', justifyContent: 'space-between' }}>
               <CardForType obra={obra} hideFavoriteButton />
               <button
                 onClick={(e) => {
@@ -143,7 +144,7 @@ function MyList() {
                   toggleList(obra);
                 }}
                 style={{
-                  marginTop: '10px',
+                  marginTop: 'auto',
                   background: 'rgba(10,10,11,0.85)',
                   color: 'var(--nl-accent)',
                   border: '1px solid var(--nl-border)',
