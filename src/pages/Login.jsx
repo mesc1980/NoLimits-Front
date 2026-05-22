@@ -73,15 +73,6 @@ function Login() {
       return;
     }
 
-    localStorage.setItem('nl_auth', '1');
-    localStorage.setItem("nl_user", JSON.stringify(userData))
-    localStorage.setItem('nl_userId', userData.id);
-    localStorage.setItem('nl_role', data.rolNombre || data.rol || '');
-
-    if (data?.token) {
-      localStorage.setItem('nl_token', data.token);
-    }
-
     const userData = {
       id: data.id || data.usuarioId || "1",
       name: data.nombre || data.name || email.split("@")[0],
@@ -91,7 +82,14 @@ function Login() {
       role: data.rolNombre || data.rol || '',
     };
 
+    localStorage.setItem('nl_auth', '1');
     localStorage.setItem('nl_user', JSON.stringify(userData));
+    localStorage.setItem('nl_userId', userData.id);
+    localStorage.setItem('nl_role', data.rolNombre || data.rol || '');
+
+    if (data?.token) {
+      localStorage.setItem('nl_token', data.token);
+    }
 
     setUser(userData);
 
@@ -103,6 +101,7 @@ function Login() {
     setEmail('');
     setPassword('');
     setName('');
+    setLastName('');
 
     const rolNombre = (data.rolNombre || data.rol || '').toUpperCase().trim();
 
@@ -215,7 +214,7 @@ function Login() {
               <div style={{  position: 'relative' }}>
                 <User size={16} style={iconStyle}/>
                 <input
-                  type='"text'
+                  type="text"
                   placeholder="Tus apellidos"
                   value={lastName}
                   onChange={(e) =>
