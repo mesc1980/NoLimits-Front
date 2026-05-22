@@ -7,7 +7,7 @@
  *  3. En tendencia esta semana (películas)
  *  4. Mejor valorado
  *  5. Anime destacado
- *  6. Videojuegos (IGDB)
+ *  6. Videojuegos (RAWG)
  *  7. Libros recomendados
  *  8. Mi biblioteca
  */
@@ -19,7 +19,7 @@ import MyListSection  from '@/components/sections/MyListSection';
 import { useTrendingMovies, useTopRatedMovies } from '@/hooks/useTMDB';
 import { useTopAnime }       from '@/hooks/useJikan';
 import { useBooksBySubject } from '@/hooks/useOpenLibrary';
-import { useTopGames }       from '@/hooks/useIGDB';
+import { useTopGames } from '@/hooks/useRAWG';
 import { HOME_SECTIONS, BOOK_SUBJECTS } from '@/utils/constants';
 
 function Home() {
