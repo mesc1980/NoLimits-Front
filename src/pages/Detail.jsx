@@ -1233,7 +1233,33 @@ function Detail() {
                   </p>
                 )}
 
-                <div style={{ display: 'flex', gap: '8px', marginTop: 'var(--space-2)', flexWrap: 'wrap' }}>
+                <div style={{ display: 'flex', gap: '8px', marginTop: 'var(--space-2)', flexWrap: 'wrap', alignItems: 'center' }}>
+                  <button
+                    onClick={() => handleReaccionReview(respuesta.id, 'LIKE')}
+                    style={{
+                      background: 'transparent',
+                      border: 'none',
+                      cursor: 'pointer',
+                      color: 'var(--nl-text-secondary)',
+                      fontSize: '14px',
+                    }}
+                  >
+                    👍 {respuesta.likes ?? 0}
+                  </button>
+
+                  <button
+                    onClick={() => handleReaccionReview(respuesta.id, 'DISLIKE')}
+                    style={{
+                      background: 'transparent',
+                      border: 'none',
+                      cursor: 'pointer',
+                      color: 'var(--nl-text-secondary)',
+                      fontSize: '14px',
+                    }}
+                  >
+                    👎 {respuesta.dislikes ?? 0}
+                  </button>
+
                   <Button
                     variant="ghost"
                     size="sm"
