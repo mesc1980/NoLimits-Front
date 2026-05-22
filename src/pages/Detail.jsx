@@ -43,6 +43,7 @@ import {
   agregarFavoritoUsuario,
   eliminarFavoritoUsuario,
 } from '@/services/usuarios';
+import { translateToSpanish } from '@/utils/translateText';
 
 /* ── Etiqueta de sección estilo brandbook ─────────────────── */
 function SectionLabel({ number, children }) {
@@ -543,6 +544,13 @@ function Detail() {
 
   const isInList   = useAppStore((s) => obra ? s.isInList(obra.id) : false);
   const toggleList = useAppStore((s) => s.toggleList);
+const [synopsis, setSynopsis] = useState('');
+
+useEffect(() => {
+  if (!obra?.synopsis) return;
+  setSynopsis(obra.synopsis);
+  translateToSpanish(obra.synopsis).then(setSynopsis);
+}, [obra?.synopsis]);
   const [reviewText, setReviewText] = useState('');
   const [reviewSaved, setReviewSaved] = useState(false);
   const [reviews, setReviews] = useState([]);
@@ -911,7 +919,6 @@ function Detail() {
               <StreamingRow providers={providers} />
             )}
 
-            {/* 04 · SINOPSIS */}
             {obra.synopsis && (
               <div>
                 <SectionLabel number={obra.platforms.length > 0 ? 3 : 2}>Sinopsis</SectionLabel>
@@ -922,7 +929,7 @@ function Detail() {
                     color:      'var(--nl-text-secondary)',
                   }}
                 >
-                  {obra.synopsis}
+                  {synopsis}   {/* ← solo esto cambia */}
                 </p>
               </div>
             )}
