@@ -75,7 +75,7 @@ function MediaCard({ obra, onClick, style, hideFavoriteButton = false }) {
         return;
       }
 
-      i//f (isInList) {
+      //f (isInList) {
       // await eliminarFavoritoUsuario(usuarioId, obra.id);
       //} else {
       //  await agregarFavoritoUsuario(usuarioId, obra);
