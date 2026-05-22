@@ -25,7 +25,7 @@ import { MEDIA_TYPES, CARD_STAGGER_DELAY } from '@/utils/constants';
 import { useTrendingMovies, useTrendingSeries } from '@/hooks/useTMDB';
 import { useTopAnime } from '@/hooks/useJikan';
 import { useBooksBySubject } from '@/hooks/useOpenLibrary';
-import { useTopGames } from '@/hooks/useIGDB';
+import { useTopGames } from '@/hooks/useRAWG';
 import { useMusicSearch } from '@/hooks/useMusicBrainz';
 import { BOOK_SUBJECTS } from '@/utils/constants';
 
