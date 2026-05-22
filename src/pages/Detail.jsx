@@ -908,15 +908,14 @@ useEffect(() => {
             {obra.synopsis && (
               <div>
                 <SectionLabel number={obra.platforms.length > 0 ? 3 : 2}>Sinopsis</SectionLabel>
-                <p
+                <div
                   style={{
                     fontSize:   '15px',
                     lineHeight: 1.8,
                     color:      'var(--nl-text-secondary)',
                   }}
-                >
-                  {synopsis}   {/* ← solo esto cambia */}
-                </p>
+                  dangerouslySetInnerHTML={{ __html: synopsis }}
+                />
               </div>
             )}
 
