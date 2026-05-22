@@ -121,13 +121,15 @@ function MyList() {
       {filtered.length > 0 && (
         <motion.div
           className="nl-grid nl-grid--cards"
+          style={{ alignItems: 'stretch' }}
           key={activeTab}
           initial="hidden"
           animate="visible"
           variants={{ visible: { transition: { staggerChildren: CARD_STAGGER_DELAY } } }}
         >
           {filtered.map((obra) => (
-            <div key={obra.id} style={{ position: 'relative' }}>
+            <div key={obra.id} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', height: '100%', justifyContent: 'space-between' }}>
+              <CardForType obra={obra} hideFavoriteButton />
               <button
                 onClick={(e) => {
                   e.preventDefault();
@@ -142,15 +144,12 @@ function MyList() {
                   toggleList(obra);
                 }}
                 style={{
-                  position: 'absolute',
-                  top: '10px',
-                  right: '10px',
-                  zIndex: 5,
+                  marginTop: 'auto',
                   background: 'rgba(10,10,11,0.85)',
                   color: 'var(--nl-accent)',
                   border: '1px solid var(--nl-border)',
                   borderRadius: '999px',
-                  padding: '6px 10px',
+                  padding: '6px 14px',
                   cursor: 'pointer',
                   fontSize: '12px',
                   fontWeight: 600,
@@ -158,8 +157,6 @@ function MyList() {
               >
                 Quitar de favoritos
               </button>
-
-              <CardForType obra={obra} hideFavoriteButton />
             </div>
           ))}
         </motion.div>
