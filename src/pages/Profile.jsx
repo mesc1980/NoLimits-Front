@@ -140,19 +140,29 @@ function Profile() {
 
   const cargarPerfil = async () => {
     try {
-
       const data = await obtenerMiPerfil();
 
-      setUsuario(data);
+      const usuarioLocal = JSON.parse(
+        localStorage.getItem("nl_user") || "null"
+      );
+
+      const esGoogle =
+        data.proveedor === "google" ||
+        usuarioLocal?.proveedor === "google" ||
+        data.apellidos === "Google";
+
+      setUsuario({
+        ...data,
+        proveedor: esGoogle ? "google" : data.proveedor,
+      });
 
       setFormData({
-        nombre:
-          data.proveedor === "google"
-            ? (data.nombre || "").trim()
-            : `${data.nombre || ""} ${data.apellidos || ""}`.trim(),
+        nombre: esGoogle
+          ? (data.nombre || "").trim()
+          : `${data.nombre || ""} ${data.apellidos || ""}`.trim(),
 
         telefono: data.telefono
-          ? `${String(data.telefono).slice(0,1)} ${String(data.telefono).slice(1)}`
+          ? `${String(data.telefono).slice(0, 1)} ${String(data.telefono).slice(1)}`
           : "",
 
         fotoPerfil: data.fotoPerfil || "",
