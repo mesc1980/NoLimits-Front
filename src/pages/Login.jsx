@@ -74,7 +74,6 @@ function Login() {
     }
 
     localStorage.setItem('nl_auth', '1');
-    localStorage.setItem('nl_user', JSON.stringify(data));
     localStorage.setItem('nl_role', data.rolNombre || data.rol || '');
 
     if (data?.token) {
@@ -82,7 +81,7 @@ function Login() {
     }
 
     const userData = {
-      id: data.id || data.usuarioId || "1",
+      id: data.id || data.usuarioId,
       name: data.nombre || data.name || email.split("@")[0],
       email: data.correo || data.email || email,
       token: data.token || null,
@@ -90,6 +89,7 @@ function Login() {
       role: data.rolNombre || data.rol || '',
     };
 
+    localStorage.setItem('nl_userId', String(userData.id));
     localStorage.setItem('nl_user', JSON.stringify(userData));
 
     setUser(userData);
