@@ -80,7 +80,6 @@ const useAppStore = create(
       loadFavorites: async () => {
         try {
           const token = localStorage.getItem("nl_token");
-
           const usuarioId = localStorage.getItem("nl_userId");
 
           if (!token || !usuarioId) return;
@@ -93,13 +92,19 @@ const useAppStore = create(
               },
             }
           );
-          if (!response.ok) {
-            throw new Error(
-              "Error cargando favoritos"
-            );
-          }
-          const data = await response.json();
 
+          if (response.status === 401 || response.status === 403) {
+            // Token expirado → limpiar sesión y redirigir al login
+            localStorage.clear();
+            window.location.href = "/login";
+            return;
+          }
+
+          if (!response.ok) {
+            throw new Error("Error cargando favoritos");
+          }
+
+          const data = await response.json();
           const favoritosMapeados = data.map((fav) => ({
             id: fav.obraId,
             title: fav.titulo,
@@ -107,13 +112,10 @@ const useAppStore = create(
             poster: fav.poster,
             source: fav.source,
           }));
-          set({
-            myList: favoritosMapeados,
-          });
+          set({ myList: favoritosMapeados });
+
         } catch (error) {
           console.error(error);
-
-          alert("Error GET favoritos")
         }
       },
 
