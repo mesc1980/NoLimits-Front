@@ -43,6 +43,7 @@ import {
   agregarFavoritoUsuario,
   eliminarFavoritoUsuario,
 } from '@/services/usuarios';
+import { translateToSpanish } from '@/utils/translateText';
 
 /* ── Etiqueta de sección estilo brandbook ─────────────────── */
 function SectionLabel({ number, children }) {
@@ -366,27 +367,60 @@ function Detail() {
       }
 
       const user = JSON.parse(localStorage.getItem("nl_user"));
-
       const usuarioId = user?.backendId || user?.idUsuario || user?.usuarioId || user?.id;
 
       if (!usuarioId) {
-        console.error("Usuario sin ID de backend:", user);
         alert("No se pudo identificar tu usuario. Cierra sesión e inicia sesión otra vez.");
+        return;
+      }
+
+      // Si hay editingReviewId → actualizar esa reseña inline
+      // Si no → crear nueva reseña desde "Mi reseña personal"
+      await guardarReview(usuarioId, {
+        obraId: obra.id,
+        contenido: editingReviewId ? reviewText : reviewText,
+        rating: 10,
+        ...(editingReviewId ? { reviewId: editingReviewId } : {}),
+      });
+
+      const reviewsActualizadas = await obtenerReviewsPorObra(obra.id);
+      setReviews(reviewsActualizadas);
+      setReviewText('');
+      setReviewSaved(true);
+      setEditingReviewId(null);
+
+    } catch (error) {
+      console.error(error);
+      alert("No se pudo guardar la reseña");
+    }
+  };
+
+  const handleNuevaReview = async () => {
+    try {
+      if (!isLoggedIn()) {
+        alert("Debes iniciar sesión para guardar reseñas");
+        navigate("/login");
+        return;
+      }
+
+      const user = JSON.parse(localStorage.getItem("nl_user"));
+      const usuarioId = user?.backendId || user?.idUsuario || user?.usuarioId || user?.id;
+
+      if (!usuarioId) {
+        alert("No se pudo identificar tu usuario.");
         return;
       }
 
       await guardarReview(usuarioId, {
         obraId: obra.id,
-        contenido: reviewText,
+        contenido: newReviewText,
         rating: 10,
       });
 
       const reviewsActualizadas = await obtenerReviewsPorObra(obra.id);
       setReviews(reviewsActualizadas);
-
-      setReviewText('');
+      setNewReviewText('');
       setReviewSaved(true);
-      setEditingReviewId(null);
 
     } catch (error) {
       console.error(error);
@@ -543,7 +577,15 @@ function Detail() {
 
   const isInList   = useAppStore((s) => obra ? s.isInList(obra.id) : false);
   const toggleList = useAppStore((s) => s.toggleList);
+const [synopsis, setSynopsis] = useState('');
+
+useEffect(() => {
+  if (!obra?.synopsis) return;
+  setSynopsis(obra.synopsis);
+  translateToSpanish(obra.synopsis).then(setSynopsis);
+}, [obra?.synopsis]);
   const [reviewText, setReviewText] = useState('');
+  const [newReviewText, setNewReviewText] = useState('');
   const [reviewSaved, setReviewSaved] = useState(false);
   const [reviews, setReviews] = useState([]);
   const [editingReviewId, setEditingReviewId] = useState(null);
@@ -911,19 +953,17 @@ function Detail() {
               <StreamingRow providers={providers} />
             )}
 
-            {/* 04 · SINOPSIS */}
             {obra.synopsis && (
               <div>
                 <SectionLabel number={obra.platforms.length > 0 ? 3 : 2}>Sinopsis</SectionLabel>
-                <p
+                <div
                   style={{
                     fontSize:   '15px',
                     lineHeight: 1.8,
                     color:      'var(--nl-text-secondary)',
                   }}
-                >
-                  {obra.synopsis}
-                </p>
+                  dangerouslySetInnerHTML={{ __html: synopsis }}
+                />
               </div>
             )}
 
@@ -931,8 +971,8 @@ function Detail() {
             <div>
               <SectionLabel number={obra.synopsis ? 5 : 4}>Mi reseña personal</SectionLabel>
               <textarea
-                value={reviewText}
-                onChange={(e) => setReviewText(e.target.value)}
+                value={newReviewText}
+                onChange={(e) => setNewReviewText(e.target.value)}
                 placeholder="Escribe tu opinión sobre esta obra…"
                 rows={5}
                 style={{
@@ -957,9 +997,9 @@ function Detail() {
               <Button
                 variant="secondary"
                 size="sm"
-                onClick={handleGuardarReview}
+                onClick={handleNuevaReview}
               >
-                {editingReviewId ? 'Actualizar reseña' : 'Guardar reseña'}
+                Guardar reseña
               </Button>
               {reviewSaved && (
                 <span style={{ marginLeft: 'var(--space-3)', fontFamily: 'var(--font-mono)', fontSize: '11px', color: 'var(--nl-text-muted)' }}>
@@ -999,9 +1039,32 @@ function Detail() {
             </span>
           </div>
 
-          <p style={{ color: 'var(--nl-text-secondary)', fontSize: '14px', lineHeight: 1.7, whiteSpace: 'pre-line' }}>
-            {review.contenido}
-          </p>
+          {editingReviewId === review.id ? (
+            <textarea
+              value={reviewText}
+              onChange={(e) => setReviewText(e.target.value)}
+              rows={4}
+              autoFocus
+              style={{
+                width: '100%',
+                background: 'var(--nl-bg-subtle)',
+                border: '1px solid var(--nl-accent)',
+                borderRadius: 'var(--radius-card)',
+                color: 'var(--nl-text-primary)',
+                padding: 'var(--space-3)',
+                fontSize: '14px',
+                lineHeight: 1.7,
+                resize: 'vertical',
+                outline: 'none',
+                fontFamily: 'var(--font-ui)',
+                marginBottom: 'var(--space-2)',
+              }}
+            />
+          ) : (
+            <p style={{ color: 'var(--nl-text-secondary)', fontSize: '14px', lineHeight: 1.7, whiteSpace: 'pre-line' }}>
+              {review.contenido}
+            </p>
+          )}
 
           <div
             style={{
@@ -1051,17 +1114,38 @@ function Detail() {
 
             {review.usuarioId === usuarioActualId && (
               <div style={{ display: 'flex', gap: '8px' }}>
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  onClick={() => {
-                    setReviewText(review.contenido);
-                    setEditingReviewId(review.id);
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                  }}
-                >
-                  Editar reseña
-                </Button>
+                {editingReviewId === review.id ? (
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    <Button
+                      variant="primary"
+                      size="sm"
+                      onClick={handleGuardarReview}
+                    >
+                      Guardar
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        setEditingReviewId(null);
+                        setReviewText('');
+                      }}
+                    >
+                      Cancelar
+                    </Button>
+                  </div>
+                ) : (
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    onClick={() => {
+                      setReviewText(review.contenido);
+                      setEditingReviewId(review.id);
+                    }}
+                  >
+                    Editar reseña
+                  </Button>
+                )}
 
                 <Button
                   variant="ghost"
