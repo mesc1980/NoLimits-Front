@@ -5,6 +5,7 @@ import { MemoryRouter } from 'react-router-dom';
 import MyList from '@/pages/MyList';
 
 const toggleListMock = vi.fn();
+const loadFavoritesMock = vi.fn();
 
 let myListMock = [];
 
@@ -13,6 +14,7 @@ vi.mock('@/store/useAppStore', () => ({
     selector({
       myList: myListMock,
       toggleList: toggleListMock,
+      loadFavorites: loadFavoritesMock,
     }),
 }));
 
@@ -39,14 +41,26 @@ function renderMyList() {
 describe('MyList', () => {
   beforeEach(() => {
     myListMock = [];
+
     toggleListMock.mockClear();
+    loadFavoritesMock.mockClear();
+
+    localStorage.clear();
+    localStorage.setItem('nl_token', 'token-falso');
   });
 
   test('muestra estado vacío cuando no hay obras guardadas', () => {
+    myListMock = [];
+
     renderMyList();
 
-    expect(screen.getByText('Tu lista está vacía.')).toBeInTheDocument();
-    expect(screen.getByText('Explorar el catálogo')).toBeInTheDocument();
+    expect(
+      screen.getByText('Tu lista está vacía.')
+    ).toBeInTheDocument();
+
+    expect(
+      screen.getByText('Explorar el catálogo')
+    ).toBeInTheDocument();
   });
 
   test('muestra cantidad de obras guardadas', () => {
@@ -96,9 +110,17 @@ describe('MyList', () => {
 
     renderMyList();
 
-    expect(screen.getByText('MediaCard: Star Wars')).toBeInTheDocument();
-    expect(screen.getByText('AnimeCard: Cowboy Bebop')).toBeInTheDocument();
-    expect(screen.getByText('BookCard: Dune')).toBeInTheDocument();
+    expect(
+      screen.getByText('MediaCard: Star Wars')
+    ).toBeInTheDocument();
+
+    expect(
+      screen.getByText('AnimeCard: Cowboy Bebop')
+    ).toBeInTheDocument();
+
+    expect(
+      screen.getByText('BookCard: Dune')
+    ).toBeInTheDocument();
   });
 
   test('filtra obras por tipo película', () => {
@@ -117,10 +139,17 @@ describe('MyList', () => {
 
     renderMyList();
 
-    fireEvent.click(screen.getByText(/Películas/));
+    fireEvent.click(
+      screen.getByText(/Películas/)
+    );
 
-    expect(screen.getByText('MediaCard: Star Wars')).toBeInTheDocument();
-    expect(screen.queryByText('BookCard: Dune')).not.toBeInTheDocument();
+    expect(
+      screen.getByText('MediaCard: Star Wars')
+    ).toBeInTheDocument();
+
+    expect(
+      screen.queryByText('BookCard: Dune')
+    ).not.toBeInTheDocument();
   });
 
   test('muestra mensaje cuando el filtro no tiene obras', () => {
@@ -134,10 +163,14 @@ describe('MyList', () => {
 
     renderMyList();
 
-    fireEvent.click(screen.getByText(/Libros/));
+    fireEvent.click(
+      screen.getByText(/Libros/)
+    );
 
     expect(
-      screen.getByText('No tienes obras de este tipo en tu lista.')
+      screen.getByText(
+        'No tienes obras de este tipo en tu lista.'
+      )
     ).toBeInTheDocument();
   });
 
@@ -152,8 +185,12 @@ describe('MyList', () => {
 
     renderMyList();
 
-    fireEvent.click(screen.getByText('Quitar de favoritos'));
+    fireEvent.click(
+      screen.getByText('Quitar de favoritos')
+    );
 
-    expect(toggleListMock).toHaveBeenCalledWith(obra);
+    expect(toggleListMock).toHaveBeenCalledWith(
+      obra
+    );
   });
 });

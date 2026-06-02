@@ -86,4 +86,60 @@ describe('SearchBar', () => {
       screen.queryByRole('tablist')
     ).not.toBeInTheDocument();
   });
+
+  test('ejecuta onSearch al cambiar de tab con texto escrito', () => {
+    const onSearch = vi.fn();
+
+    renderSearchBar({
+      onSearch,
+    });
+
+    const input = screen.getByLabelText('Buscar obras');
+
+    fireEvent.change(input, {
+      target: { value: 'Naruto' },
+    });
+
+    fireEvent.click(
+      screen.getByRole('tab', { name: /Anime/i })
+    );
+
+    expect(onSearch).toHaveBeenCalledWith('Naruto', 'anime');
+  });
+
+  test('ejecuta onSearch al cambiar de tab sin texto escrito', () => {
+    const onSearch = vi.fn();
+
+    renderSearchBar({
+      onSearch,
+    });
+
+    fireEvent.click(
+      screen.getByRole('tab', { name: /Películas/i })
+    );
+
+    expect(onSearch).toHaveBeenCalledWith('', 'movie');
+  });
+
+  test('actualiza el input si cambia initialQuery', () => {
+    const { rerender } = render(
+      <MemoryRouter>
+        <SearchBar initialQuery="Star Wars" />
+      </MemoryRouter>
+    );
+
+    expect(
+      screen.getByLabelText('Buscar obras')
+    ).toHaveValue('Star Wars');
+
+    rerender(
+      <MemoryRouter>
+        <SearchBar initialQuery="Matrix" initialType="movie" />
+      </MemoryRouter>
+    );
+
+    expect(
+      screen.getByLabelText('Buscar obras')
+    ).toHaveValue('Matrix');
+  });
 });
