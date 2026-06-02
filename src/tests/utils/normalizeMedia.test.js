@@ -6,7 +6,9 @@ import {
   normalizeJikanAnime,
   normalizeOpenLibraryBook,
   normalizeIgdbGame,
+  normalizeRawgGame,
   normalizeMusicBrainzRelease,
+  normalizeGoogleBook,
 } from '@/utils/normalizeMedia';
 
 describe('normalizeMedia', () => {
@@ -178,5 +180,89 @@ describe('normalizeMedia', () => {
       backdrop: '/img/fallbacks/music-fallback.webp',
       source: 'musicbrainz',
     });
+  });
+
+  test('normaliza un videojuego de RAWG', () => {
+    const game = normalizeRawgGame({
+      id: 123,
+      name: 'Cyberpunk 2077',
+      released: '2020-12-10',
+      rating: 4.3,
+      background_image: 'https://img.com/cyberpunk.jpg',
+      background_image_additional: 'https://img.com/cyberpunk-bg.jpg',
+      description_raw: 'RPG futurista',
+      genres: [{ name: 'RPG' }],
+      platforms: [{ platform: { name: 'PC' } }],
+      stores: [{ url: 'https://store.steampowered.com/app/1091500' }],
+    });
+
+    expect(game).toMatchObject({
+      id: 'rawg:game:123',
+      type: 'game',
+      title: 'Cyberpunk 2077',
+      year: '2020',
+      rating: '8.6',
+      poster: 'https://img.com/cyberpunk.jpg',
+      backdrop: 'https://img.com/cyberpunk-bg.jpg',
+      synopsis: 'RPG futurista',
+      genres: ['RPG'],
+      platforms: ['PC'],
+      source: 'rawg',
+    });
+
+    expect(game.gameStores[0]).toMatchObject({
+      label: 'Steam',
+      accent: true,
+    });
+  });
+
+  test('normaliza un libro de Google Books', () => {
+    const book = normalizeGoogleBook({
+      id: 'google-book-1',
+      volumeInfo: {
+        title: 'Harry Potter: La piedra filosofal',
+        publishedDate: '1997-06-26',
+        averageRating: 4.5,
+        imageLinks: {
+          thumbnail: 'http://books.google.com/cover.jpg',
+        },
+        description: 'Un joven mago descubre su destino.',
+        categories: ['Fantasy'],
+      },
+    });
+
+    expect(book).toMatchObject({
+      id: 'openlibrary:book:google-book-1',
+      type: 'book',
+      title: 'Harry Potter',
+      year: '1997',
+      rating: '9.0',
+      poster: 'https://books.google.com/cover.jpg',
+      backdrop: 'https://books.google.com/cover.jpg',
+      synopsis: 'Un joven mago descubre su destino.',
+      genres: ['Fantasy'],
+      source: 'openlibrary',
+    });
+  });
+
+  test('normalizadores usan valores fallback cuando faltan datos', () => {
+    const igdb = normalizeIgdbGame({ id: 1 });
+    const rawg = normalizeRawgGame({ id: 2 });
+    const googleBook = normalizeGoogleBook({ id: 'book-1' });
+
+    expect(igdb.title).toBe('Sin título');
+    expect(igdb.year).toBe('—');
+    expect(igdb.rating).toBe('—');
+    expect(igdb.poster).toBe('/img/fallbacks/videogame-fallback.webp');
+
+    expect(rawg.title).toBe('Sin título');
+    expect(rawg.year).toBe('—');
+    expect(rawg.rating).toBe('—');
+    expect(rawg.poster).toBeNull();
+
+    expect(googleBook.title).toBe('Sin título');
+    expect(googleBook.year).toBe('—');
+    expect(googleBook.rating).toBe('—');
+    expect(googleBook.poster).toBe('/img/fallbacks/book-fallback.webp');
   });
 });
