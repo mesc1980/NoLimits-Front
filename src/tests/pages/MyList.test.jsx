@@ -1,4 +1,4 @@
-import { describe, expect, test, vi, beforeEach } from 'vitest';
+import { describe, test, vi, beforeEach, assert } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 
@@ -54,13 +54,8 @@ describe('MyList', () => {
 
     renderMyList();
 
-    expect(
-      screen.getByText('Tu lista está vacía.')
-    ).toBeInTheDocument();
-
-    expect(
-      screen.getByText('Explorar el catálogo')
-    ).toBeInTheDocument();
+    assert.isNotNull(screen.getByText('Tu lista está vacía.'));
+    assert.isNotNull(screen.getByText('Explorar el catálogo'));
   });
 
   test('muestra cantidad de obras guardadas', () => {
@@ -85,8 +80,8 @@ describe('MyList', () => {
 
     renderMyList();
 
-    expect(screen.getByText('2')).toBeInTheDocument();
-    expect(screen.getByText('obras guardadas')).toBeInTheDocument();
+    assert.isNotNull(screen.getByText('2'));
+    assert.isNotNull(screen.getByText('obras guardadas'));
   });
 
   test('renderiza cards según el tipo de obra', () => {
@@ -110,17 +105,9 @@ describe('MyList', () => {
 
     renderMyList();
 
-    expect(
-      screen.getByText('MediaCard: Star Wars')
-    ).toBeInTheDocument();
-
-    expect(
-      screen.getByText('AnimeCard: Cowboy Bebop')
-    ).toBeInTheDocument();
-
-    expect(
-      screen.getByText('BookCard: Dune')
-    ).toBeInTheDocument();
+    assert.isNotNull(screen.getByText('MediaCard: Star Wars'));
+    assert.isNotNull(screen.getByText('AnimeCard: Cowboy Bebop'));
+    assert.isNotNull(screen.getByText('BookCard: Dune'));
   });
 
   test('filtra obras por tipo película', () => {
@@ -139,17 +126,10 @@ describe('MyList', () => {
 
     renderMyList();
 
-    fireEvent.click(
-      screen.getByText(/Películas/)
-    );
+    fireEvent.click(screen.getByText(/Películas/));
 
-    expect(
-      screen.getByText('MediaCard: Star Wars')
-    ).toBeInTheDocument();
-
-    expect(
-      screen.queryByText('BookCard: Dune')
-    ).not.toBeInTheDocument();
+    assert.isNotNull(screen.getByText('MediaCard: Star Wars'));
+    assert.isNull(screen.queryByText('BookCard: Dune'));
   });
 
   test('muestra mensaje cuando el filtro no tiene obras', () => {
@@ -163,15 +143,11 @@ describe('MyList', () => {
 
     renderMyList();
 
-    fireEvent.click(
-      screen.getByText(/Libros/)
-    );
+    fireEvent.click(screen.getByText(/Libros/));
 
-    expect(
-      screen.getByText(
-        'No tienes obras de este tipo en tu lista.'
-      )
-    ).toBeInTheDocument();
+    assert.isNotNull(
+      screen.getByText('No tienes obras de este tipo en tu lista.')
+    );
   });
 
   test('ejecuta toggleList al quitar de favoritos', () => {
@@ -185,12 +161,8 @@ describe('MyList', () => {
 
     renderMyList();
 
-    fireEvent.click(
-      screen.getByText('Quitar de favoritos')
-    );
+    fireEvent.click(screen.getByText('Quitar de favoritos'));
 
-    expect(toggleListMock).toHaveBeenCalledWith(
-      obra
-    );
+    assert.deepEqual(toggleListMock.mock.calls[0], [obra]);
   });
 });

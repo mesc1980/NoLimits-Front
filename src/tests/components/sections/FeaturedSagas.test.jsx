@@ -1,4 +1,4 @@
-import { describe, expect, test, vi, beforeEach } from 'vitest';
+import { describe, test, vi, beforeEach, assert } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -58,24 +58,24 @@ describe('FeaturedSagas', () => {
   test('renderiza el título de la sección', () => {
     renderFeaturedSagas();
 
-    expect(
+    assert.isNotNull(
       screen.getByText('Sagas destacadas · Explora el universo completo')
-    ).toBeInTheDocument();
+    );
   });
 
   test('renderiza sagas destacadas principales', () => {
     renderFeaturedSagas();
 
-    expect(screen.getByText('Spider-Man')).toBeInTheDocument();
-    expect(screen.getByText('Star Wars')).toBeInTheDocument();
-    expect(screen.getByText('Batman')).toBeInTheDocument();
-    expect(screen.getByText('Dragon Ball')).toBeInTheDocument();
+    assert.isNotNull(screen.getByText('Spider-Man'));
+    assert.isNotNull(screen.getByText('Star Wars'));
+    assert.isNotNull(screen.getByText('Batman'));
+    assert.isNotNull(screen.getByText('Dragon Ball'));
   });
 
   test('renderiza nombre personalizado de El Señor de los Anillos', () => {
     renderFeaturedSagas();
 
-    expect(screen.getByText('El Señor de los Anillos')).toBeInTheDocument();
+    assert.isNotNull(screen.getByText('El Señor de los Anillos'));
   });
 
   test('navega al hacer click en una saga', () => {
@@ -85,7 +85,7 @@ describe('FeaturedSagas', () => {
       screen.getByRole('button', { name: 'Explorar saga Star Wars' })
     );
 
-    expect(mockNavigate).toHaveBeenCalledWith('/saga/Star%20Wars');
+    assert.deepEqual(mockNavigate.mock.calls[0], ['/saga/Star%20Wars']);
   });
 
   test('navega al presionar Enter en una saga', () => {
@@ -96,6 +96,6 @@ describe('FeaturedSagas', () => {
       { key: 'Enter' }
     );
 
-    expect(mockNavigate).toHaveBeenCalledWith('/saga/Batman');
+    assert.deepEqual(mockNavigate.mock.calls[0], ['/saga/Batman']);
   });
 });

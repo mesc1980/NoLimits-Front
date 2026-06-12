@@ -1,4 +1,4 @@
-import { describe, expect, test, vi } from 'vitest';
+import { describe, test, vi, assert } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 
@@ -16,9 +16,7 @@ describe('SearchBar', () => {
   test('renderiza el input de búsqueda', () => {
     renderSearchBar();
 
-    expect(
-      screen.getByLabelText('Buscar obras')
-    ).toBeInTheDocument();
+    assert.isNotNull(screen.getByLabelText('Buscar obras'));
   });
 
   test('muestra la búsqueda inicial', () => {
@@ -26,9 +24,10 @@ describe('SearchBar', () => {
       initialQuery: 'Star Wars',
     });
 
-    expect(
-      screen.getByLabelText('Buscar obras')
-    ).toHaveValue('Star Wars');
+    assert.equal(
+      screen.getByLabelText('Buscar obras').value,
+      'Star Wars'
+    );
   });
 
   test('permite escribir en el input', () => {
@@ -40,7 +39,7 @@ describe('SearchBar', () => {
       target: { value: 'Matrix' },
     });
 
-    expect(input).toHaveValue('Matrix');
+    assert.equal(input.value, 'Matrix');
   });
 
   test('ejecuta onSearch al enviar una búsqueda válida', () => {
@@ -56,11 +55,9 @@ describe('SearchBar', () => {
       target: { value: 'Harry Potter' },
     });
 
-    fireEvent.submit(
-      screen.getByRole('search')
-    );
+    fireEvent.submit(screen.getByRole('search'));
 
-    expect(onSearch).toHaveBeenCalledWith('Harry Potter', 'all');
+    assert.deepEqual(onSearch.mock.calls[0], ['Harry Potter', 'all']);
   });
 
   test('no ejecuta onSearch si la búsqueda está vacía', () => {
@@ -70,11 +67,9 @@ describe('SearchBar', () => {
       onSearch,
     });
 
-    fireEvent.submit(
-      screen.getByRole('search')
-    );
+    fireEvent.submit(screen.getByRole('search'));
 
-    expect(onSearch).not.toHaveBeenCalled();
+    assert.equal(onSearch.mock.calls.length, 0);
   });
 
   test('no muestra tabs cuando compact es true', () => {
@@ -82,9 +77,7 @@ describe('SearchBar', () => {
       compact: true,
     });
 
-    expect(
-      screen.queryByRole('tablist')
-    ).not.toBeInTheDocument();
+    assert.isNull(screen.queryByRole('tablist'));
   });
 
   test('ejecuta onSearch al cambiar de tab con texto escrito', () => {
@@ -100,11 +93,9 @@ describe('SearchBar', () => {
       target: { value: 'Naruto' },
     });
 
-    fireEvent.click(
-      screen.getByRole('tab', { name: /Anime/i })
-    );
+    fireEvent.click(screen.getByRole('tab', { name: /Anime/i }));
 
-    expect(onSearch).toHaveBeenCalledWith('Naruto', 'anime');
+    assert.deepEqual(onSearch.mock.calls[0], ['Naruto', 'anime']);
   });
 
   test('ejecuta onSearch al cambiar de tab sin texto escrito', () => {
@@ -114,11 +105,9 @@ describe('SearchBar', () => {
       onSearch,
     });
 
-    fireEvent.click(
-      screen.getByRole('tab', { name: /Películas/i })
-    );
+    fireEvent.click(screen.getByRole('tab', { name: /Películas/i }));
 
-    expect(onSearch).toHaveBeenCalledWith('', 'movie');
+    assert.deepEqual(onSearch.mock.calls[0], ['', 'movie']);
   });
 
   test('actualiza el input si cambia initialQuery', () => {
@@ -128,9 +117,10 @@ describe('SearchBar', () => {
       </MemoryRouter>
     );
 
-    expect(
-      screen.getByLabelText('Buscar obras')
-    ).toHaveValue('Star Wars');
+    assert.equal(
+      screen.getByLabelText('Buscar obras').value,
+      'Star Wars'
+    );
 
     rerender(
       <MemoryRouter>
@@ -138,8 +128,9 @@ describe('SearchBar', () => {
       </MemoryRouter>
     );
 
-    expect(
-      screen.getByLabelText('Buscar obras')
-    ).toHaveValue('Matrix');
+    assert.equal(
+      screen.getByLabelText('Buscar obras').value,
+      'Matrix'
+    );
   });
 });

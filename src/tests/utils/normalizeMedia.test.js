@@ -1,4 +1,4 @@
-import { describe, expect, test } from 'vitest';
+import { describe, test, assert } from 'vitest';
 
 import {
   normalizeTmdbMovie,
@@ -9,6 +9,7 @@ import {
   normalizeRawgGame,
   normalizeMusicBrainzRelease,
   normalizeGoogleBook,
+  normalizeOpenLibrarySubjectWork,
 } from '@/utils/normalizeMedia';
 
 describe('normalizeMedia', () => {
@@ -26,7 +27,7 @@ describe('normalizeMedia', () => {
       belongs_to_collection: { name: 'Star Wars Collection' },
     });
 
-    expect(movie).toMatchObject({
+    assert.include(movie, {
       id: 'tmdb:movie:1893',
       type: 'movie',
       title: 'Star Wars',
@@ -34,13 +35,13 @@ describe('normalizeMedia', () => {
       rating: '8.6',
       voteCount: 1000,
       synopsis: 'Una película espacial.',
-      genres: ['Ciencia ficción', 'Aventura'],
       saga: 'Star Wars Collection',
       source: 'tmdb',
     });
 
-    expect(movie.poster).toContain('/poster.jpg');
-    expect(movie.backdrop).toContain('/backdrop.jpg');
+    assert.deepEqual(movie.genres, ['Ciencia ficción', 'Aventura']);
+    assert.include(movie.poster, '/poster.jpg');
+    assert.include(movie.backdrop, '/backdrop.jpg');
   });
 
   test('normaliza una serie de TMDB', () => {
@@ -54,17 +55,18 @@ describe('normalizeMedia', () => {
       networks: [{ name: 'HBO' }],
     });
 
-    expect(series).toMatchObject({
+    assert.include(series, {
       id: 'tmdb:series:1399',
       type: 'series',
       title: 'Game of Thrones',
       year: '2011',
       rating: '8.4',
       synopsis: 'Serie de fantasía.',
-      genres: ['Drama'],
-      platforms: ['HBO'],
       source: 'tmdb',
     });
+
+    assert.deepEqual(series.genres, ['Drama']);
+    assert.deepEqual(series.platforms, ['HBO']);
   });
 
   test('normaliza un anime de Jikan', () => {
@@ -83,7 +85,7 @@ describe('normalizeMedia', () => {
       studios: [{ name: 'Sunrise' }],
     });
 
-    expect(anime).toMatchObject({
+    assert.include(anime, {
       id: 'jikan:anime:1',
       type: 'anime',
       title: 'Cowboy Bebop',
@@ -91,10 +93,11 @@ describe('normalizeMedia', () => {
       rating: '8.8',
       poster: 'https://cdn.example.com/cowboy.jpg',
       synopsis: 'Anime espacial.',
-      genres: ['Action', 'Sci-Fi'],
-      platforms: ['Sunrise'],
       source: 'jikan',
     });
+
+    assert.deepEqual(anime.genres, ['Action', 'Sci-Fi']);
+    assert.deepEqual(anime.platforms, ['Sunrise']);
   });
 
   test('normaliza un libro de OpenLibrary', () => {
@@ -108,18 +111,18 @@ describe('normalizeMedia', () => {
       subjects: ['Fantasy', 'Adventure', 'Classic'],
     });
 
-    expect(book).toMatchObject({
+    assert.include(book, {
       id: 'openlibrary:book:OL45804W',
       type: 'book',
       title: 'The Lord of the Rings',
       year: '1954',
       rating: '4.7',
       synopsis: 'Novela de fantasía.',
-      genres: ['Fantasy', 'Adventure', 'Classic'],
       source: 'openlibrary',
     });
 
-    expect(book.poster).toContain('12345-L.jpg');
+    assert.deepEqual(book.genres, ['Fantasy', 'Adventure', 'Classic']);
+    assert.include(book.poster, '12345-L.jpg');
   });
 
   test('normaliza un videojuego de IGDB', () => {
@@ -139,20 +142,21 @@ describe('normalizeMedia', () => {
       ],
     });
 
-    expect(game).toMatchObject({
+    assert.include(game, {
       id: 'igdb:game:1020',
       type: 'game',
       title: 'The Legend of Zelda',
       year: '2017',
       rating: '9.5',
       synopsis: 'Juego de aventura.',
-      genres: ['Adventure'],
       saga: 'Zelda',
-      platforms: ['Nintendo Switch'],
       source: 'igdb',
     });
 
-    expect(game.gameStores[0]).toMatchObject({
+    assert.deepEqual(game.genres, ['Adventure']);
+    assert.deepEqual(game.platforms, ['Nintendo Switch']);
+
+    assert.include(game.gameStores[0], {
       label: 'Nintendo',
       accent: true,
     });
@@ -168,18 +172,19 @@ describe('normalizeMedia', () => {
       tags: [{ name: 'edm' }, { name: 'progressive house' }],
     });
 
-    expect(music).toMatchObject({
+    assert.include(music, {
       id: 'musicbrainz:music:mb-123',
       type: 'music',
       title: 'Animals',
       year: '2013',
       rating: '9.0',
       synopsis: 'Single',
-      genres: ['edm', 'progressive house'],
       poster: '/img/fallbacks/music-fallback.webp',
       backdrop: '/img/fallbacks/music-fallback.webp',
       source: 'musicbrainz',
     });
+
+    assert.deepEqual(music.genres, ['edm', 'progressive house']);
   });
 
   test('normaliza un videojuego de RAWG', () => {
@@ -196,7 +201,7 @@ describe('normalizeMedia', () => {
       stores: [{ url: 'https://store.steampowered.com/app/1091500' }],
     });
 
-    expect(game).toMatchObject({
+    assert.include(game, {
       id: 'rawg:game:123',
       type: 'game',
       title: 'Cyberpunk 2077',
@@ -205,12 +210,13 @@ describe('normalizeMedia', () => {
       poster: 'https://img.com/cyberpunk.jpg',
       backdrop: 'https://img.com/cyberpunk-bg.jpg',
       synopsis: 'RPG futurista',
-      genres: ['RPG'],
-      platforms: ['PC'],
       source: 'rawg',
     });
 
-    expect(game.gameStores[0]).toMatchObject({
+    assert.deepEqual(game.genres, ['RPG']);
+    assert.deepEqual(game.platforms, ['PC']);
+
+    assert.include(game.gameStores[0], {
       label: 'Steam',
       accent: true,
     });
@@ -231,7 +237,7 @@ describe('normalizeMedia', () => {
       },
     });
 
-    expect(book).toMatchObject({
+    assert.include(book, {
       id: 'openlibrary:book:google-book-1',
       type: 'book',
       title: 'Harry Potter',
@@ -240,9 +246,10 @@ describe('normalizeMedia', () => {
       poster: 'https://books.google.com/cover.jpg',
       backdrop: 'https://books.google.com/cover.jpg',
       synopsis: 'Un joven mago descubre su destino.',
-      genres: ['Fantasy'],
       source: 'openlibrary',
     });
+
+    assert.deepEqual(book.genres, ['Fantasy']);
   });
 
   test('normalizadores usan valores fallback cuando faltan datos', () => {
@@ -250,19 +257,55 @@ describe('normalizeMedia', () => {
     const rawg = normalizeRawgGame({ id: 2 });
     const googleBook = normalizeGoogleBook({ id: 'book-1' });
 
-    expect(igdb.title).toBe('Sin título');
-    expect(igdb.year).toBe('—');
-    expect(igdb.rating).toBe('—');
-    expect(igdb.poster).toBe('/img/fallbacks/videogame-fallback.webp');
+    assert.equal(igdb.title, 'Sin título');
+    assert.equal(igdb.year, '—');
+    assert.equal(igdb.rating, '—');
+    assert.equal(igdb.poster, '/img/fallbacks/videogame-fallback.webp');
 
-    expect(rawg.title).toBe('Sin título');
-    expect(rawg.year).toBe('—');
-    expect(rawg.rating).toBe('—');
-    expect(rawg.poster).toBeNull();
+    assert.equal(rawg.title, 'Sin título');
+    assert.equal(rawg.year, '—');
+    assert.equal(rawg.rating, '—');
+    assert.isNull(rawg.poster);
 
-    expect(googleBook.title).toBe('Sin título');
-    expect(googleBook.year).toBe('—');
-    expect(googleBook.rating).toBe('—');
-    expect(googleBook.poster).toBe('/img/fallbacks/book-fallback.webp');
+    assert.equal(googleBook.title, 'Sin título');
+    assert.equal(googleBook.year, '—');
+    assert.equal(googleBook.rating, '—');
+    assert.equal(googleBook.poster, '/img/fallbacks/book-fallback.webp');
+  });
+
+  test('normaliza un work de subject de OpenLibrary', () => {
+    const book = normalizeOpenLibrarySubjectWork({
+      key: '/works/OL999W',
+      title: 'Libro subject',
+      cover_id: 555,
+      subject: ['Fantasy', 'Magic', 'Adventure'],
+    });
+
+    assert.include(book, {
+      id: 'openlibrary:book:OL999W',
+      type: 'book',
+      title: 'Libro subject',
+      year: '—',
+      rating: '—',
+      synopsis: '',
+      saga: null,
+      source: 'openlibrary',
+    });
+
+    assert.deepEqual(book.genres, ['Fantasy', 'Magic', 'Adventure']);
+    assert.include(book.poster, '555-M.jpg');
+    assert.include(book.backdrop, '555-L.jpg');
+  });
+
+  test('normaliza un work de subject de OpenLibrary con fallbacks', () => {
+    const book = normalizeOpenLibrarySubjectWork({});
+
+    assert.equal(book.type, 'book');
+    assert.equal(book.title, 'Sin título');
+    assert.equal(book.year, '—');
+    assert.equal(book.rating, '—');
+    assert.deepEqual(book.genres, []);
+    assert.equal(book.poster, '/img/fallbacks/book-fallback.webp');
+    assert.equal(book.backdrop, '/img/fallbacks/book-fallback.webp');
   });
 });
