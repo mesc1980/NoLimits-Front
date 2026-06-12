@@ -42,3 +42,7 @@ pnpm-debug.log*
 # ── Tests ────────────────────────────────────────────────────
 coverage/
 .nyc_output/
+
+# ── Playwright ────────────────────────────────────────────────────
+test-results/
+playwright-report/
