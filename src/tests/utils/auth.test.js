@@ -1,4 +1,4 @@
-import { describe, expect, test, vi, beforeEach } from 'vitest';
+import { describe, test, beforeEach, assert } from 'vitest';
 
 import { cerrarSesion } from '@/utils/auth';
 
@@ -22,22 +22,22 @@ describe('auth utils', () => {
 
     cerrarSesion();
 
-    expect(localStorage.getItem('nl_auth')).toBeNull();
-    expect(localStorage.getItem('nl_user')).toBeNull();
-    expect(localStorage.getItem('nl_role')).toBeNull();
-    expect(localStorage.getItem('nl_token')).toBeNull();
-    expect(localStorage.getItem('nl_supabase_token')).toBeNull();
+    assert.isNull(localStorage.getItem('nl_auth'));
+    assert.isNull(localStorage.getItem('nl_user'));
+    assert.isNull(localStorage.getItem('nl_role'));
+    assert.isNull(localStorage.getItem('nl_token'));
+    assert.isNull(localStorage.getItem('nl_supabase_token'));
   });
 
   test('redirige a la ruta indicada', () => {
     cerrarSesion('/login');
 
-    expect(window.location.href).toBe('/login');
+    assert.equal(window.location.href, '/login');
   });
 
   test('redirige a "/" por defecto', () => {
     cerrarSesion();
 
-    expect(window.location.href).toBe('/');
+    assert.equal(window.location.href, '/');
   });
 });

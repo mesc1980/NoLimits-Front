@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
-import { describe, expect, test, vi } from 'vitest';
+import { describe, test, vi, assert } from 'vitest';
 import SearchResults from '@/pages/SearchResults';
 import { MEDIA_TYPES } from '@/utils/constants';
 
@@ -85,22 +85,22 @@ describe('SearchResults - tests de regresión', () => {
       </MemoryRouter>
     );
 
-    expect(screen.getByText('6')).toBeInTheDocument();
-    expect(screen.getByText(/test/i)).toBeInTheDocument();
+    assert.isNotNull(screen.getByText('6'));
+    assert.isNotNull(screen.getByText(/test/i));
 
-    expect(screen.getByText('Películas')).toBeInTheDocument();
-    expect(screen.getByText('Series')).toBeInTheDocument();
-    expect(screen.getByText('Anime')).toBeInTheDocument();
-    expect(screen.getByText('Videojuegos')).toBeInTheDocument();
-    expect(screen.getByText('Libros')).toBeInTheDocument();
-    expect(screen.getByText('Música')).toBeInTheDocument();
+    assert.isNotNull(screen.getByText('Películas'));
+    assert.isNotNull(screen.getByText('Series'));
+    assert.isNotNull(screen.getByText('Anime'));
+    assert.isNotNull(screen.getByText('Videojuegos'));
+    assert.isNotNull(screen.getByText('Libros'));
+    assert.isNotNull(screen.getByText('Música'));
 
-    expect(screen.getByText('Interestelar')).toBeInTheDocument();
-    expect(screen.getByText('Breaking Bad')).toBeInTheDocument();
-    expect(screen.getByText('Naruto')).toBeInTheDocument();
-    expect(screen.getByText('Cyberpunk 2077')).toBeInTheDocument();
-    expect(screen.getByText('Dune')).toBeInTheDocument();
-    expect(screen.getByText('Random Access Memories')).toBeInTheDocument();
+    assert.isNotNull(screen.getByText('Interestelar'));
+    assert.isNotNull(screen.getByText('Breaking Bad'));
+    assert.isNotNull(screen.getByText('Naruto'));
+    assert.isNotNull(screen.getByText('Cyberpunk 2077'));
+    assert.isNotNull(screen.getByText('Dune'));
+    assert.isNotNull(screen.getByText('Random Access Memories'));
   });
 
   test('muestra estado vacío cuando no hay resultados para una búsqueda', () => {
@@ -116,9 +116,9 @@ describe('SearchResults - tests de regresión', () => {
       </MemoryRouter>
     );
 
-    expect(screen.getByText('Sin resultados')).toBeInTheDocument();
-    expect(screen.getByText(/No se encontraron resultados para/i)).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /explorar saga/i })).toBeInTheDocument();
+    assert.isNotNull(screen.getByText('Sin resultados'));
+    assert.isNotNull(screen.getByText(/No se encontraron resultados para/i));
+    assert.isNotNull(screen.getByRole('button', { name: /explorar saga/i }));
   });
 
   test('muestra skeleton mientras carga la búsqueda', () => {
@@ -134,7 +134,7 @@ describe('SearchResults - tests de regresión', () => {
       </MemoryRouter>
     );
 
-    expect(screen.getByTestId('skeleton-card')).toBeInTheDocument();
-    expect(screen.getByText(/Buscando/i)).toBeInTheDocument();
+    assert.isNotNull(screen.getByTestId('skeleton-card'));
+    assert.isNotNull(screen.getByText(/Buscando/i));
   });
 });

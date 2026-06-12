@@ -1,4 +1,4 @@
-import { describe, expect, test, vi, beforeEach } from 'vitest';
+import { describe, test, vi, beforeEach, assert } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 
@@ -50,15 +50,15 @@ describe('AnimeCard', () => {
   test('renderiza título, año, poster y rating', () => {
     renderAnimeCard();
 
-    expect(screen.getByText('Fullmetal Alchemist')).toBeInTheDocument();
-    expect(screen.getByText(/2009/)).toBeInTheDocument();
+    assert.isNotNull(screen.getByText('Fullmetal Alchemist'));
+    assert.isNotNull(screen.getByText(/2009/));
 
-    expect(screen.getByAltText('Poster de Fullmetal Alchemist')).toHaveAttribute(
-      'src',
+    assert.equal(
+      screen.getByAltText('Poster de Fullmetal Alchemist').getAttribute('src'),
       '/poster-fma.jpg'
     );
 
-    expect(screen.getByText(/9.1/)).toBeInTheDocument();
+    assert.isNotNull(screen.getByText(/9.1/));
   });
 
   test('ejecuta onClick personalizado al presionar la card', () => {
@@ -70,7 +70,7 @@ describe('AnimeCard', () => {
       screen.getByRole('button', { name: 'Ver Fullmetal Alchemist' })
     );
 
-    expect(onClick).toHaveBeenCalledWith(obraMock);
+    assert.deepEqual(onClick.mock.calls[0], [obraMock]);
   });
 
   test('navega al detalle si no recibe onClick', () => {
@@ -80,7 +80,7 @@ describe('AnimeCard', () => {
       screen.getByRole('button', { name: 'Ver Fullmetal Alchemist' })
     );
 
-    expect(mockNavigate).toHaveBeenCalledWith('/detail/jikan-anime-5114');
+    assert.deepEqual(mockNavigate.mock.calls[0], ['/detail/jikan-anime-5114']);
   });
 
   test('también navega al detalle al presionar Enter', () => {
@@ -91,7 +91,7 @@ describe('AnimeCard', () => {
       { key: 'Enter' }
     );
 
-    expect(mockNavigate).toHaveBeenCalledWith('/detail/jikan-anime-5114');
+    assert.deepEqual(mockNavigate.mock.calls[0], ['/detail/jikan-anime-5114']);
   });
 
   test('oculta el botón de favoritos cuando hideFavoriteButton es true', () => {
@@ -99,9 +99,7 @@ describe('AnimeCard', () => {
       hideFavoriteButton: true,
     });
 
-    expect(
-      screen.queryByLabelText('Agregar a favoritos')
-    ).not.toBeInTheDocument();
+    assert.isNull(screen.queryByLabelText('Agregar a favoritos'));
   });
 
   test('redirige a login si intenta guardar favorito sin sesión', () => {
@@ -109,15 +107,13 @@ describe('AnimeCard', () => {
 
     renderAnimeCard();
 
-    fireEvent.click(
-      screen.getByLabelText('Agregar a favoritos')
-    );
+    fireEvent.click(screen.getByLabelText('Agregar a favoritos'));
 
-    expect(alertMock).toHaveBeenCalledWith(
-      'Debes iniciar sesión para guardar en favoritos'
-    );
+    assert.deepEqual(alertMock.mock.calls[0], [
+      'Debes iniciar sesión para guardar en favoritos',
+    ]);
 
-    expect(mockNavigate).toHaveBeenCalledWith('/login');
+    assert.deepEqual(mockNavigate.mock.calls[0], ['/login']);
 
     alertMock.mockRestore();
   });
@@ -135,10 +131,8 @@ describe('AnimeCard', () => {
 
     renderAnimeCard();
 
-    fireEvent.click(
-      screen.getByLabelText('Agregar a favoritos')
-    );
+    fireEvent.click(screen.getByLabelText('Agregar a favoritos'));
 
-    expect(mockToggleList).toHaveBeenCalledWith(obraMock);
+    assert.deepEqual(mockToggleList.mock.calls[0], [obraMock]);
   });
 });

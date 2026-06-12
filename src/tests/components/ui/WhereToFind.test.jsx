@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import { describe, expect, test } from 'vitest';
+import { describe, test, assert } from 'vitest';
 import WhereToFind from '@/components/ui/WhereToFind';
 import { MEDIA_TYPES } from '@/utils/constants';
 
@@ -20,8 +20,11 @@ describe('WhereToFind - tests de regresión', () => {
 
     const link = screen.getByRole('link', { name: /mercado libre/i });
 
-    expect(link).toBeInTheDocument();
-    expect(link).toHaveAttribute('href', 'https://www.mercadolibre.cl/producto-prueba');
+    assert.isNotNull(link);
+    assert.equal(
+      link.getAttribute('href'),
+      'https://www.mercadolibre.cl/producto-prueba'
+    );
   });
 
   test('muestra Steam cuando un videojuego tiene plataforma PC', () => {
@@ -33,13 +36,13 @@ describe('WhereToFind - tests de regresión', () => {
 
     render(<WhereToFind obra={obra} />);
 
-    expect(screen.getByText('PC')).toBeInTheDocument();
+    assert.isNotNull(screen.getByText('PC'));
 
     const steamLink = screen.getByRole('link', { name: /steam/i });
 
-    expect(steamLink).toBeInTheDocument();
-    expect(steamLink).toHaveAttribute(
-      'href',
+    assert.isNotNull(steamLink);
+    assert.equal(
+      steamLink.getAttribute('href'),
       'https://store.steampowered.com/search/?term=Cyberpunk%202077'
     );
   });
@@ -55,8 +58,11 @@ describe('WhereToFind - tests de regresión', () => {
 
     const link = screen.getByRole('link', { name: /ver en google books/i });
 
-    expect(link).toBeInTheDocument();
-    expect(link).toHaveAttribute('href', 'https://books.google.com/books?id=abc123');
+    assert.isNotNull(link);
+    assert.equal(
+      link.getAttribute('href'),
+      'https://books.google.com/books?id=abc123'
+    );
   });
 
   test('muestra Crunchyroll y Netflix para anime', () => {
@@ -67,8 +73,8 @@ describe('WhereToFind - tests de regresión', () => {
 
     render(<WhereToFind obra={obra} />);
 
-    expect(screen.getByRole('link', { name: /crunchyroll/i })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /netflix/i })).toBeInTheDocument();
+    assert.isNotNull(screen.getByRole('link', { name: /crunchyroll/i }));
+    assert.isNotNull(screen.getByRole('link', { name: /netflix/i }));
   });
 
   test('muestra JustWatch y Buscar online para película en modo compact', () => {
@@ -79,8 +85,8 @@ describe('WhereToFind - tests de regresión', () => {
 
     render(<WhereToFind obra={obra} compact />);
 
-    expect(screen.getByRole('link', { name: /justwatch/i })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /buscar online/i })).toBeInTheDocument();
+    assert.isNotNull(screen.getByRole('link', { name: /justwatch/i }));
+    assert.isNotNull(screen.getByRole('link', { name: /buscar online/i }));
   });
 
   test('muestra proveedores de streaming y excluye Google Play Movies', () => {
@@ -107,9 +113,9 @@ describe('WhereToFind - tests de regresión', () => {
 
     render(<WhereToFind obra={obra} providers={providers} />);
 
-    expect(screen.getByRole('link', { name: /netflix/i })).toBeInTheDocument();
-    expect(screen.queryByText(/google play movies/i)).not.toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /buscar online/i })).toBeInTheDocument();
+    assert.isNotNull(screen.getByRole('link', { name: /netflix/i }));
+    assert.isNull(screen.queryByText(/google play movies/i));
+    assert.isNotNull(screen.getByRole('link', { name: /buscar online/i }));
   });
 
   test('muestra MusicBrainz para una obra de tipo música', () => {
@@ -123,10 +129,96 @@ describe('WhereToFind - tests de regresión', () => {
 
     const link = screen.getByRole('link', { name: /ver en musicbrainz/i });
 
-    expect(link).toBeInTheDocument();
-    expect(link).toHaveAttribute(
-      'href',
+    assert.isNotNull(link);
+    assert.equal(
+      link.getAttribute('href'),
       'https://musicbrainz.org/release-group/mbid123'
     );
+  });
+  
+  test('retorna null cuando no recibe obra', () => {
+    const { container } = render(<WhereToFind obra={null} />);
+
+    assert.equal(container.textContent, '');
+  });
+
+  test('muestra tiendas directas cuando videojuego tiene gameStores', () => {
+    const obra = {
+      title: 'Zelda',
+      type: MEDIA_TYPES.GAME,
+      platforms: ['Nintendo Switch', 'PC'],
+      gameStores: [
+        {
+          url: 'https://www.nintendo.com/zelda',
+          label: 'Nintendo',
+          accent: true,
+        },
+      ],
+    };
+
+    render(<WhereToFind obra={obra} />);
+
+    assert.isNotNull(screen.getByText('NSW'));
+    assert.isNotNull(screen.getByText('PC'));
+    assert.isNotNull(screen.getByRole('link', { name: /nintendo/i }));
+  });
+
+  test('muestra fallback de búsqueda si videojuego no tiene plataformas conocidas', () => {
+    const obra = {
+      title: 'Juego raro',
+      type: MEDIA_TYPES.GAME,
+      platforms: ['Plataforma inventada'],
+    };
+
+    render(<WhereToFind obra={obra} />);
+
+    assert.isNotNull(screen.getByText('Plataf'));
+    assert.isNotNull(
+      screen.getByRole('link', { name: /buscar dónde comprar/i })
+    );
+  });
+
+  test('muestra JustWatch cuando providers no trae servicios', () => {
+    const obra = {
+      title: 'Película sin providers',
+      type: MEDIA_TYPES.MOVIE,
+    };
+
+    render(
+      <WhereToFind
+        obra={obra}
+        providers={{
+          link: 'https://www.justwatch.com/mx/movie/test',
+          flatrate: [],
+        }}
+      />
+    );
+
+    assert.isNotNull(screen.getByRole('link', { name: /justwatch/i }));
+    assert.isNotNull(screen.getByRole('link', { name: /buscar online/i }));
+  });
+
+  test('muestra fallback dónde verlo cuando película no está en modo compact ni providers', () => {
+    const obra = {
+      title: 'Película fallback',
+      type: MEDIA_TYPES.MOVIE,
+    };
+
+    render(<WhereToFind obra={obra} />);
+
+    assert.isNotNull(screen.getByRole('link', { name: /dónde verlo/i }));
+  });
+
+  test('retorna null para tipo no soportado', () => {
+    const { container } = render(
+      <WhereToFind
+        obra={{
+          title: 'Tipo raro',
+          type: 'unknown',
+        }}
+      />
+    );
+
+    assert.equal(container.textContent, '');
   });
 });

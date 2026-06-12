@@ -1,4 +1,4 @@
-import { describe, expect, test, vi, beforeEach } from 'vitest';
+import { describe, test, vi, beforeEach, assert } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 
@@ -49,21 +49,15 @@ describe('GameCard', () => {
   test('renderiza título, año, poster y rating', () => {
     renderGameCard();
 
-    expect(
-      screen.getByText('Grand Theft Auto V')
-    ).toBeInTheDocument();
+    assert.isNotNull(screen.getByText('Grand Theft Auto V'));
+    assert.isNotNull(screen.getByText(/2013/));
 
-    expect(
-      screen.getByText(/2013/)
-    ).toBeInTheDocument();
+    assert.equal(
+      screen.getByAltText('Poster de Grand Theft Auto V').getAttribute('src'),
+      '/gta-v.jpg'
+    );
 
-    expect(
-      screen.getByAltText('Poster de Grand Theft Auto V')
-    ).toHaveAttribute('src', '/gta-v.jpg');
-
-    expect(
-      screen.getByText(/4.7/)
-    ).toBeInTheDocument();
+    assert.isNotNull(screen.getByText(/4.7/));
   });
 
   test('ejecuta onClick personalizado', () => {
@@ -77,7 +71,7 @@ describe('GameCard', () => {
       })
     );
 
-    expect(onClick).toHaveBeenCalledWith(obraMock);
+    assert.deepEqual(onClick.mock.calls[0], [obraMock]);
   });
 
   test('navega al detalle si no recibe onClick', () => {
@@ -89,9 +83,7 @@ describe('GameCard', () => {
       })
     );
 
-    expect(mockNavigate).toHaveBeenCalledWith(
-      '/detail/rawg-game-3498'
-    );
+    assert.deepEqual(mockNavigate.mock.calls[0], ['/detail/rawg-game-3498']);
   });
 
   test('navega al detalle al presionar Enter', () => {
@@ -106,20 +98,14 @@ describe('GameCard', () => {
       }
     );
 
-    expect(mockNavigate).toHaveBeenCalledWith(
-      '/detail/rawg-game-3498'
-    );
+    assert.deepEqual(mockNavigate.mock.calls[0], ['/detail/rawg-game-3498']);
   });
 
   test('guarda en mi lista al hacer click en el botón', () => {
     renderGameCard();
 
-    fireEvent.click(
-      screen.getByLabelText('Guardar en mi lista')
-    );
+    fireEvent.click(screen.getByLabelText('Guardar en mi lista'));
 
-    expect(mockToggleList).toHaveBeenCalledWith(
-      obraMock
-    );
+    assert.deepEqual(mockToggleList.mock.calls[0], [obraMock]);
   });
 });

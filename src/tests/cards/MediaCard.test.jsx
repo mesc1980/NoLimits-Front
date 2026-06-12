@@ -1,4 +1,4 @@
-import { describe, expect, test, vi, beforeEach } from 'vitest';
+import { describe, test, vi, beforeEach, assert } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 
@@ -55,15 +55,15 @@ describe('MediaCard', () => {
   test('renderiza título, año, poster y rating', () => {
     renderMediaCard();
 
-    expect(screen.getByText('Star Wars')).toBeInTheDocument();
-    expect(screen.getByText(/1977/)).toBeInTheDocument();
+    assert.isNotNull(screen.getByText('Star Wars'));
+    assert.isNotNull(screen.getByText(/1977/));
 
-    expect(screen.getByAltText('Poster de Star Wars')).toHaveAttribute(
-      'src',
+    assert.equal(
+      screen.getByAltText('Poster de Star Wars').getAttribute('src'),
       '/poster-star-wars.jpg'
     );
 
-    expect(screen.getByText(/8.6/)).toBeInTheDocument();
+    assert.isNotNull(screen.getByText(/8.6/));
   });
 
   test('ejecuta onClick personalizado al presionar la card', () => {
@@ -71,21 +71,17 @@ describe('MediaCard', () => {
 
     renderMediaCard({ onClick });
 
-    fireEvent.click(
-      screen.getByRole('button', { name: 'Ver Star Wars' })
-    );
+    fireEvent.click(screen.getByRole('button', { name: 'Ver Star Wars' }));
 
-    expect(onClick).toHaveBeenCalledWith(obraMock);
+    assert.deepEqual(onClick.mock.calls[0], [obraMock]);
   });
 
   test('navega al detalle si no recibe onClick', () => {
     renderMediaCard();
 
-    fireEvent.click(
-      screen.getByRole('button', { name: 'Ver Star Wars' })
-    );
+    fireEvent.click(screen.getByRole('button', { name: 'Ver Star Wars' }));
 
-    expect(mockNavigate).toHaveBeenCalledWith('/detail/tmdb-movie-1893');
+    assert.deepEqual(mockNavigate.mock.calls[0], ['/detail/tmdb-movie-1893']);
   });
 
   test('también navega al detalle al presionar Enter', () => {
@@ -96,7 +92,7 @@ describe('MediaCard', () => {
       { key: 'Enter' }
     );
 
-    expect(mockNavigate).toHaveBeenCalledWith('/detail/tmdb-movie-1893');
+    assert.deepEqual(mockNavigate.mock.calls[0], ['/detail/tmdb-movie-1893']);
   });
 
   test('oculta el botón de favoritos cuando hideFavoriteButton es true', () => {
@@ -104,9 +100,7 @@ describe('MediaCard', () => {
       hideFavoriteButton: true,
     });
 
-    expect(
-      screen.queryByLabelText('Agregar a favoritos')
-    ).not.toBeInTheDocument();
+    assert.isNull(screen.queryByLabelText('Agregar a favoritos'));
   });
 
   test('redirige a login si intenta guardar favorito sin sesión', () => {
@@ -114,15 +108,13 @@ describe('MediaCard', () => {
 
     renderMediaCard();
 
-    fireEvent.click(
-      screen.getByLabelText('Agregar a favoritos')
-    );
+    fireEvent.click(screen.getByLabelText('Agregar a favoritos'));
 
-    expect(alertMock).toHaveBeenCalledWith(
-      'Debes iniciar sesión para guardar en favoritos'
-    );
+    assert.deepEqual(alertMock.mock.calls[0], [
+      'Debes iniciar sesión para guardar en favoritos',
+    ]);
 
-    expect(mockNavigate).toHaveBeenCalledWith('/login');
+    assert.deepEqual(mockNavigate.mock.calls[0], ['/login']);
 
     alertMock.mockRestore();
   });
@@ -140,11 +132,9 @@ describe('MediaCard', () => {
 
     renderMediaCard();
 
-    fireEvent.click(
-      screen.getByLabelText('Agregar a favoritos')
-    );
+    fireEvent.click(screen.getByLabelText('Agregar a favoritos'));
 
-    expect(mockToggleList).toHaveBeenCalledWith(obraMock);
+    assert.deepEqual(mockToggleList.mock.calls[0], [obraMock]);
   });
 
   test('muestra alerta si no puede identificar usuario', () => {
@@ -161,15 +151,13 @@ describe('MediaCard', () => {
 
     renderMediaCard();
 
-    fireEvent.click(
-      screen.getByLabelText('Agregar a favoritos')
-    );
+    fireEvent.click(screen.getByLabelText('Agregar a favoritos'));
 
-    expect(alertMock).toHaveBeenCalledWith(
-      'No se pudo identificar tu usuario. Cierra sesión e inicia sesión otra vez.'
-    );
+    assert.deepEqual(alertMock.mock.calls[0], [
+      'No se pudo identificar tu usuario. Cierra sesión e inicia sesión otra vez.',
+    ]);
 
-    expect(mockToggleList).not.toHaveBeenCalled();
+    assert.equal(mockToggleList.mock.calls.length, 0);
 
     alertMock.mockRestore();
   });
@@ -182,7 +170,7 @@ describe('MediaCard', () => {
       },
     });
 
-    expect(screen.queryByText(/8.6/)).not.toBeInTheDocument();
+    assert.isNull(screen.queryByText(/8.6/));
   });
 
   test('usa fallback cuando falla la imagen', () => {
@@ -192,7 +180,7 @@ describe('MediaCard', () => {
 
     fireEvent.error(img);
 
-    expect(img.getAttribute('src')).toContain('data:image/svg+xml');
+    assert.include(img.getAttribute('src'), 'data:image/svg+xml');
   });
 
   test('renderiza sin año visible cuando year es guion', () => {
@@ -203,7 +191,7 @@ describe('MediaCard', () => {
       },
     });
 
-    expect(screen.queryByText(/1977/)).not.toBeInTheDocument();
+    assert.isNull(screen.queryByText(/1977/));
   });
 
   test('aplica estilo especial cuando el tipo es game', () => {
@@ -216,8 +204,6 @@ describe('MediaCard', () => {
 
     const img = screen.getByAltText('Poster de Star Wars');
 
-    expect(img).toHaveStyle({
-      aspectRatio: '4/3',
-    });
+    assert.include(img.getAttribute('style'), 'aspect-ratio: 4/3');
   });
 });

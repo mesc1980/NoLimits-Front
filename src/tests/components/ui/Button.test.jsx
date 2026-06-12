@@ -1,4 +1,4 @@
-import { describe, expect, test, vi } from 'vitest';
+import { describe, test, vi, assert } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 
 import Button from '@/components/ui/Button';
@@ -11,9 +11,9 @@ describe('Button', () => {
       </Button>
     );
 
-    expect(
+    assert.isNotNull(
       screen.getByText('Ver detalle')
-    ).toBeInTheDocument();
+    );
   });
 
   test('aplica variante primary por defecto', () => {
@@ -25,7 +25,10 @@ describe('Button', () => {
 
     const button = screen.getByRole('button');
 
-    expect(button.className).toContain('nl-btn--primary');
+    assert.include(
+      button.className,
+      'nl-btn--primary'
+    );
   });
 
   test('aplica variante secondary', () => {
@@ -37,7 +40,10 @@ describe('Button', () => {
 
     const button = screen.getByRole('button');
 
-    expect(button.className).toContain('nl-btn--secondary');
+    assert.include(
+      button.className,
+      'nl-btn--secondary'
+    );
   });
 
   test('aplica tamaño lg', () => {
@@ -49,7 +55,10 @@ describe('Button', () => {
 
     const button = screen.getByRole('button');
 
-    expect(button.className).toContain('nl-btn--lg');
+    assert.include(
+      button.className,
+      'nl-btn--lg'
+    );
   });
 
   test('ejecuta onClick al hacer click', () => {
@@ -65,7 +74,10 @@ describe('Button', () => {
       screen.getByRole('button')
     );
 
-    expect(handleClick).toHaveBeenCalledTimes(1);
+    assert.equal(
+      handleClick.mock.calls.length,
+      1
+    );
   });
 
   test('puede estar deshabilitado', () => {
@@ -75,8 +87,8 @@ describe('Button', () => {
       </Button>
     );
 
-    expect(
-      screen.getByRole('button')
-    ).toBeDisabled();
+    assert.isTrue(
+      screen.getByRole('button').disabled
+    );
   });
 });
