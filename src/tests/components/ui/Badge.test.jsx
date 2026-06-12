@@ -1,4 +1,4 @@
-import { describe, expect, test } from 'vitest';
+import { describe, test, assert } from 'vitest';
 import { render, screen } from '@testing-library/react';
 
 import Badge from '@/components/ui/Badge';
@@ -9,9 +9,9 @@ describe('Badge', () => {
       <Badge type="movie" />
     );
 
-    expect(
+    assert.isNotNull(
       screen.getByText('Película')
-    ).toBeInTheDocument();
+    );
   });
 
   test('renderiza label personalizada', () => {
@@ -22,9 +22,9 @@ describe('Badge', () => {
       />
     );
 
-    expect(
+    assert.isNotNull(
       screen.getByText('Custom Label')
-    ).toBeInTheDocument();
+    );
   });
 
   test('renderiza badge de rating', () => {
@@ -35,9 +35,9 @@ describe('Badge', () => {
       />
     );
 
-    expect(
+    assert.isNotNull(
       screen.getByText(/8.7/)
-    ).toBeInTheDocument();
+    );
   });
 
   test('aplica clase de rating correctamente', () => {
@@ -50,7 +50,10 @@ describe('Badge', () => {
 
     const badge = screen.getByText(/9.1/);
 
-    expect(badge.className).toContain('nl-badge--rating');
+    assert.include(
+      badge.className,
+      'nl-badge--rating'
+    );
   });
 
   test('aplica clase correspondiente al tipo', () => {
@@ -60,6 +63,9 @@ describe('Badge', () => {
 
     const badge = screen.getByText('Videojuego');
 
-    expect(badge.className).toContain('nl-badge');
+    assert.include(
+      badge.className,
+      'nl-badge'
+    );
   });
 });

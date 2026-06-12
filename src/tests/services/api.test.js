@@ -1,4 +1,4 @@
-import { describe, expect, test, vi, beforeEach, afterEach } from 'vitest';
+import { describe, test, vi, beforeEach, afterEach, assert } from 'vitest';
 
 import { apiFetch } from '@/services/api';
 
@@ -30,16 +30,16 @@ describe('apiFetch', () => {
 
     const result = await apiFetch('https://api.test.com/movies');
 
-    expect(result).toEqual(dataMock);
+    assert.deepEqual(result, dataMock);
 
-    expect(global.fetch).toHaveBeenCalledWith(
+    assert.deepEqual(global.fetch.mock.calls[0], [
       'https://api.test.com/movies',
       {
         headers: {
           'Content-Type': 'application/json',
         },
-      }
-    );
+      },
+    ]);
   });
 
   test('mezcla headers personalizados con Content-Type', async () => {
@@ -58,17 +58,17 @@ describe('apiFetch', () => {
       },
     });
 
-    expect(result).toEqual(dataMock);
+    assert.deepEqual(result, dataMock);
 
-    expect(global.fetch).toHaveBeenCalledWith(
+    assert.deepEqual(global.fetch.mock.calls[0], [
       'https://api.test.com/protected',
       {
         headers: {
           'Content-Type': 'application/json',
           Authorization: 'Bearer token-falso',
         },
-      }
-    );
+      },
+    ]);
   });
 
   test('mantiene opciones adicionales como method y body', async () => {
@@ -90,9 +90,9 @@ describe('apiFetch', () => {
       body,
     });
 
-    expect(result).toEqual(dataMock);
+    assert.deepEqual(result, dataMock);
 
-    expect(global.fetch).toHaveBeenCalledWith(
+    assert.deepEqual(global.fetch.mock.calls[0], [
       'https://api.test.com/obras',
       {
         method: 'POST',
@@ -100,8 +100,8 @@ describe('apiFetch', () => {
         headers: {
           'Content-Type': 'application/json',
         },
-      }
-    );
+      },
+    ]);
   });
 
   test('retorna data vacía cuando la respuesta no es ok', async () => {
@@ -117,13 +117,13 @@ describe('apiFetch', () => {
 
     const result = await apiFetch('https://api.test.com/error');
 
-    expect(result).toEqual({
+    assert.deepEqual(result, {
       data: [],
     });
 
-    expect(warnMock).toHaveBeenCalledWith(
-      '⚠️ API error 500: https://api.test.com/error'
-    );
+    assert.deepEqual(warnMock.mock.calls[0], [
+      '⚠️ API error 500: https://api.test.com/error',
+    ]);
 
     warnMock.mockRestore();
   });
@@ -139,14 +139,14 @@ describe('apiFetch', () => {
 
     const result = await apiFetch('https://api.test.com/falla');
 
-    expect(result).toEqual({
+    assert.deepEqual(result, {
       data: [],
     });
 
-    expect(warnMock).toHaveBeenCalledWith(
+    assert.deepEqual(warnMock.mock.calls[0], [
       '⚠️ Error en apiFetch:',
-      error
-    );
+      error,
+    ]);
 
     warnMock.mockRestore();
   });

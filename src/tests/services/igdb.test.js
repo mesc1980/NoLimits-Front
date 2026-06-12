@@ -1,4 +1,4 @@
-import { describe, expect, test, vi, beforeEach } from 'vitest';
+import { describe, test, vi, beforeEach, assert } from 'vitest';
 
 import {
   igdbImageUrl,
@@ -16,15 +16,16 @@ vi.mock('@/services/api', () => ({
 
 describe('igdbImageUrl', () => {
   test('retorna null si no recibe url', () => {
-    expect(igdbImageUrl()).toBeNull();
-    expect(igdbImageUrl(null)).toBeNull();
+    assert.isNull(igdbImageUrl());
+    assert.isNull(igdbImageUrl(null));
   });
 
   test('convierte imagen t_thumb a t_cover_big por defecto', () => {
     const url =
       '//images.igdb.com/igdb/image/upload/t_thumb/co1wyy.jpg';
 
-    expect(igdbImageUrl(url)).toBe(
+    assert.equal(
+      igdbImageUrl(url),
       'https://images.igdb.com/igdb/image/upload/t_cover_big/co1wyy.jpg'
     );
   });
@@ -33,7 +34,8 @@ describe('igdbImageUrl', () => {
     const url =
       '//images.igdb.com/igdb/image/upload/t_thumb/co1wyy.jpg';
 
-    expect(igdbImageUrl(url, 't_1080p')).toBe(
+    assert.equal(
+      igdbImageUrl(url, 't_1080p'),
       'https://images.igdb.com/igdb/image/upload/t_1080p/co1wyy.jpg'
     );
   });
@@ -56,20 +58,17 @@ describe('IGDB services', () => {
 
     const result = await fetchTopGames();
 
-    expect(result).toEqual(gamesMock);
+    assert.deepEqual(result, gamesMock);
 
-    expect(apiFetch).toHaveBeenCalledWith(
-      '/api/igdb/games',
-      expect.objectContaining({
-        method: 'POST',
-        headers: {
-          'Content-Type': 'text/plain',
-        },
-      })
-    );
+    assert.equal(apiFetch.mock.calls[0][0], '/api/igdb/games');
+    assert.equal(apiFetch.mock.calls[0][1].method, 'POST');
 
-    expect(apiFetch.mock.calls[0][1].body).toContain('fields name');
-    expect(apiFetch.mock.calls[0][1].body).toContain('limit 18');
+    assert.deepEqual(apiFetch.mock.calls[0][1].headers, {
+      'Content-Type': 'text/plain',
+    });
+
+    assert.include(apiFetch.mock.calls[0][1].body, 'fields name');
+    assert.include(apiFetch.mock.calls[0][1].body, 'limit 18');
   });
 
   test('searchGames busca juegos y limpia comillas dobles', async () => {
@@ -84,23 +83,21 @@ describe('IGDB services', () => {
 
     const result = await searchGames('The "Legend" of Zelda');
 
-    expect(result).toEqual(gamesMock);
+    assert.deepEqual(result, gamesMock);
 
-    expect(apiFetch).toHaveBeenCalledWith(
-      '/api/igdb/games',
-      expect.objectContaining({
-        method: 'POST',
-        headers: {
-          'Content-Type': 'text/plain',
-        },
-      })
-    );
+    assert.equal(apiFetch.mock.calls[0][0], '/api/igdb/games');
+    assert.equal(apiFetch.mock.calls[0][1].method, 'POST');
 
-    expect(apiFetch.mock.calls[0][1].body).toContain(
+    assert.deepEqual(apiFetch.mock.calls[0][1].headers, {
+      'Content-Type': 'text/plain',
+    });
+
+    assert.include(
+      apiFetch.mock.calls[0][1].body,
       'search "The Legend of Zelda"'
     );
 
-    expect(apiFetch.mock.calls[0][1].body).toContain('limit 20');
+    assert.include(apiFetch.mock.calls[0][1].body, 'limit 20');
   });
 
   test('searchGameSeries busca colecciones y limpia comillas dobles', async () => {
@@ -115,23 +112,21 @@ describe('IGDB services', () => {
 
     const result = await searchGameSeries('Final "Fantasy"');
 
-    expect(result).toEqual(seriesMock);
+    assert.deepEqual(result, seriesMock);
 
-    expect(apiFetch).toHaveBeenCalledWith(
-      '/api/igdb/collections',
-      expect.objectContaining({
-        method: 'POST',
-        headers: {
-          'Content-Type': 'text/plain',
-        },
-      })
-    );
+    assert.equal(apiFetch.mock.calls[0][0], '/api/igdb/collections');
+    assert.equal(apiFetch.mock.calls[0][1].method, 'POST');
 
-    expect(apiFetch.mock.calls[0][1].body).toContain(
+    assert.deepEqual(apiFetch.mock.calls[0][1].headers, {
+      'Content-Type': 'text/plain',
+    });
+
+    assert.include(
+      apiFetch.mock.calls[0][1].body,
       'search "Final Fantasy"'
     );
 
-    expect(apiFetch.mock.calls[0][1].body).toContain('limit 5');
+    assert.include(apiFetch.mock.calls[0][1].body, 'limit 5');
   });
 
   test('fetchGameDetail retorna el primer resultado', async () => {
@@ -146,20 +141,17 @@ describe('IGDB services', () => {
 
     const result = await fetchGameDetail(3498);
 
-    expect(result).toEqual(detailMock[0]);
+    assert.deepEqual(result, detailMock[0]);
 
-    expect(apiFetch).toHaveBeenCalledWith(
-      '/api/igdb/games',
-      expect.objectContaining({
-        method: 'POST',
-        headers: {
-          'Content-Type': 'text/plain',
-        },
-      })
-    );
+    assert.equal(apiFetch.mock.calls[0][0], '/api/igdb/games');
+    assert.equal(apiFetch.mock.calls[0][1].method, 'POST');
 
-    expect(apiFetch.mock.calls[0][1].body).toContain('where id = 3498');
-    expect(apiFetch.mock.calls[0][1].body).toContain('limit 1');
+    assert.deepEqual(apiFetch.mock.calls[0][1].headers, {
+      'Content-Type': 'text/plain',
+    });
+
+    assert.include(apiFetch.mock.calls[0][1].body, 'where id = 3498');
+    assert.include(apiFetch.mock.calls[0][1].body, 'limit 1');
   });
 
   test('fetchGameDetail retorna null si no encuentra resultados', async () => {
@@ -167,7 +159,7 @@ describe('IGDB services', () => {
 
     const result = await fetchGameDetail(9999);
 
-    expect(result).toBeNull();
+    assert.isNull(result);
   });
 
   test('fetchGameDetail retorna null si apiFetch retorna undefined', async () => {
@@ -175,6 +167,6 @@ describe('IGDB services', () => {
 
     const result = await fetchGameDetail(9999);
 
-    expect(result).toBeNull();
+    assert.isNull(result);
   });
 });
