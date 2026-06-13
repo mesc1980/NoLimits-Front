@@ -46,3 +46,6 @@ coverage/
 # ── Playwright ────────────────────────────────────────────────────
 test-results/
 playwright-report/
+
+# ── Evidencias ───────────────────────────────────────────────
+evidencias/
