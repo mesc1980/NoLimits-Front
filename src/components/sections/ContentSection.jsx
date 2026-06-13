@@ -110,14 +110,14 @@ function ContentSection({
 
       <div className="container">
         {/* Skeleton */}
-        {isLoading && (
+        {(isLoading || (error && !obras?.length)) && (
           <div className={resolvedGrid}>
             <SkeletonCard count={Math.min(limit, 5)} />
           </div>
         )}
 
         {/* Error */}
-        {error && !isLoading && (
+        {error && !isLoading && !obras?.length && (
           <p style={{ color: 'white', fontFamily: 'var(--font-mono)', fontSize: '12px', padding: 'var(--space-4) 0' }}>
             No se pudo cargar esta sección.
           </p>
