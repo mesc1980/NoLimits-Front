@@ -29,9 +29,14 @@ export function useTopAnime() {
     queryKey: ['jikan', 'top-anime'],
     queryFn: async () => {
       const res = await fetchTopAnime();
+      if (!res?.data?.length) {
+        throw new Error('Jikan no devolvió datos — reintentando…');
+      }
       return res.data.map(normalizeJikanAnime);
     },
     staleTime: STALE_TIME,
+    retry: 3,
+    retryDelay: (attempt) => Math.min(1000 * 2 ** attempt, 10000),
   });
 }
 
