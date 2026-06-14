@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from "../lib/supabase";
 
 import { Eye, EyeOff } from "lucide-react";
 const API_BASE =
@@ -62,7 +61,7 @@ export default function ResetPassword() {
     setTimeout(() => {
         navigate('/login');
     }, 1500);
-    } catch (err) {
+    } catch {
       setError('Ocurrió un error.');
     } finally {
       setLoading(false);

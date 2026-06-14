@@ -9,6 +9,7 @@ import js from '@eslint/js'
 import globals from 'globals'
 import reactHooks from 'eslint-plugin-react-hooks'
 import reactRefresh from 'eslint-plugin-react-refresh'
+import security from 'eslint-plugin-security'
 import { defineConfig, globalIgnores } from 'eslint/config'
 
 // defineConfig permite estructurar la configuración moderna de ESLint
@@ -23,6 +24,7 @@ export default defineConfig([
   {
     // Archivos a los que se aplicará esta configuración
     files: ['**/*.{js,jsx}'],
+    plugins: { security },
 
     // ---------------------------------
     // Configuraciones base recomendadas
@@ -31,6 +33,7 @@ export default defineConfig([
       js.configs.recommended,                     // Reglas básicas de JavaScript
       reactHooks.configs['recommended-latest'],   // Buenas prácticas para React Hooks
       reactRefresh.configs.vite,                  // Soporte para React Fast Refresh con Vite
+      security.configs.recommended,
     ],
 
     // ---------------------------------

@@ -193,7 +193,7 @@ function ChatBot() {
     e?.preventDefault();
     if (!input.trim() || thinking) return;
 
-    const userText = input.trim();
+    const userText = input.trim().slice(0, 500);
     setInput('');
 
     setMessages((prev) => [
