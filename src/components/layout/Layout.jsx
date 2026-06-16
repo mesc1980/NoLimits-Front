@@ -40,61 +40,6 @@ function Layout() {
     }
   }, [theme]);
 
-  // Edge scroll — se detiene si el mouse está sobre el navbar (Header)
-  useEffect(() => {
-    const ZONE = 150;
-    const MAX_SPEED = 20;
-    const MIN_SPEED = 5;
-    let currentSpeed = 0;
-    let animFrame;
-
-    function scrollLoop() {
-      if (currentSpeed !== 0) {
-        window.scrollBy(0, currentSpeed);
-      }
-      animFrame = requestAnimationFrame(scrollLoop);
-    }
-    animFrame = requestAnimationFrame(scrollLoop);
-
-    function onMouseMove(e) {
-      const h = window.innerHeight;
-      const y = e.clientY;
-
-      // Detectar si el mouse está sobre el header/navbar
-      const headerEl = document.querySelector('header');
-      if (headerEl) {
-        const rect = headerEl.getBoundingClientRect();
-        if (e.clientY >= rect.top && e.clientY <= rect.bottom) {
-          currentSpeed = 0;
-          return;
-        }
-      }
-
-      if (y > h - ZONE) {
-        const ratio = (y - (h - ZONE)) / ZONE;
-        currentSpeed = MIN_SPEED + ratio * (MAX_SPEED - MIN_SPEED);
-      } else if (y < ZONE) {
-        const ratio = (ZONE - y) / ZONE;
-        currentSpeed = -(MIN_SPEED + ratio * (MAX_SPEED - MIN_SPEED));
-      } else {
-        currentSpeed = 0;
-      }
-    }
-
-    function onMouseLeave() {
-      currentSpeed = 0;
-    }
-
-    document.addEventListener('mousemove', onMouseMove);
-    document.addEventListener('mouseleave', onMouseLeave);
-
-    return () => {
-      cancelAnimationFrame(animFrame);
-      document.removeEventListener('mousemove', onMouseMove);
-      document.removeEventListener('mouseleave', onMouseLeave);
-    };
-  }, []);
-
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       <ScrollToTop />
