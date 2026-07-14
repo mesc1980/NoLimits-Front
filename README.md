@@ -122,7 +122,7 @@ Entre ellas destacan:
 La siguiente imagen representa la arquitectura general del frontend de **NoLimits**, desarrollado con **React** y **Vite**, comunicándose mediante una API REST con el backend implementado en Spring Boot.
 
 <p align="center">
-<img src="docs/images/arquitectura-frontend-nolimits.png" width="900">
+  <img src="docs/images/Arquitectura-Front-NoLimits.png" width="900">
 </p>
 
 La arquitectura del frontend está organizada mediante componentes reutilizables, rutas protegidas, servicios para el consumo de APIs y una separación clara entre la interfaz de usuario y la lógica de negocio.
@@ -136,7 +136,7 @@ La arquitectura del frontend está organizada mediante componentes reutilizables
 La página principal permite explorar películas, series, videojuegos y diferentes sagas mediante una interfaz moderna y responsiva.
 
 <p align="center">
-<img src="docs/images/Paginaprincipal.png" width="900">
+  <img src="docs/images/Paginaprincipal.png.png" width="900">
 </p>
 
 ---
@@ -146,9 +146,9 @@ La página principal permite explorar películas, series, videojuegos y diferent
 La autenticación permite acceder mediante correo electrónico o utilizando una cuenta de Google gracias a la integración con Supabase Authentication.
 
 <p align="center">
-<img src="docs/images/Iniciodesesion.png" width="700">
+  <img src="docs/images/Iniciodesesion.png.png" width="500
 </p>
-
+    
 ---
 
 ## 👤 Perfil del usuario
@@ -166,17 +166,7 @@ Los usuarios pueden administrar su información personal, actualizar su fotograf
 Vista destinada a la administración y visualización de productos disponibles dentro de la plataforma.
 
 <p align="center">
-<img src="docs/images/Gestión de productos.png" width="900">
-</p>
-
----
-
-## 📄 Consumo de la API (Swagger)
-
-El frontend consume la API REST documentada mediante Swagger/OpenAPI, facilitando la integración entre ambas aplicaciones.
-
-<p align="center">
-<img src="docs/images/Swagger.png" width="900">
+<img src="docs/images/Gestióndeproductos.png" width="900">
 </p>
 
 ---
