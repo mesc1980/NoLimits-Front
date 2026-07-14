@@ -166,7 +166,7 @@ Los usuarios pueden administrar su información personal, actualizar su fotograf
 Vista destinada a la administración y visualización de productos disponibles dentro de la plataforma.
 
 <p align="center">
-<img src="docs/images/Gestióndeproductos.png" width="900">
+<img src="docs/images/Gestiondeproductos.png" width="900">
 </p>
 
 ---
