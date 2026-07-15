@@ -136,7 +136,7 @@ La arquitectura del frontend está organizada mediante componentes reutilizables
 La página principal permite explorar películas, series, videojuegos y diferentes sagas mediante una interfaz moderna y responsiva.
 
 <p align="center">
-  <img src="docs/images/Paginaprincipal.png.png" width="900">
+  <img src="docs/images/Paginaprincipal.png" width="900">
 </p>
 
 ---
@@ -146,7 +146,7 @@ La página principal permite explorar películas, series, videojuegos y diferent
 La autenticación permite acceder mediante correo electrónico o utilizando una cuenta de Google gracias a la integración con Supabase Authentication.
 
 <p align="center">
-  <img src="docs/images/Iniciodesesion.png.png" width="500
+  <img src="docs/images/Iniciodesesion.png" width="500"
 </p>
     
 ---
